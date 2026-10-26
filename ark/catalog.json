@@ -1,0 +1,3170 @@
+{
+  "dataset_version": "base-game-en-v1-transcription-2026-07-14",
+  "source_notes": [
+    "English rulebook v1",
+    "official Sanctuary Scorer tile images and scoring output"
+  ],
+  "achievement_markers": {
+    "thresholds": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "points": [
+      5,
+      7,
+      10,
+      14
+    ]
+  },
+  "open_area": {
+    "points": 1,
+    "physical_face": "reverse side of any tile"
+  },
+  "tiles": [
+    {
+      "tile_id": "001",
+      "name": "Lion",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "predator": 1,
+        "africa": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "predator",
+        "multiplier": 2,
+        "connected": false
+      },
+      "source_image_id": 1,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "lion"
+    },
+    {
+      "tile_id": "002",
+      "name": "Lion",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "predator": 1,
+        "africa": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "predator",
+        "multiplier": 2,
+        "connected": false
+      },
+      "source_image_id": 2,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "lion"
+    },
+    {
+      "tile_id": "003",
+      "name": "Australian Dingo",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "predator": 1,
+        "australia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "predator",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 3,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "australian-dingo"
+    },
+    {
+      "tile_id": "004",
+      "name": "Australian Dingo",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "predator": 1,
+        "australia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "predator",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 4,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "australian-dingo"
+    },
+    {
+      "tile_id": "005",
+      "name": "Eurasian Otter",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "predator": 1,
+        "europe": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "water",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 5,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "eurasian-otter"
+    },
+    {
+      "tile_id": "006",
+      "name": "Eurasian Otter",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "predator": 1,
+        "europe": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "water",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 6,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "eurasian-otter"
+    },
+    {
+      "tile_id": "007",
+      "name": "Caracal",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "predator": 1,
+        "africa": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 3
+      },
+      "source_image_id": 7,
+      "audit_flags": [],
+      "immediate_effect": "draw 3 tiles from the pile; keep 1 Animal",
+      "open_area_edges": [
+        "lower-left"
+      ]
+    },
+    {
+      "tile_id": "008",
+      "name": "Australian Sea Lion",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "predator": 1,
+        "australia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "predator",
+        "multiplier": 2,
+        "connected": false
+      },
+      "source_image_id": 8,
+      "audit_flags": [],
+      "immediate_effect": "draw 3 tiles from the pile; keep 1 Animal",
+      "open_area_edges": [
+        "top"
+      ]
+    },
+    {
+      "tile_id": "009",
+      "name": "Eurasian Brown Bear",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "predator": 1,
+        "europe": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 9,
+      "audit_flags": [],
+      "immediate_effect": "take all Projects from the display",
+      "open_area_edges": [
+        "top"
+      ]
+    },
+    {
+      "tile_id": "010",
+      "name": "Sumatran Tiger",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "predator": 1,
+        "asia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 10,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "sumatran-tiger",
+      "immediate_effect": "gain 1 conservation marker",
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 1
+      },
+      "open_area_edges": [
+        "upper-left",
+        "upper-right"
+      ]
+    },
+    {
+      "tile_id": "011",
+      "name": "Sumatran Tiger",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "predator": 1,
+        "asia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 11,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "sumatran-tiger",
+      "immediate_effect": "gain 1 conservation marker",
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 1
+      },
+      "open_area_edges": [
+        "lower-left",
+        "lower-right"
+      ]
+    },
+    {
+      "tile_id": "012",
+      "name": "Jaguar",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "predator": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 7
+      },
+      "source_image_id": 12,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "jaguar",
+      "immediate_effect": "draw 3 tiles from the pile; keep 1 Animal",
+      "open_area_edges": [
+        "lower-left"
+      ]
+    },
+    {
+      "tile_id": "013",
+      "name": "Jaguar",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "predator": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 7
+      },
+      "source_image_id": 13,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "jaguar",
+      "immediate_effect": "draw 3 tiles from the pile; keep 1 Animal",
+      "open_area_edges": [
+        "upper-right"
+      ]
+    },
+    {
+      "tile_id": "014",
+      "name": "Great Hornbill",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "bird": 1,
+        "asia": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "asia",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 14,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "015",
+      "name": "Laughing Kookaburra",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "bird": 1,
+        "australia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "australia",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 15,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "016",
+      "name": "Toco Toucan",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "bird": 1,
+        "americas": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "americas",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 16,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "017",
+      "name": "Snowy Owl",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "bird": 1,
+        "europe": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "europe",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 17,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "018",
+      "name": "Common Ostrich",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "bird": 1,
+        "africa": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 18,
+      "audit_flags": [],
+      "immediate_effect": "place 2 Open Areas from the pile in your zoo"
+    },
+    {
+      "tile_id": "019",
+      "name": "Greater Flamingo",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "bird": 1,
+        "africa": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "africa",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 19,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "020",
+      "name": "White Stork",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "bird": 1,
+        "europe": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "open",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 20,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "white-stork"
+    },
+    {
+      "tile_id": "021",
+      "name": "White Stork",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "bird": 1,
+        "europe": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "open",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 21,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "white-stork",
+      "immediate_effect": "place 1 Open Area from the pile in your zoo"
+    },
+    {
+      "tile_id": "022",
+      "name": "Scarlet Macaw",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "bird": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 22,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "scarlet-macaw"
+    },
+    {
+      "tile_id": "023",
+      "name": "Scarlet Macaw",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "bird": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 23,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "scarlet-macaw"
+    },
+    {
+      "tile_id": "024",
+      "name": "Australian Pelican",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "bird": 1,
+        "australia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 24,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "australian-pelican",
+      "immediate_effect": "place 1 Open Area from the pile in your zoo"
+    },
+    {
+      "tile_id": "025",
+      "name": "Australian Pelican",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "bird": 1,
+        "australia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 25,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "australian-pelican",
+      "immediate_effect": "place 1 Open Area from the pile in your zoo"
+    },
+    {
+      "tile_id": "026",
+      "name": "Green Peafowl",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "bird": 1,
+        "asia": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "project",
+        "multiplier": 3,
+        "connected": false
+      },
+      "source_image_id": 26,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "027",
+      "name": "Giant Panda",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "asia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 9
+      },
+      "source_image_id": 27,
+      "audit_flags": [],
+      "immediate_effect": "take all Buildings from the display",
+      "open_area_edges": [
+        "top",
+        "upper-right",
+        "lower-right"
+      ]
+    },
+    {
+      "tile_id": "028",
+      "name": "Indian Rhinoceros",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "asia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "building",
+        "multiplier": 2,
+        "connected": false
+      },
+      "source_image_id": 28,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "indian-rhinoceros",
+      "open_area_edges": [
+        "upper-left"
+      ]
+    },
+    {
+      "tile_id": "029",
+      "name": "Indian Rhinoceros",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "asia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "building",
+        "multiplier": 2,
+        "connected": false
+      },
+      "source_image_id": 29,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "indian-rhinoceros",
+      "open_area_edges": [
+        "upper-right"
+      ]
+    },
+    {
+      "tile_id": "030",
+      "name": "African Bush Elephant",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "africa": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 10
+      },
+      "source_image_id": 30,
+      "audit_flags": [],
+      "open_area_edges": [
+        "upper-left",
+        "lower-left",
+        "lower-right"
+      ]
+    },
+    {
+      "tile_id": "031",
+      "name": "Alpine Ibex",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "europe": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "mountain",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 31,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "alpine-ibex"
+    },
+    {
+      "tile_id": "032",
+      "name": "Alpine Ibex",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "europe": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "mountain",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 32,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "alpine-ibex"
+    },
+    {
+      "tile_id": "033",
+      "name": "Red-necked Wallaby",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "australia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 3
+      },
+      "source_image_id": 33,
+      "audit_flags": [],
+      "immediate_effect": "discard up to 2 tiles; gain 1 pouch marker for each",
+      "marker_reward": {
+        "type": "pouch",
+        "amount_per_discard": 1,
+        "maximum_discards": 2
+      }
+    },
+    {
+      "tile_id": "034",
+      "name": "Capybara",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "americas": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 34,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "capybara"
+    },
+    {
+      "tile_id": "035",
+      "name": "Capybara",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "americas": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 35,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "capybara"
+    },
+    {
+      "tile_id": "036",
+      "name": "Northern Giraffe",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "africa": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 7
+      },
+      "source_image_id": 36,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "northern-giraffe",
+      "immediate_effect": "take 1 Building from the display",
+      "open_area_edges": [
+        "upper-right"
+      ]
+    },
+    {
+      "tile_id": "037",
+      "name": "Northern Giraffe",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "africa": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 7
+      },
+      "source_image_id": 37,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "northern-giraffe",
+      "immediate_effect": "take 1 Building from the display",
+      "open_area_edges": [
+        "lower-left"
+      ]
+    },
+    {
+      "tile_id": "038",
+      "name": "Koala",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "australia": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 5
+      },
+      "source_image_id": 38,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "koala",
+      "immediate_effect": "discard up to 2 tiles; gain 1 pouch marker for each",
+      "marker_reward": {
+        "type": "pouch",
+        "amount_per_discard": 1,
+        "maximum_discards": 2
+      }
+    },
+    {
+      "tile_id": "039",
+      "name": "Koala",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "herbivore": 1,
+        "australia": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 5
+      },
+      "source_image_id": 39,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "koala",
+      "immediate_effect": "discard up to 2 tiles; gain 1 pouch marker for each",
+      "marker_reward": {
+        "type": "pouch",
+        "amount_per_discard": 1,
+        "maximum_discards": 2
+      }
+    },
+    {
+      "tile_id": "040",
+      "name": "Thorny Devil",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "reptile": 1,
+        "australia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 40,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "thorny-devil"
+    },
+    {
+      "tile_id": "041",
+      "name": "Thorny Devil",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "reptile": 1,
+        "australia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 41,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "thorny-devil"
+    },
+    {
+      "tile_id": "042",
+      "name": "Chinese Water Dragon",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "reptile": 1,
+        "asia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "water",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 42,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "043",
+      "name": "Galápagos Giant Tortoise",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "reptile": 1,
+        "americas": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 7
+      },
+      "source_image_id": 43,
+      "audit_flags": [],
+      "immediate_effect": "gain 1 conservation marker",
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 1
+      }
+    },
+    {
+      "tile_id": "044",
+      "name": "Nile Crocodile",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "reptile": 1,
+        "africa": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 44,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "nile-crocodile",
+      "immediate_effect": "take 1 tile from the display",
+      "open_area_edges": [
+        "upper-left"
+      ]
+    },
+    {
+      "tile_id": "045",
+      "name": "Nile Crocodile",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "reptile": 1,
+        "africa": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 45,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "nile-crocodile",
+      "immediate_effect": "take 1 tile from the display",
+      "open_area_edges": [
+        "lower-right"
+      ]
+    },
+    {
+      "tile_id": "046",
+      "name": "Green Iguana",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "reptile": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 46,
+      "audit_flags": [],
+      "immediate_effect": "take 1 tile from the display"
+    },
+    {
+      "tile_id": "047",
+      "name": "American Anole",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "reptile": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "forest",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 47,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "048",
+      "name": "European Pond Turtle",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "reptile": 1,
+        "europe": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 2
+      },
+      "source_image_id": 48,
+      "audit_flags": [],
+      "immediate_effect": "gain 1 conservation marker",
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 1
+      }
+    },
+    {
+      "tile_id": "049",
+      "name": "Common Wall Lizard",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "reptile": 1,
+        "europe": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "mountain",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 49,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "050",
+      "name": "Indian Python",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "reptile": 1,
+        "asia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 50,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "indian-python",
+      "immediate_effect": "relocate 1 tile in your zoo"
+    },
+    {
+      "tile_id": "051",
+      "name": "Indian Python",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "reptile": 1,
+        "asia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 51,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "indian-python",
+      "immediate_effect": "relocate 1 tile in your zoo"
+    },
+    {
+      "tile_id": "052",
+      "name": "Inland Taipan",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "reptile": 1,
+        "australia": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 52,
+      "audit_flags": [],
+      "immediate_effect": "relocate 1 tile in your zoo"
+    },
+    {
+      "tile_id": "053",
+      "name": "Barbary Macaque",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "primate": 1,
+        "europe": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 5
+      },
+      "source_image_id": 53,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "barbary-macaque",
+      "immediate_effect": "move 1 Action to strength 1"
+    },
+    {
+      "tile_id": "054",
+      "name": "Barbary Macaque",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "primate": 1,
+        "europe": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 5
+      },
+      "source_image_id": 54,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "barbary-macaque",
+      "immediate_effect": "move 1 Action to strength 1"
+    },
+    {
+      "tile_id": "055",
+      "name": "Guiana Spider Monkey",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "primate": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-hand-tile",
+        "multiplier": 2
+      },
+      "source_image_id": 55,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "guiana-spider-monkey",
+      "immediate_effect": "gain 1 conservation marker",
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 1
+      },
+      "open_area_edges": [
+        "top",
+        "lower-left"
+      ]
+    },
+    {
+      "tile_id": "056",
+      "name": "Guiana Spider Monkey",
+      "kind": "animal",
+      "level": 5,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "primate": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-hand-tile",
+        "multiplier": 2
+      },
+      "source_image_id": 56,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "guiana-spider-monkey",
+      "immediate_effect": "gain 1 conservation marker",
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 1
+      },
+      "open_area_edges": [
+        "top",
+        "upper-right"
+      ]
+    },
+    {
+      "tile_id": "057",
+      "name": "Hamadryas Baboon",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "primate": 1,
+        "africa": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 57,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "hamadryas-baboon",
+      "immediate_effect": "draw 1 tile from the pile",
+      "open_area_edges": [
+        "upper-right",
+        "lower-left"
+      ]
+    },
+    {
+      "tile_id": "058",
+      "name": "Hamadryas Baboon",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "rock"
+      ],
+      "icons": {
+        "primate": 1,
+        "africa": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 58,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "hamadryas-baboon",
+      "immediate_effect": "draw 1 tile from the pile",
+      "open_area_edges": [
+        "upper-right",
+        "lower-left"
+      ]
+    },
+    {
+      "tile_id": "059",
+      "name": "Japanese Macaque",
+      "kind": "animal",
+      "level": 4,
+      "habitats": [
+        "water"
+      ],
+      "icons": {
+        "primate": 1,
+        "asia": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 59,
+      "audit_flags": [],
+      "immediate_effect": "draw 2 tiles from the pile",
+      "open_area_edges": [
+        "upper-right"
+      ]
+    },
+    {
+      "tile_id": "060",
+      "name": "Dusky Leaf Monkey",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "primate": 1,
+        "asia": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "forest",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 60,
+      "audit_flags": [],
+      "sex": "female",
+      "pair_key": "dusky-leaf-monkey"
+    },
+    {
+      "tile_id": "061",
+      "name": "Dusky Leaf Monkey",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "primate": 1,
+        "asia": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "forest",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 61,
+      "audit_flags": [],
+      "sex": "male",
+      "pair_key": "dusky-leaf-monkey"
+    },
+    {
+      "tile_id": "062",
+      "name": "Mantled Guereza",
+      "kind": "animal",
+      "level": 3,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "primate": 1,
+        "africa": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 62,
+      "audit_flags": [],
+      "immediate_effect": "move 1 Action to strength 1",
+      "open_area_edges": [
+        "upper-left"
+      ]
+    },
+    {
+      "tile_id": "063",
+      "name": "Squirrel Monkey",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest"
+      ],
+      "icons": {
+        "primate": 1,
+        "americas": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-hand-tile",
+        "multiplier": 1
+      },
+      "source_image_id": 63,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "064",
+      "name": "Minipig",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "pet": 1
+      },
+      "scoring": {
+        "type": "pet-set",
+        "table": {
+          "1": 3,
+          "2": 9,
+          "3+": 18
+        }
+      },
+      "source_image_id": 64,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "065",
+      "name": "Donkey",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "pet": 1
+      },
+      "scoring": {
+        "type": "pet-set",
+        "table": {
+          "1": 3,
+          "2": 9,
+          "3+": 18
+        }
+      },
+      "source_image_id": 65,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "066",
+      "name": "Sheep",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "pet": 1
+      },
+      "scoring": {
+        "type": "pet-set",
+        "table": {
+          "1": 3,
+          "2": 9,
+          "3+": 18
+        }
+      },
+      "source_image_id": 66,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "067",
+      "name": "Pony",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "pet": 1
+      },
+      "scoring": {
+        "type": "pet-set",
+        "table": {
+          "1": 3,
+          "2": 9,
+          "3+": 18
+        }
+      },
+      "source_image_id": 67,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "068",
+      "name": "Goat",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "pet": 1
+      },
+      "scoring": {
+        "type": "pet-set",
+        "table": {
+          "1": 3,
+          "2": 9,
+          "3+": 18
+        }
+      },
+      "source_image_id": 68,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "069",
+      "name": "Alpaca",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "pet": 1
+      },
+      "scoring": {
+        "type": "pet-set",
+        "table": {
+          "1": 3,
+          "2": 9,
+          "3+": 18
+        }
+      },
+      "source_image_id": 69,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "070",
+      "name": "Domestic Rabbit",
+      "kind": "animal",
+      "level": 2,
+      "habitats": [
+        "forest",
+        "water",
+        "rock"
+      ],
+      "icons": {
+        "pet": 1
+      },
+      "scoring": {
+        "type": "pet-set",
+        "table": {
+          "1": 3,
+          "2": 9,
+          "3+": 18
+        }
+      },
+      "source_image_id": 70,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "071",
+      "name": "Hydrologist",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "water",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 71,
+      "audit_flags": [],
+      "ongoing_effect": "tiles with a water icon require 1 less action strength",
+      "level_discount": {
+        "amount": 1,
+        "matching_icon": "water",
+        "applies_to": "any-level-tile"
+      }
+    },
+    {
+      "tile_id": "072",
+      "name": "Geologist",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "mountain",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 72,
+      "audit_flags": [],
+      "ongoing_effect": "tiles with a rock icon require 1 less action strength",
+      "level_discount": {
+        "amount": 1,
+        "matching_icon": "rock",
+        "applies_to": "any-level-tile"
+      }
+    },
+    {
+      "tile_id": "073",
+      "name": "Dendrologist",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "forest": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "forest",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 73,
+      "audit_flags": [],
+      "ongoing_effect": "tiles with a forest icon require 1 less action strength",
+      "level_discount": {
+        "amount": 1,
+        "matching_icon": "forest",
+        "applies_to": "any-level-tile"
+      }
+    },
+    {
+      "tile_id": "074",
+      "name": "Expert in Predators",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "predator": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "predator",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 74,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a predator icon: draw 3 tiles from the pile; keep 1 Animal"
+    },
+    {
+      "tile_id": "075",
+      "name": "Herpetologist",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "reptile": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "reptile",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 75,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a reptile icon: take 1 tile from the display"
+    },
+    {
+      "tile_id": "076",
+      "name": "Primatologist",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "primate": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "primate",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 76,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a primate icon: relocate 1 tile in your zoo"
+    },
+    {
+      "tile_id": "077",
+      "name": "Expert in Herbivores",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "herbivore": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "herbivore",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 77,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a herbivore icon: take 1 Building from the display"
+    },
+    {
+      "tile_id": "078",
+      "name": "Ornithologist",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "bird": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "bird",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 78,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a bird icon: place 1 Open Area from the pile in your zoo"
+    },
+    {
+      "tile_id": "079",
+      "name": "Expert in Small Animals",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 0
+      },
+      "source_image_id": 79,
+      "audit_flags": [],
+      "ongoing_effect": "tiles of level 2 or 3 require 1 less action strength",
+      "level_discount": {
+        "amount": 1,
+        "matching_levels": [
+          2,
+          3
+        ],
+        "applies_to": "any-level-tile"
+      },
+      "immediate_effect": "take 1 Small Animal from the display"
+    },
+    {
+      "tile_id": "080",
+      "name": "Expert in Large Animals",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 0
+      },
+      "source_image_id": 80,
+      "audit_flags": [],
+      "ongoing_effect": "tiles of level 4 or 5 require 1 less action strength",
+      "level_discount": {
+        "amount": 1,
+        "matching_levels": [
+          4,
+          5
+        ],
+        "applies_to": "any-level-tile"
+      },
+      "immediate_effect": "take 1 Large Animal from the display"
+    },
+    {
+      "tile_id": "081",
+      "name": "Partner Zoo Africa",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "africa": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 0
+      },
+      "source_image_id": 81,
+      "audit_flags": [],
+      "ongoing_effect": "tiles with an africa icon require 2 less action strength",
+      "level_discount": {
+        "amount": 2,
+        "matching_icon": "africa",
+        "applies_to": "any-level-tile"
+      },
+      "immediate_effect": "take 1 tile with an africa icon from the display"
+    },
+    {
+      "tile_id": "082",
+      "name": "Partner Zoo Asia",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "asia": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 0
+      },
+      "source_image_id": 82,
+      "audit_flags": [],
+      "ongoing_effect": "tiles with an asia icon require 2 less action strength",
+      "level_discount": {
+        "amount": 2,
+        "matching_icon": "asia",
+        "applies_to": "any-level-tile"
+      },
+      "immediate_effect": "take 1 tile with an asia icon from the display"
+    },
+    {
+      "tile_id": "083",
+      "name": "Partner Zoo Europe",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "europe": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 0
+      },
+      "source_image_id": 83,
+      "audit_flags": [],
+      "ongoing_effect": "tiles with an europe icon require 2 less action strength",
+      "level_discount": {
+        "amount": 2,
+        "matching_icon": "europe",
+        "applies_to": "any-level-tile"
+      },
+      "immediate_effect": "take 1 tile with an europe icon from the display"
+    },
+    {
+      "tile_id": "084",
+      "name": "Partner Zoo Americas",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "americas": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 0
+      },
+      "source_image_id": 84,
+      "audit_flags": [],
+      "ongoing_effect": "tiles with an americas icon require 2 less action strength",
+      "level_discount": {
+        "amount": 2,
+        "matching_icon": "americas",
+        "applies_to": "any-level-tile"
+      },
+      "immediate_effect": "take 1 tile with an americas icon from the display"
+    },
+    {
+      "tile_id": "085",
+      "name": "Partner Zoo Australia",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "australia": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 0
+      },
+      "source_image_id": 85,
+      "audit_flags": [],
+      "ongoing_effect": "tiles with an australia icon require 2 less action strength",
+      "level_discount": {
+        "amount": 2,
+        "matching_icon": "australia",
+        "applies_to": "any-level-tile"
+      },
+      "immediate_effect": "take 1 tile with an australia icon from the display"
+    },
+    {
+      "tile_id": "086",
+      "name": "Amboseli National Park",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "rock": 1,
+        "africa": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 86,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the africa icon",
+      "release_icon": "africa",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "087",
+      "name": "Chitwan National Park",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "water": 1,
+        "asia": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 87,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the asia icon",
+      "release_icon": "asia",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "088",
+      "name": "Yellowstone National Park",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "forest": 1,
+        "americas": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 88,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the americas icon",
+      "release_icon": "americas",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "089",
+      "name": "Lake District National Park",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "water": 1,
+        "europe": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 89,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the europe icon",
+      "release_icon": "europe",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "090",
+      "name": "Port Campbell National Park",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "rock": 1,
+        "australia": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 90,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the australia icon",
+      "release_icon": "australia",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "091",
+      "name": "Canyon",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "water": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 91,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the reptile icon",
+      "release_icon": "reptile",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "092",
+      "name": "Savanna",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "forest": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 92,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the predator icon",
+      "release_icon": "predator",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "093",
+      "name": "Low Mountain Range",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "forest": 1,
+        "rock": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 93,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the bird icon",
+      "release_icon": "bird",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "094",
+      "name": "Jungle",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "forest": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 94,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the primate icon",
+      "release_icon": "primate",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "095",
+      "name": "Bamboo Forest",
+      "kind": "project",
+      "level": 4,
+      "icons": {
+        "project": 1,
+        "forest": 1,
+        "water": 1
+      },
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 95,
+      "audit_flags": [],
+      "placement_requirement": "release 1 Animal with the herbivore icon",
+      "release_icon": "herbivore",
+      "immediate_effect": "gain 2 conservation markers for a released level 2/3 Animal, or 3 for level 4/5",
+      "marker_reward": {
+        "type": "conservation",
+        "by_released_level": {
+          "2-3": 2,
+          "4-5": 3
+        }
+      }
+    },
+    {
+      "tile_id": "096",
+      "name": "Bird Breeding",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "bird": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "bird",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 96,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "097",
+      "name": "Herbivore Breeding",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "herbivore": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "herbivore",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 97,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "098",
+      "name": "Primate Breeding",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "primate": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "primate",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 98,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "099",
+      "name": "Predator Breeding",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "predator": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "predator",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 99,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "100",
+      "name": "Reptile Breeding",
+      "kind": "project",
+      "level": 3,
+      "icons": {
+        "project": 1,
+        "reptile": 1
+      },
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "reptile",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 100,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "101",
+      "name": "Outback Area",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "australia": 1
+      },
+      "placement_requirement": "next to 2 australia icons",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "australia",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 101,
+      "audit_flags": [],
+      "habitats": [
+        "rock"
+      ]
+    },
+    {
+      "tile_id": "102",
+      "name": "Alpine Area",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "europe": 1
+      },
+      "placement_requirement": "next to 2 europe icons",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "europe",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 102,
+      "audit_flags": [],
+      "habitats": [
+        "rock"
+      ]
+    },
+    {
+      "tile_id": "103",
+      "name": "Sumatra Area",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "asia": 1
+      },
+      "placement_requirement": "next to 2 asia icons",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "asia",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 103,
+      "audit_flags": [],
+      "habitats": [
+        "forest"
+      ]
+    },
+    {
+      "tile_id": "104",
+      "name": "Okavango Area",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "africa": 1
+      },
+      "placement_requirement": "next to 2 africa icons",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "africa",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 104,
+      "audit_flags": [],
+      "habitats": [
+        "forest"
+      ]
+    },
+    {
+      "tile_id": "105",
+      "name": "Amazon Area",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "americas": 1
+      },
+      "placement_requirement": "next to 2 americas icons",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "americas",
+        "multiplier": 2,
+        "connected": true
+      },
+      "source_image_id": 105,
+      "audit_flags": [],
+      "habitats": [
+        "forest"
+      ]
+    },
+    {
+      "tile_id": "106",
+      "name": "Predator House",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "predator": 1
+      },
+      "placement_requirement": "next to 1 predator icon",
+      "scoring": {
+        "type": "per-adjacent-icon",
+        "attribute": "predator",
+        "multiplier": 2
+      },
+      "source_image_id": 106,
+      "audit_flags": [],
+      "habitats": [
+        "rock"
+      ]
+    },
+    {
+      "tile_id": "107",
+      "name": "Primate House",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "primate": 1
+      },
+      "placement_requirement": "next to 1 primate icon",
+      "scoring": {
+        "type": "per-adjacent-icon",
+        "attribute": "primate",
+        "multiplier": 2
+      },
+      "source_image_id": 107,
+      "audit_flags": [],
+      "habitats": [
+        "rock"
+      ]
+    },
+    {
+      "tile_id": "108",
+      "name": "Bird Trees",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "bird": 1
+      },
+      "placement_requirement": "next to 1 bird icon",
+      "scoring": {
+        "type": "per-adjacent-icon",
+        "attribute": "bird",
+        "multiplier": 2
+      },
+      "source_image_id": 108,
+      "audit_flags": [],
+      "habitats": [
+        "forest"
+      ]
+    },
+    {
+      "tile_id": "109",
+      "name": "Reptile House",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "reptile": 1
+      },
+      "placement_requirement": "next to 1 reptile icon",
+      "scoring": {
+        "type": "per-adjacent-icon",
+        "attribute": "reptile",
+        "multiplier": 2
+      },
+      "source_image_id": 109,
+      "audit_flags": [],
+      "habitats": [
+        "forest"
+      ]
+    },
+    {
+      "tile_id": "110",
+      "name": "Herbivore House",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "herbivore": 1
+      },
+      "placement_requirement": "next to 1 herbivore icon",
+      "scoring": {
+        "type": "per-adjacent-icon",
+        "attribute": "herbivore",
+        "multiplier": 2
+      },
+      "source_image_id": 110,
+      "audit_flags": [],
+      "habitats": [
+        "rock"
+      ]
+    },
+    {
+      "tile_id": "111",
+      "name": "Climbing Forest",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "forest": 1
+      },
+      "placement_requirement": "next to a connected Forest area of at least 4 tiles",
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 111,
+      "audit_flags": [],
+      "habitats": [
+        "forest"
+      ]
+    },
+    {
+      "tile_id": "112",
+      "name": "Aerial Cableway",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "rock": 1
+      },
+      "placement_requirement": "next to a connected Rock area of at least 4 tiles",
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 112,
+      "audit_flags": [],
+      "habitats": [
+        "rock"
+      ]
+    },
+    {
+      "tile_id": "113",
+      "name": "Aquarium",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "water": 1
+      },
+      "placement_requirement": "next to a connected Water area of at least 4 tiles",
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 113,
+      "audit_flags": [],
+      "habitats": [
+        "water"
+      ]
+    },
+    {
+      "tile_id": "114",
+      "name": "Water Playground",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "water": 1
+      },
+      "placement_requirement": "next to 2 Water icons",
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 114,
+      "audit_flags": [],
+      "habitats": [
+        "water"
+      ]
+    },
+    {
+      "tile_id": "115",
+      "name": "Tree House",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "forest": 1
+      },
+      "placement_requirement": "next to 2 Forest icons",
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 115,
+      "audit_flags": [],
+      "habitats": [
+        "forest"
+      ]
+    },
+    {
+      "tile_id": "116",
+      "name": "Adventure Playground",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "rock": 1
+      },
+      "placement_requirement": "next to 2 Rock icons",
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 116,
+      "audit_flags": [],
+      "habitats": [
+        "rock"
+      ]
+    },
+    {
+      "tile_id": "117",
+      "name": "Observation Deck",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "rock": 1
+      },
+      "placement_requirement": "next to 4 different adjacent animal and/or continent icons",
+      "scoring": {
+        "type": "per-adjacent-icon",
+        "attribute": "different",
+        "multiplier": 1
+      },
+      "source_image_id": 117,
+      "audit_flags": [],
+      "habitats": [
+        "rock"
+      ]
+    },
+    {
+      "tile_id": "118",
+      "name": "Observation Deck",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "forest": 1
+      },
+      "placement_requirement": "next to 4 different adjacent animal and/or continent icons",
+      "scoring": {
+        "type": "per-adjacent-icon",
+        "attribute": "different",
+        "multiplier": 1
+      },
+      "source_image_id": 118,
+      "audit_flags": [],
+      "habitats": [
+        "forest"
+      ]
+    },
+    {
+      "tile_id": "119",
+      "name": "Observation Deck",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "water": 1
+      },
+      "placement_requirement": "next to 4 different adjacent animal and/or continent icons",
+      "scoring": {
+        "type": "per-adjacent-icon",
+        "attribute": "different",
+        "multiplier": 1
+      },
+      "source_image_id": 119,
+      "audit_flags": [],
+      "habitats": [
+        "water"
+      ]
+    },
+    {
+      "tile_id": "120",
+      "name": "Administration",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "next to 2 Buildings",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "building",
+        "multiplier": 2,
+        "connected": false
+      },
+      "source_image_id": 120,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "121",
+      "name": "Hidden Glass Wall",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "next to 2 Large Animals",
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 121,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "122",
+      "name": "Asia Pavilion",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "asia": 1
+      },
+      "placement_requirement": "by the River",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "asia",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 122,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a asia icon: take 1 Project from the display"
+    },
+    {
+      "tile_id": "123",
+      "name": "Americas Pavilion",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "americas": 1
+      },
+      "placement_requirement": "by the River",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "americas",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 123,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a americas icon: move 1 Action to strength 1"
+    },
+    {
+      "tile_id": "124",
+      "name": "Africa Pavilion",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "africa": 1
+      },
+      "placement_requirement": "by the River",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "africa",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 124,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a africa icon: draw 1 tile from the pile"
+    },
+    {
+      "tile_id": "125",
+      "name": "Europe Pavilion",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "europe": 1
+      },
+      "placement_requirement": "by the River",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "europe",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 125,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a europe icon: take 1 Animal from the display"
+    },
+    {
+      "tile_id": "126",
+      "name": "Australia Pavilion",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "australia": 1
+      },
+      "placement_requirement": "by the River",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "australia",
+        "multiplier": 1,
+        "connected": true
+      },
+      "source_image_id": 126,
+      "audit_flags": [],
+      "ongoing_effect": "after playing a tile with a australia icon: discard 1 tile to gain 1 pouch marker",
+      "marker_reward": {
+        "type": "pouch",
+        "amount": 1,
+        "requires_discard": 1
+      }
+    },
+    {
+      "tile_id": "127",
+      "name": "Park",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "next to 2 placement-bonus spaces",
+      "scoring": {
+        "type": "fixed",
+        "points": 5
+      },
+      "source_image_id": 127,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "128",
+      "name": "Conference Hall",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "project": 1
+      },
+      "placement_requirement": "have 5 different continent icons",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "project",
+        "multiplier": 1,
+        "connected": false
+      },
+      "source_image_id": 128,
+      "audit_flags": [],
+      "immediate_effect": "gain 2 conservation markers",
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 2
+      }
+    },
+    {
+      "tile_id": "129",
+      "name": "Zoo Kitchen",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "have 5 different animal icons",
+      "scoring": {
+        "type": "fixed",
+        "points": 0
+      },
+      "source_image_id": 129,
+      "audit_flags": [],
+      "immediate_effect": "gain 2 conservation markers",
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 2
+      }
+    },
+    {
+      "tile_id": "130",
+      "name": "Exhibition Hall",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "have 10 different animal and/or continent icons",
+      "scoring": {
+        "type": "fixed",
+        "points": 10
+      },
+      "source_image_id": 130,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "131",
+      "name": "Library",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1,
+        "project": 1
+      },
+      "placement_requirement": "next to 2 Projects",
+      "scoring": {
+        "type": "per-attribute",
+        "attribute": "project",
+        "multiplier": 2,
+        "connected": false
+      },
+      "source_image_id": 131,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "132",
+      "name": "Zoo School",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "by the River",
+      "scoring": {
+        "type": "fixed",
+        "points": 4
+      },
+      "source_image_id": 132,
+      "audit_flags": [],
+      "immediate_effect": "take 1 Project from the display; gain 1 conservation marker",
+      "open_area_edges": [
+        "top"
+      ],
+      "marker_reward": {
+        "type": "conservation",
+        "amount": 1
+      }
+    },
+    {
+      "tile_id": "133",
+      "name": "Fountain",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "have tiles on all spaces by the River",
+      "scoring": {
+        "type": "fixed",
+        "points": 6
+      },
+      "source_image_id": 133,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "134",
+      "name": "Excavation Site",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "have at least 7 tiles in hand",
+      "scoring": {
+        "type": "per-hand-tile",
+        "multiplier": 1
+      },
+      "source_image_id": 134,
+      "audit_flags": []
+    },
+    {
+      "tile_id": "135",
+      "name": "Statue",
+      "kind": "building",
+      "level": 0,
+      "icons": {
+        "building": 1
+      },
+      "placement_requirement": "discard 4 tiles",
+      "scoring": {
+        "type": "fixed",
+        "points": 8
+      },
+      "source_image_id": 135,
+      "audit_flags": []
+    }
+  ],
+  "objectives": [
+    {
+      "objective_id": "africa",
+      "icon": "africa"
+    },
+    {
+      "objective_id": "asia",
+      "icon": "asia"
+    },
+    {
+      "objective_id": "europe",
+      "icon": "europe"
+    },
+    {
+      "objective_id": "americas",
+      "icon": "americas"
+    },
+    {
+      "objective_id": "australia",
+      "icon": "australia"
+    },
+    {
+      "objective_id": "predator",
+      "icon": "predator"
+    },
+    {
+      "objective_id": "herbivore",
+      "icon": "herbivore"
+    },
+    {
+      "objective_id": "bird",
+      "icon": "bird"
+    },
+    {
+      "objective_id": "reptile",
+      "icon": "reptile"
+    },
+    {
+      "objective_id": "primate",
+      "icon": "primate"
+    }
+  ]
+}
