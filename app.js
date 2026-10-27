@@ -1,5 +1,8 @@
 import {resolveSelection,toggleMainBall,adjustDiscard,cardAvailability} from './selection.js?v=10';
 import {api,currentUser} from './account-api.js';
+import {summarizeGame,renderGameStats} from './game-stats.js';
+let gameStartedAt=0,gameFinishedAt=0,statsForGame=null;
+const resultsBox=document.createElement('section');resultsBox.className='game-results';resultsBox.hidden=true;resultsBox.setAttribute('aria-label','本局对战统计');document.querySelector('.history-box').before(resultsBox);
 let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
 const accountLink=document.createElement('a');accountLink.href='account.html';accountLink.textContent='登录 / 我的对局';document.querySelector('.game-header-right').append(accountLink);
 const archiveBox=document.createElement('div');archiveBox.className='hint';archiveBox.hidden=true;document.querySelector('.history-box').append(archiveBox);
@@ -71,7 +74,7 @@ function showCardDetail(c){hideZoom();$('#detail-art').replaceChildren(cardSurfa
 function chooseCard(c){if(busy||state?.terminal||state?.current_player!==0)return;selectedCard=selectedCard===c?null:c;selectedDeck=null;chosenBalls.fill(0);pending=null;render();}
 function cardButton(c,cls='card'){
  const b=document.createElement('button');b.className=cls;b.dataset.card=c;b.title=cards[c].name+' · 长按查看';b.setAttribute('aria-label',cards[c].name);
- if(cls==='card')b.append(cardSurface(c));else b.textContent=cards[c].name;
+ if(cls==='card')b.append(cardSurface(c));else {const name=document.createElement('span');name.className='owned-name';name.textContent=cards[c].name;b.append(name);}
  b.onclick=()=>{if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}chooseCard(c);};
  b.onmouseenter=()=>{if(!matchMedia('(hover:hover)').matches)return;zoomTimer=setTimeout(()=>{$('#zoom').replaceChildren(cardSurface(c));$('#zoom').hidden=false;},550);};
  b.onmouseleave=hideZoom;b.onblur=hideZoom;
@@ -203,7 +206,8 @@ function render(){
    if(a.kind===3){const small=document.createElement('small');small.textContent='支付：'+countText(a.payment);b.append(small);}
    b.onclick=()=>{pending=a;render();};options.append(b);});options.scrollTop=oldScroll;
  if(!busy&&!terminal&&!human){const retry=document.createElement('button');retry.className='action';retry.textContent='重试电脑行动';retry.onclick=aiTurns;options.append(retry);}
- if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';archiveComplete();}
+ if(terminal){const viewStats=document.createElement('button');viewStats.className='action';viewStats.textContent='查看本局统计 ↓';viewStats.onclick=()=>resultsBox.scrollIntoView({behavior:'smooth',block:'start'});options.append(viewStats);$('#confirm').textContent='本局已结束';}
+ if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';if(statsForGame!==archiveId){gameFinishedAt=performance.now();renderGameStats(resultsBox,summarizeGame(state,cards,log,gameFinishedAt-gameStartedAt));statsForGame=archiveId;}archiveComplete();}
  else if(busy&&!human)$('#selection').textContent='电脑正在思考，你仍可查看卡牌。';
  else if(pending)showSelection(pending);
  else if(state.phase===1)$('#selection').textContent=`请选择要弃掉的球：${total(chosenBalls)} / ${discardNeed()}。使用球下方的加减按钮调整。`;
@@ -233,6 +237,7 @@ $('#new').onclick=async()=>{
     const owner=await currentUser();
     const m=await send({op:'new',seed:gameSeed,starting_player:first,full:nextDifficulty==='hard'});state=m.result;activeDifficulty=nextDifficulty;activeFirstOption=nextFirstOption;
     archiveOwner=owner;archiveId=crypto.randomUUID();startingPlayer=first;archiveStatus='idle';archiveBox.hidden=true;
+    gameStartedAt=performance.now();gameFinishedAt=0;statsForGame=null;resultsBox.hidden=true;
    log=[];lastAction=null;lastActor=null;$('#history').replaceChildren();if($('#setup-dialog').open)$('#setup-dialog').close();$('#hint').textContent='点选球，或选择一张卡牌。电脑回合仍可长按查看卡牌。';clearSelection();await aiTurns();
  }catch(e){busy=false;syncSetup();$('#new').textContent=state?'开始新对局':'开始对战 ↗';toast(e.message);}
 };
