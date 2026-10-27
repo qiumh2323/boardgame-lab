@@ -1,4 +1,16 @@
 import {resolveSelection,toggleMainBall,adjustDiscard,cardAvailability} from './selection.js?v=10';
+import {api,currentUser} from './account-api.js';
+let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
+const accountLink=document.createElement('a');accountLink.href='account.html';accountLink.textContent='登录 / 我的对局';document.querySelector('.game-header-right').append(accountLink);
+const archiveBox=document.createElement('div');archiveBox.className='hint';archiveBox.hidden=true;document.querySelector('.history-box').append(archiveBox);
+function replayPayload(){return {schema:'pokemon-web-replay-v2',champion:'V32.9',seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,actions:log};}
+async function archiveComplete(){
+ if(!state?.terminal||archiveStatus!=='idle')return;
+ if(!archiveOwner){archiveStatus='guest';archiveBox.hidden=false;archiveBox.textContent='游客对局未上传。登录后新开始的完整对局可自动保存回放。';return;}
+ const savingId=archiveId;archiveStatus='saving';archiveBox.hidden=false;archiveBox.textContent='对局结束，正在校验并保存回放…';
+ try{const result=await api('matches',{owner_id:archiveOwner.id,client_id:archiveId,replay:replayPayload()});if(archiveId!==savingId)return;archiveStatus='saved';const link=document.createElement('a');link.href='replay.html?id='+encodeURIComponent(result.id);link.textContent='查看本局回放 →';archiveBox.replaceChildren(document.createTextNode('完整对局已保存。 '),link);}
+ catch(e){if(archiveId!==savingId)return;archiveStatus='failed';const retry=document.createElement('button');retry.textContent='重试保存';retry.onclick=()=>{archiveStatus='idle';archiveComplete();};archiveBox.replaceChildren(document.createTextNode('未保存：'+e.message+' '),retry);}
+}
 const $=s=>document.querySelector(s),names=['红球','蓝球','黑球','粉球','黄球','大师球'];
 const colors=['red','blue','black','pink','yellow','master'],deckNames=['初级','进阶','高级','稀有','传说'];
 const deckFiles=['tier-1','tier-2','tier-3','rare','legendary'];
@@ -18,7 +30,7 @@ function syncSetup(){
 }
 function engineStatus(message,kind='loading'){
  $('#load-state').textContent=message;$('#engine-indicator').className='engine-indicator '+kind;$('#retry-load').hidden=kind!=='error';
- if(kind==='ready')$('#runtime').textContent='对局不会上传；高难度可能需要更长思考时间。';
+ if(kind==='ready')$('#runtime').textContent='游客对局不上传；登录后新开始的完整对局会保存到个人回放。';
 }
 function openSetup(){
  if(busy)return;
@@ -191,7 +203,7 @@ function render(){
    if(a.kind===3){const small=document.createElement('small');small.textContent='支付：'+countText(a.payment);b.append(small);}
    b.onclick=()=>{pending=a;render();};options.append(b);});options.scrollTop=oldScroll;
  if(!busy&&!terminal&&!human){const retry=document.createElement('button');retry.className='action';retry.textContent='重试电脑行动';retry.onclick=aiTurns;options.append(retry);}
- if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';}
+ if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';archiveComplete();}
  else if(busy&&!human)$('#selection').textContent='电脑正在思考，你仍可查看卡牌。';
  else if(pending)showSelection(pending);
  else if(state.phase===1)$('#selection').textContent=`请选择要弃掉的球：${total(chosenBalls)} / ${discardNeed()}。使用球下方的加减按钮调整。`;
@@ -218,7 +230,9 @@ $('#new').onclick=async()=>{
  if(busy||!engineReady)return;busy=true;syncSetup();$('#new').textContent='正在布置棋盘…';
  try{const nextDifficulty=$('#difficulty').value,nextFirstOption=$('#first').value;gameSeed=crypto.getRandomValues(new Uint32Array(1))[0];
    const first=$('#first').value==='random'?crypto.getRandomValues(new Uint32Array(1))[0]%2:Number($('#first').value);
-   const m=await send({op:'new',seed:gameSeed,starting_player:first,full:nextDifficulty==='hard'});state=m.result;activeDifficulty=nextDifficulty;activeFirstOption=nextFirstOption;
+    const owner=await currentUser();
+    const m=await send({op:'new',seed:gameSeed,starting_player:first,full:nextDifficulty==='hard'});state=m.result;activeDifficulty=nextDifficulty;activeFirstOption=nextFirstOption;
+    archiveOwner=owner;archiveId=crypto.randomUUID();startingPlayer=first;archiveStatus='idle';archiveBox.hidden=true;
    log=[];lastAction=null;lastActor=null;$('#history').replaceChildren();if($('#setup-dialog').open)$('#setup-dialog').close();$('#hint').textContent='点选球，或选择一张卡牌。电脑回合仍可长按查看卡牌。';clearSelection();await aiTurns();
  }catch(e){busy=false;syncSetup();$('#new').textContent=state?'开始新对局':'开始对战 ↗';toast(e.message);}
 };
@@ -228,7 +242,7 @@ $('#confirm').onclick=async()=>{
  try{const m=await send({op:'apply',action:a});state=m.result;addLog(0,a,0);busy=false;clearSelection();await aiTurns();}
  catch(e){busy=false;toast(e.message);render();}
 };
-function exportReplay(){if(!state)return;const blob=new Blob([JSON.stringify({schema:'pokemon-web-replay-v1',champion:'V32.9',seed:gameSeed,difficulty:activeDifficulty,actions:log},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`pokemon-web-${gameSeed}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function exportReplay(){if(!state)return;const blob=new Blob([JSON.stringify(replayPayload(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`pokemon-web-${gameSeed}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('#export').onclick=exportReplay;$('#export-before-leave').onclick=exportReplay;
 $('#open-setup').onclick=openSetup;$('#close-setup').onclick=()=>$('#setup-dialog').close();
 $('#setup-dialog').addEventListener('close',()=>{if(state){$('#difficulty').value=activeDifficulty;$('#first').value=activeFirstOption;syncSetup();}});
