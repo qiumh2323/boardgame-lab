@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="城堡嘉年华非官方浏览器原型：与规则 AI 构筑 3×3 角色阵列。"><meta name="theme-color" content="#17322f"><title>城堡嘉年华 · 路克球的桌游实验室</title><link rel="stylesheet" href="style.css?v=1">
+</head><body>
+<header><a class="back" href="../">← 返回实验室</a><div class="title"><span>非官方轻量原型</span><h1>城堡嘉年华</h1><p>九次招募，拼出你的最高分宫廷。</p></div><button id="rulesBtn" class="ghost">规则</button></header>
+<main>
+ <section class="statusbar" aria-label="对局状态"><div><small>回合</small><strong id="round">1 / 9</strong></div><div class="messenger" id="messenger"><i>♞</i><span>信使在村庄</span></div><div class="resource gold"><small>金币</small><strong id="gold">15</strong></div><div class="resource keys"><small>钥匙</small><strong id="keys">2</strong></div><button id="restart" class="ghost">重新开始</button></section>
+ <section class="markets" aria-label="角色市场">
+  <div class="market castle-market" data-row="castle"><div class="market-label"><span>上城</span><b>城堡</b><button class="key-action" data-action="move" data-row="castle">花 1 🔑 移动信使</button><button class="key-action" data-action="refresh" data-row="castle">花 1 🔑 刷新本行</button></div><div class="market-cards" id="castleMarket"></div></div>
+  <div class="market village-market" data-row="village"><div class="market-label"><span>下城</span><b>村庄</b><button class="key-action" data-action="move" data-row="village">花 1 🔑 移动信使</button><button class="key-action" data-action="refresh" data-row="village">花 1 🔑 刷新本行</button></div><div class="market-cards" id="villageMarket"></div></div>
+ </section>
+ <p class="hint" id="hint">从信使所在的一行选一张牌，再选择阵列中的空位。</p>
+ <section class="boards">
+  <article><div class="board-head"><div><small>你的阵列</small><h2>嘉宾席</h2></div><span id="previewScore">预计 0 分</span></div><div class="grid" id="playerGrid" aria-label="你的 3×3 阵列"></div></article>
+  <article class="ai-panel"><div class="board-head"><div><small>规则 AI</small><h2>对手阵列</h2></div><span id="aiScore">预计 0 分</span></div><div class="grid" id="aiGrid" aria-label="AI 的 3×3 阵列"></div><div class="ai-thought" id="aiThought">AI 正在观察两个市场……</div></article>
+ </section>
+ <section class="log-panel"><h2>宫廷纪事</h2><ol id="log" aria-live="polite"></ol></section>
+</main>
+<dialog id="rules"><button class="close" aria-label="关闭">×</button><p class="kicker">快速规则</p><h2>九张牌，构筑一座宫廷</h2><ol><li>你与 AI 从信使所在的市场购买角色；买牌要支付左上角的金币。</li><li>花 1 把钥匙可以移动信使，或刷新信使所在的一整行。</li><li>买不起时，可免费翻面招募：获得 6 金币和 2 钥匙，但这张牌没有能力与分数。</li><li>角色必须放入 3×3 阵列；即时能力在放置后触发。</li><li>九轮后结算角色条件、钱袋金币和剩余钥匙。最高分获胜。</li></ol><p class="fine">本作是用于 AI 与网页交互实验的非官方简化原型。卡牌名称、数值与图形为原创；没有复制商业版完整牌库。</p></dialog>
+<dialog id="result"><p class="kicker">对局结束</p><h2 id="resultTitle"></h2><div class="scoreline"><div><small>你</small><b id="finalPlayer"></b></div><span>—</span><div><small>AI</small><b id="finalAi"></b></div></div><p id="resultDetail"></p><button id="again" class="primary">再来一局</button></dialog>
+<script type="module" src="game.js?v=1"></script></body></html>

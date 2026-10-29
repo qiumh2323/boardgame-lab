@@ -4,10 +4,11 @@ function showNotes(game){document.querySelector('#experiment-title').textContent
 function gameCard(game){
  const card=el('article','game-card '+game.theme);card.dataset.game=game.id;
  const visual=el('a','game-art');visual.href=game.href;visual.setAttribute('aria-label',`进入${game.title}`);
- visual.append(el('span','exhibit-number',game.number),el('span','exhibit-type',game.theme==='ark'?'栖息地规划':'资源与进化'));
+ visual.append(el('span','exhibit-number',game.number),el('span','exhibit-type',game.type));
  if(game.cover){const img=el('img','custom-cover');img.src=game.cover;img.alt=game.title;visual.append(img);}
  else if(game.theme==='pokemon'){[['assets/cards/pdf-t1-bulbasaur-01.jpg','妙蛙种子','art-card one'],['assets/cards/pdf-legendary-mewtwo.jpg','超梦','art-card two'],['assets/balls/ball-red.png','红球','art-ball']].forEach(([src,alt,cls])=>{const img=el('img',cls);img.src=src;img.alt=alt;visual.append(img);});}
- const body=el('div','game-body'),meta=el('div','game-meta');meta.append(el('span','game-category',game.type),el('span','game-version',game.theme==='ark'?'轻量试玩':'V32.9'));body.append(meta);const title=el('h3'),titleLink=el('a','',game.title);titleLink.href=game.href;title.append(titleLink);body.append(title,el('p','game-subtitle',game.theme==='ark'?'规划栖息地，经营你的保护区。':'收集精灵球，捕获与进化宝可梦。'));
+ else if(game.theme==='castle'){const scene=el('span','castle-scene');scene.innerHTML='<i class="castle-tower left"></i><i class="castle-tower right"></i><i class="castle-gate"></i><b class="castle-card c1">♞</b><b class="castle-card c2">♛</b><em class="castle-coin">5</em><em class="castle-key">⚿</em>';visual.append(scene);}
+ const body=el('div','game-body'),meta=el('div','game-meta');meta.append(el('span','game-category',game.type),el('span','game-version',game.theme==='ark'?'轻量试玩':game.theme==='castle'?'规则 AI':'V32.9'));body.append(meta);const title=el('h3'),titleLink=el('a','',game.title);titleLink.href=game.href;title.append(titleLink);body.append(title,el('p','game-subtitle',game.subtitle));
  const bottom=el('div','game-bottom'),play=el('a','play-link','开始游戏');play.href=game.href;play.append(el('span','','↗'));const notes=el('button','notes-link','游戏说明');notes.setAttribute('aria-label',`${game.title}游戏说明`);notes.onclick=()=>showNotes(game);bottom.append(play,notes);body.append(bottom);card.append(visual,body);return card;
 }
 const dialog=document.querySelector('#experiment-dialog');document.querySelector('#close-experiment').onclick=()=>dialog.close();dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
