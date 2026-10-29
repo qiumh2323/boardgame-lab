@@ -1,7 +1,6 @@
 # 素材与运行说明
 
-- 实验室通用地址：`https://qiumh2323.github.io/boardgame-lab/`。首页包含宝可梦璀璨宝石、方舟保护区与城堡嘉年华三个独立桌游入口。
-- 城堡嘉年华：当前网页是非官方轻量规则原型，24 种角色名称、数值、emoji 头像、金币/钥匙 token 与城堡场景均由本站代码原创绘制，不含商业版完整 78 张卡牌扫描图。玩法核对参考 [Asmodee 产品说明](https://www.asmodee.ca/en/product/castle-combo/)、[Board Game Arena 中文规则](https://zh-cn.boardgamearena.com/gamepanel?game=castlecombo) 与 [BoardGameGeek 条目](https://boardgamegeek.com/boardgame/416851/castle-combo)；这些页面上的官方或玩家图片并未复制进本站。
+- 实验室通用地址：`https://qiumh2323.github.io/boardgame-lab/`。首页包含宝可梦璀璨宝石与方舟保护区两个独立桌游入口。
 - 方舟保护区：沿用用户提供并经项目整理的地图、版块、行动牌、图标素材，相关权利归原权利方所有。网页仅为实验试玩，正式公开发行前需确认素材授权。
 - 方舟网页使用项目已有的浏览器轻量策略，不是本机神经网络冠军；规则/计分/策略模块未改写。回放只保存在当前浏览器IndexedDB中，无服务器归档和在线联机，清理站点数据会移除记录。
 - 字体、间距、语义色与通用控件在 `lab-ui.css` 统一；设计原则参考 [GitHub Primer](https://github.com/primer/design/blob/main/content/foundations/typography.mdx) 与 [Radix Themes](https://www.radix-ui.com/themes/docs/theme/typography)，未复制库源码。
