@@ -8,3 +8,4 @@ export async function fetchWithProgress(url,onProgress,fetcher=fetch){
  onProgress(loaded,loaded);return bytes.buffer;
 }
 export function loadingLabel(stage,loaded=0,total=0){return total>0?`${stage} ${Math.min(100,Math.floor(loaded/total*100))}%`:`${stage}${loaded>0?' '+(loaded/1048576).toFixed(1)+' MB':'…'}`;}
+export function preparationLabel(step,message){return `步骤 ${step}/5 · ${message}`;}
