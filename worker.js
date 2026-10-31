@@ -1,6 +1,6 @@
 import createEngine from './engine.js?v=4';
 import {encode,tieRanks} from './encoder.js';
-import {fetchWithProgress,loadingLabel,preparationLabel} from './load-progress.js?v=2';
+import {fetchWithProgress,loadingLabel,preparationLabel} from './load-progress.js?v=3';
 import * as ort from './vendor/ort.wasm.min.mjs';
 let engine,data,session,ready;
 let currentRequestId=null;
