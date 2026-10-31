@@ -3,11 +3,10 @@ const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className
 function showNotes(game){document.querySelector('#experiment-title').textContent=game.title;document.querySelector('#experiment-description').textContent=game.description;document.querySelector('#experiment-notes').replaceChildren(...game.notes.map(t=>el('li','',t)));document.querySelector('#experiment-play').href=game.href;document.querySelector('#experiment-dialog').showModal();}
 function gameCard(game){
  if(game.status==='upcoming'){
-  const card=el('article','game-card '+game.theme+' upcoming');card.dataset.game=game.id;
-  const visual=el('div','game-art');visual.append(el('span','exhibit-number',game.number),el('span','exhibit-type','敬请期待'));
-  if(game.cover){const image=el('img','custom-cover');image.src=game.cover;image.alt=game.title;visual.append(image);}
-  const body=el('div','game-body'),title=el('h3','',game.title);body.append(title,el('p','game-subtitle',game.subtitle));
-  const bottom=el('div','game-bottom');bottom.append(el('span','coming-soon','敬请期待'),el('span','coming-note','这一桌，正在准备。'));body.append(bottom);card.append(visual,body);return card;
+  const card=el('article','game-card reserved-exhibit upcoming');card.dataset.game=game.id;card.setAttribute('aria-label','预留展位，敬请期待');
+  const visual=el('div','reserved-art');visual.setAttribute('aria-hidden','true');
+  const cards=el('div','mystery-cards');cards.append(el('span','mystery-card back'),el('span','mystery-card front'));visual.append(el('span','reserved-orbit'),cards,el('span','reserved-piece'),el('span','reserved-corner top'),el('span','reserved-corner bottom'));
+  const body=el('div','reserved-caption');body.append(el('h3','','敬请期待'),el('span','reserved-dots','···'));card.append(visual,body);return card;
  }
  const card=el('article','game-card '+game.theme);card.dataset.game=game.id;
  const visual=el('a','game-art');visual.href=game.href;visual.setAttribute('aria-label',`进入${game.title}`);

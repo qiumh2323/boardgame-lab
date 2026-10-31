@@ -23,26 +23,15 @@
     ]
   },
   {
-    "id": "ark-sanctuary",
+    "id": "reserved-table",
     "number": "002",
-    "title": "方舟保护区",
-    "subtitle": "规划栖息地，让自然在你的选择中生长。",
+    "title": "敬请期待",
+    "subtitle": "",
     "status": "upcoming",
-    "type": "版块放置 · 资源规划",
-    "tags": [
-      "浏览器试玩",
-      "轻量策略",
-      "本地回放"
-    ],
-    "href": "ark/index.html",
-    "cover": "ark/assets/map-A.webp",
-    "theme": "ark",
-    "description": "在六角地图上安置动物、规划项目与栖息地，用行动牌组合争取保护目标。",
-    "notes": [
-      "本网页接入现有项目的浏览器规则与轻量策略，支持地图选择、AI对战和本地回放。",
-      "本机神经网络冠军依赖Python推理服务，尚未迁移到此静态版本；不要把网页轻量策略与本机冠军的强度混为一谈。",
-      "对局自动保存在当前浏览器的IndexedDB中，可以继续、回放和导出；清除浏览器站点数据会删除这些本地记录。",
-      "静态版本不提供在线联机，也不会要求或上传API Key。"
-    ]
+    "type": "预留展位",
+    "tags": [],
+    "theme": "reserved",
+    "description": "",
+    "notes": []
   }
 ]
