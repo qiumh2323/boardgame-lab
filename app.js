@@ -20,11 +20,11 @@ const deckFiles=['tier-1','tier-2','tier-3','rare','legendary'];
 let cards=[],state=null,boardState=null,busy=false,pending=null,selectedCard=null,selectedDeck=null;
 let chosenBalls=[0,0,0,0,0,0],requestId=0,log=[],gameSeed=0,activeDifficulty='simple',activeFirstOption='random',engineReady=false;
 let zoomTimer,touchTimer,touchOrigin,lastAction=null,lastActor=null,thinkTimer,thinkStart=0,searchProgress=null;
-const worker=new Worker('./worker.js?v=4',{type:'module'}),waiting=new Map(),ballViews=[];
+const worker=new Worker('./worker.js?v=5',{type:'module'}),waiting=new Map(),ballViews=[];
 const glareProfiles={'pdf-t3-alakazam-01':'top-right','pdf-t2-haunter-01':'right','pdf-t1-charmander-01':'right','pdf-legendary-mewtwo':'top-right'};
 const sprite=c=>`assets/balls/ball-${colors[c]}.png`,art=c=>`assets/cards/${cards[c].id}.jpg`;
 const total=v=>v.reduce((a,b)=>a+b,0),countText=v=>v.map((n,i)=>n?`${names[i]}×${n}`:'').filter(Boolean).join('、')||'无需支付';
-const difficultyName=()=>({simple:'简单电脑',medium:'中等电脑',hard:'困难电脑'}[activeDifficulty]);
+const difficultyName=()=>({simple:'Blue · 初阶训练家',medium:'Green · 道馆挑战者',hard:'Red · 冠军守门人'}[activeDifficulty]);
 const difficultyHelp={simple:'双方遵循正常信息范围，适合先熟悉规则与操作。',medium:'双方遵循正常信息范围，电脑会更充分地考虑未知牌的可能性。',hard:'公开信息模式：电脑可查看真实牌库与隐藏保留牌，你也可查看完整牌库顺序。'};
 function syncSetup(){
  const selected=$('#difficulty').value;$('#difficulty-help').textContent=difficultyHelp[selected];
@@ -33,6 +33,8 @@ function syncSetup(){
 }
 function engineStatus(message,kind='loading'){
  $('#load-state').textContent=message;$('#engine-indicator').className='engine-indicator '+kind;$('#retry-load').hidden=kind!=='error';
+ if(!engineReady){$('#new').textContent=kind==='error'?'AI 准备失败，请重试':message;$('#new').setAttribute('aria-busy',kind==='loading'?'true':'false');}
+ else $('#new').removeAttribute('aria-busy');
  if(kind==='ready')$('#runtime').textContent='游客对局不上传；登录后新开始的完整对局会保存到个人回放。';
 }
 function openSetup(){

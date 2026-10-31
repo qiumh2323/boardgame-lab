@@ -1,5 +1,6 @@
 import createEngine from './engine.js?v=4';
 import {encode,tieRanks} from './encoder.js';
+import {fetchWithProgress,loadingLabel} from './load-progress.js';
 import * as ort from './vendor/ort.wasm.min.mjs';
 let engine,data,session,ready;
 let currentRequestId=null;
@@ -20,12 +21,16 @@ async function dispatch(req){
  const result=JSON.parse(text);if(result.error)throw Error(result.error);return result;
 }
 async function initialize(){
- postMessage({type:'loading',message:'下载冠军与本地计算引擎…'});
+ const status=(message)=>postMessage({type:'loading',message});
+ status('正在准备 AI · 读取卡牌…');
  data=await fetch('./catalog.json').then(r=>r.json());
- postMessage({type:'loading',message:'正在准备本地搜索引擎…'});
- engine=await createEngine({locateFile:name=>new URL(name+'?v=4',import.meta.url).href});
- postMessage({type:'loading',message:'正在加载冠军模型，首次打开需要下载…'});
- session=await ort.InferenceSession.create('./champion.onnx',{executionProviders:['wasm'],graphOptimizationLevel:'all'});
+ const wasmBinary=await fetchWithProgress(new URL('./engine.wasm?v=4',import.meta.url),(n,total)=>status(loadingLabel('下载搜索引擎',n,total)));
+ status('正在准备 AI · 初始化搜索引擎…');
+ engine=await createEngine({wasmBinary,locateFile:name=>new URL(name+'?v=4',import.meta.url).href});
+ const model=await fetchWithProgress(new URL('./champion.onnx',import.meta.url),(n,total)=>status(loadingLabel('下载冠军模型',n,total)));
+ status('正在准备 AI · 加载推理运行时…');
+ session=await ort.InferenceSession.create(model,{executionProviders:['wasm'],graphOptimizationLevel:'all'});
+ status('正在准备 AI · 校验规则…');
  await dispatch({op:'init',data});
  postMessage({type:'ready',data:{version:data.version,cards:data.cards.map(({features,entity,...c})=>c)}});
 }
