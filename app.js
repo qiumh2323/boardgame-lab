@@ -28,6 +28,8 @@ const difficultyName=()=>({simple:'Blue · 初阶训练家',medium:'Green · 道
 const difficultyHelp={simple:'双方遵循正常信息范围，适合先熟悉规则与操作。',medium:'双方遵循正常信息范围，电脑会更充分地考虑未知牌的可能性。',hard:'公开信息模式：电脑可查看真实牌库与隐藏保留牌，你也可查看完整牌库顺序。'};
 function syncSetup(){
  const selected=$('#difficulty').value;$('#difficulty-help').textContent=difficultyHelp[selected];
+ $('#difficulty-help').classList.toggle('public-information-notice',selected==='hard');
+ $('#difficulty-help').setAttribute('role','status');$('#difficulty-help').setAttribute('aria-live','polite');
  document.querySelectorAll('[data-difficulty]').forEach(b=>{const checked=b.dataset.difficulty===selected;b.setAttribute('aria-checked',String(checked));b.tabIndex=checked?0:-1;b.disabled=busy;});
  $('#new').disabled=busy||!engineReady;$('#first').disabled=busy;$('#close-setup').disabled=busy;
 }

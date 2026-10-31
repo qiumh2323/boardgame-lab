@@ -2,6 +2,13 @@ const grid=document.querySelector('#game-grid');
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n;};
 function showNotes(game){document.querySelector('#experiment-title').textContent=game.title;document.querySelector('#experiment-description').textContent=game.description;document.querySelector('#experiment-notes').replaceChildren(...game.notes.map(t=>el('li','',t)));document.querySelector('#experiment-play').href=game.href;document.querySelector('#experiment-dialog').showModal();}
 function gameCard(game){
+ if(game.status==='upcoming'){
+  const card=el('article','game-card '+game.theme+' upcoming');card.dataset.game=game.id;
+  const visual=el('div','game-art');visual.append(el('span','exhibit-number',game.number),el('span','exhibit-type','敬请期待'));
+  if(game.cover){const image=el('img','custom-cover');image.src=game.cover;image.alt=game.title;visual.append(image);}
+  const body=el('div','game-body'),title=el('h3','',game.title);body.append(title,el('p','game-subtitle',game.subtitle));
+  const bottom=el('div','game-bottom');bottom.append(el('span','coming-soon','敬请期待'),el('span','coming-note','这一桌，正在准备。'));body.append(bottom);card.append(visual,body);return card;
+ }
  const card=el('article','game-card '+game.theme);card.dataset.game=game.id;
  const visual=el('a','game-art');visual.href=game.href;visual.setAttribute('aria-label',`进入${game.title}`);
  visual.append(el('span','exhibit-number',game.number),el('span','exhibit-type',game.theme==='ark'?'栖息地规划':'资源与进化'));
@@ -11,4 +18,4 @@ function gameCard(game){
  const bottom=el('div','game-bottom'),play=el('a','play-link','开始游戏');play.href=game.href;play.append(el('span','','↗'));const notes=el('button','notes-link','游戏说明');notes.setAttribute('aria-label',`${game.title}游戏说明`);notes.onclick=()=>showNotes(game);bottom.append(play,notes);body.append(bottom);card.append(visual,body);return card;
 }
 const dialog=document.querySelector('#experiment-dialog');document.querySelector('#close-experiment').onclick=()=>dialog.close();dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
-try{const response=await fetch('./games.json');if(!response.ok)throw Error('load');const games=await response.json();grid.replaceChildren(...games.filter(g=>g.status==='live'&&g.href).map(gameCard));}catch{const p=el('p','load-error','游戏列表加载失败。');for(const [title,href]of[['宝可梦璀璨宝石','game.html']]){const a=el('a','',`直接进入${title} ↗ `);a.href=href;p.append(a);}grid.append(p);}
+try{const response=await fetch('./games.json',{cache:'no-cache'});if(!response.ok)throw Error('load');const games=await response.json();grid.replaceChildren(...games.filter(g=>g.status==='upcoming'||(g.status==='live'&&g.href)).map(gameCard));}catch{const p=el('p','load-error','游戏列表加载失败。');for(const [title,href]of[['宝可梦璀璨宝石','game.html']]){const a=el('a','',`直接进入${title} ↗ `);a.href=href;p.append(a);}grid.append(p);}
