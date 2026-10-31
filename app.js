@@ -4,7 +4,7 @@ import {summarizeGame,renderGameStats} from './game-stats.js';
 let gameStartedAt=0,gameFinishedAt=0,statsForGame=null;
 const resultsBox=document.createElement('section');resultsBox.className='game-results';resultsBox.hidden=true;resultsBox.setAttribute('aria-label','本局对战统计');document.querySelector('.history-box').before(resultsBox);
 let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
-const accountLink=document.createElement('a');accountLink.href='account.html';accountLink.textContent='登录 / 我的对局';document.querySelector('.game-header-right').append(accountLink);
+// Account and replay pages remain available for local testing; navigation is paused.
 const archiveBox=document.createElement('div');archiveBox.className='hint';archiveBox.hidden=true;document.querySelector('.history-box').append(archiveBox);
 function replayPayload(){return {schema:'pokemon-web-replay-v2',champion:'V32.9',seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,actions:log};}
 async function archiveComplete(){
@@ -25,7 +25,7 @@ const glareProfiles={'pdf-t3-alakazam-01':'top-right','pdf-t2-haunter-01':'right
 const sprite=c=>`assets/balls/ball-${colors[c]}.png`,art=c=>`assets/cards/${cards[c].id}.jpg`;
 const total=v=>v.reduce((a,b)=>a+b,0),countText=v=>v.map((n,i)=>n?`${names[i]}×${n}`:'').filter(Boolean).join('、')||'无需支付';
 const difficultyName=()=>({simple:'Blue · 简单的',medium:'Green · 中等难度的',hard:'Red · 令人发狂的'}[activeDifficulty]);
-const difficultyHelp={simple:'双方遵循正常信息范围，适合先熟悉规则与操作。',medium:'双方遵循正常信息范围，电脑会更充分地考虑未知牌的可能性。',hard:'公开信息模式：电脑可查看真实牌库与隐藏保留牌，你也可查看完整牌库顺序。'};
+const difficultyHelp={simple:'双方遵循正常信息范围，适合先熟悉规则与操作。',medium:'双方遵循正常信息范围，电脑会更充分地考虑未知牌的可能性。',hard:'公开信息模式：双方都可通过将鼠标悬浮在牌库上方，查看真实牌库的顺序。'};
 function syncSetup(){
  const selected=$('#difficulty').value;$('#difficulty-help').textContent=difficultyHelp[selected];
  $('#difficulty-help').classList.toggle('public-information-notice',selected==='hard');
