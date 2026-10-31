@@ -251,8 +251,6 @@ $('#confirm').onclick=async()=>{
  try{const m=await send({op:'apply',action:a});state=m.result;addLog(0,a,0);busy=false;clearSelection();await aiTurns();}
  catch(e){busy=false;toast(e.message);render();}
 };
-function exportReplay(){if(!state)return;const blob=new Blob([JSON.stringify(replayPayload(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`pokemon-web-${gameSeed}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-$('#export').onclick=exportReplay;$('#export-before-leave').onclick=exportReplay;
 $('#open-setup').onclick=openSetup;$('#close-setup').onclick=()=>$('#setup-dialog').close();
 $('#setup-dialog').addEventListener('close',()=>{if(state){$('#difficulty').value=activeDifficulty;$('#first').value=activeFirstOption;syncSetup();}});
 $('#setup-dialog').addEventListener('click',e=>{const d=e.currentTarget;if(e.target===d&&!busy){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}});
