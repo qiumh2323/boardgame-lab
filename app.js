@@ -3,16 +3,28 @@ import {api,currentUser} from './account-api.js';
 import {summarizeGame,renderGameStats} from './game-stats.js';
 import {createHoverPreview} from './hover-preview.js?v=3';
 import {createPreviewCache} from './preview-cache.js?v=1';
+import {replayFrame,saveLocalMatch} from './local-matches.js?v=1';
 const previewCache=createPreviewCache();
+let replayFrames=[],finalStats=null,resultPopupPending=false,localSaveState='idle';
 let gameStartedAt=0,gameFinishedAt=0,statsForGame=null;
 const resultsBox=document.createElement('section');resultsBox.className='game-results';resultsBox.hidden=true;resultsBox.setAttribute('aria-label','本局对战统计');document.querySelector('.history-box').before(resultsBox);
 let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
 // Account and replay pages remain available for local testing; navigation is paused.
 const archiveBox=document.createElement('div');archiveBox.className='hint';archiveBox.hidden=true;document.querySelector('.history-box').append(archiveBox);
+const savedLink=document.createElement('a');savedLink.href='matches.html';savedLink.target='_blank';savedLink.rel='noopener';savedLink.textContent='已保存对局';document.querySelector('.game-header-right').append(savedLink);
+function updateLocalSave(message){document.querySelectorAll('[data-save-local]').forEach(b=>{b.disabled=!state?.terminal||localSaveState==='saving'||localSaveState==='saved';b.textContent=localSaveState==='saved'?'本局已保存':localSaveState==='saving'?'正在保存…':'保存本局';});document.querySelectorAll('[data-local-save-status]').forEach(n=>n.textContent=message);}
+async function saveCurrentGame(){
+ if(!state?.terminal||localSaveState==='saving'||localSaveState==='saved')return;
+ const savingId=archiveId;localSaveState='saving';updateLocalSave('正在保存到当前浏览器…');
+ const input={id:archiveId,seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,champion:'V32.9',created:Date.now(),elapsedMs:gameFinishedAt-gameStartedAt,actions:log,frames:replayFrames};
+ try{await saveLocalMatch(input);if(archiveId!==savingId)return;localSaveState='saved';updateLocalSave('完整对局已保存在当前浏览器，可在“已保存对局”中回看。');}
+ catch(e){if(archiveId!==savingId)return;localSaveState='failed';updateLocalSave(e.message+'，可点击“保存本局”重试。');}
+}
+function showResultPopup(){if(!state?.terminal||!finalStats)return;if(document.querySelector('dialog[open]')){resultPopupPending=true;return;}resultPopupPending=false;hideZoom();renderGameStats(document.querySelector('#result-dialog-stats'),finalStats);document.querySelector('#result-dialog').showModal();}
 function replayPayload(){return {schema:'pokemon-web-replay-v2',champion:'V32.9',seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,actions:log};}
 async function archiveComplete(){
  if(!state?.terminal||archiveStatus!=='idle')return;
- if(!archiveOwner){archiveStatus='guest';archiveBox.hidden=false;archiveBox.textContent='游客对局未上传。登录后新开始的完整对局可自动保存回放。';return;}
+ if(!archiveOwner){archiveStatus='guest';return;}
  const savingId=archiveId;archiveStatus='saving';archiveBox.hidden=false;archiveBox.textContent='对局结束，正在校验并保存回放…';
  try{const result=await api('matches',{owner_id:archiveOwner.id,client_id:archiveId,replay:replayPayload()});if(archiveId!==savingId)return;archiveStatus='saved';const link=document.createElement('a');link.href='replay.html?id='+encodeURIComponent(result.id);link.textContent='查看本局回放 →';archiveBox.replaceChildren(document.createTextNode('完整对局已保存。 '),link);}
  catch(e){if(archiveId!==savingId)return;archiveStatus='failed';const retry=document.createElement('button');retry.textContent='重试保存';retry.onclick=()=>{archiveStatus='idle';archiveComplete();};archiveBox.replaceChildren(document.createTextNode('未保存：'+e.message+' '),retry);}
@@ -41,7 +53,7 @@ function engineStatus(message,kind='loading'){
  $('#load-state').textContent=message;$('#engine-indicator').className='engine-indicator '+kind;$('#retry-load').hidden=kind!=='error';
  if(!engineReady){$('#new').textContent=kind==='error'?'AI 准备失败，请重试':message;$('#new').setAttribute('aria-busy',kind==='loading'?'true':'false');}
  else $('#new').removeAttribute('aria-busy');
- if(kind==='ready')$('#runtime').textContent='游客对局不上传；登录后新开始的完整对局会保存到个人回放。';
+ if(kind==='ready')$('#runtime').textContent='完整对局会保存在当前浏览器；无需登录，清除站点数据会删除本地记录。';
 }
 function openSetup(){
  if(busy)return;
@@ -147,7 +159,7 @@ function actionLabel(a){
 function renderPlayer(index,id){
  const p=state.players[index],box=$(id),bonus=[0,0,0,0,0];
  p.active.forEach(c=>bonus[cards[c].bonus_color]+=cards[c].bonus_value);box.replaceChildren();
- const title=document.createElement('h3');title.innerHTML=`${index?'电脑':'你'} <span class="score">${p.score}<small> / 18分</small></span>`;box.append(title);
+ const title=document.createElement('h3');title.innerHTML=`${index?'电脑（'+difficultyName()+'）':'你'} <span class="score">${p.score}<small> / 18分</small></span>`;box.append(title);
  const scorebar=document.createElement('progress');scorebar.className='score-progress';scorebar.max=18;scorebar.value=Math.min(18,p.score);scorebar.setAttribute('aria-label',`${index?'电脑':'你'}的得分进度`);box.append(scorebar);
  const inv=document.createElement('div');inv.className='inventory';
  names.forEach((name,c)=>{const el=document.createElement('div');el.className='owned-column';el.innerHTML=`<img src="${sprite(c)}" alt="${name}"><strong>${p.tokens[c]}</strong>${c<5?`<small>永久 ${bonus[c]}</small>`:''}`;
@@ -200,7 +212,7 @@ function render(){
  const terminal=state.terminal,human=state.current_player===0,phase=['主要行动','弃球','进化选择'][state.phase];
  document.body.classList.add('has-game');document.body.classList.toggle('ai-busy',busy&&!human);
  $('#game-lobby').hidden=true;$('#game-board').hidden=false;
- $('#turn').textContent=terminal?'对局结束':`回合 ${state.turn_number+1} · ${human?'你':'电脑'} · ${phase}`;
+ $('#turn').textContent=terminal?'对局结束':`回合 ${state.turn_number+1} · ${human?'你':'电脑（'+difficultyName()+'）'} · ${phase}`;
  $('#thinking').hidden=!(busy&&!human);$('#new').disabled=busy;$('#open-setup').disabled=busy;
  $('#open-setup').textContent=terminal?'再来一局':'新对局';$('#difficulty-label').textContent=difficultyName();
  $('#new').textContent='开始新对局';$('#setup-warning').hidden=terminal;$('#clear').disabled=busy;
@@ -209,7 +221,7 @@ function render(){
  renderBank();renderBoard();
  const resolved=(!busy&&human&&!terminal)?resolveSelection(state.actions,pending,{card:selectedCard,deck:selectedDeck,balls:chosenBalls}):{visible:[],pending:null};
  pending=resolved.pending;
- $('#decision-title').textContent=terminal?'对局结束':!human?'电脑回合':`你的${phase}`;
+ $('#decision-title').textContent=terminal?'对局结束':!human?`电脑回合（${difficultyName()}）`:`你的${phase}`;
  $('#confirm').disabled=busy||!human||!pending||terminal;
  $('#confirm').textContent=busy?(!human?'电脑思考中…':'正在执行…'):pending?({0:'确认拿球',1:'确认拿球',2:'确认保留',3:'确认捕获',4:'确认弃球',5:'确认进化',6:'跳过本回合进化',7:'确认让过'}[pending.kind]):'请先选择行动';
  const options=$('#actions'),oldScroll=options.scrollTop;options.replaceChildren();
@@ -217,24 +229,26 @@ function render(){
    if(a.kind===3){const small=document.createElement('small');small.textContent='支付：'+countText(a.payment);b.append(small);}
    b.onclick=()=>{pending=a;render();};options.append(b);});options.scrollTop=oldScroll;
  if(!busy&&!terminal&&!human){const retry=document.createElement('button');retry.className='action';retry.textContent='重试电脑行动';retry.onclick=aiTurns;options.append(retry);}
- if(terminal){const viewStats=document.createElement('button');viewStats.className='action';viewStats.textContent='查看本局统计 ↓';viewStats.onclick=()=>resultsBox.scrollIntoView({behavior:'smooth',block:'start'});options.append(viewStats);$('#confirm').textContent='本局已结束';}
- if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';if(statsForGame!==archiveId){gameFinishedAt=performance.now();renderGameStats(resultsBox,summarizeGame(state,cards,log,gameFinishedAt-gameStartedAt));statsForGame=archiveId;}archiveComplete();}
+ if(terminal){const viewStats=document.createElement('button');viewStats.className='action';viewStats.textContent='查看本局统计';viewStats.onclick=showResultPopup;options.append(viewStats);$('#confirm').textContent='本局已结束';}
+ if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';if(statsForGame!==archiveId){gameFinishedAt=performance.now();finalStats=summarizeGame(state,cards,log,gameFinishedAt-gameStartedAt);renderGameStats(resultsBox,finalStats);statsForGame=archiveId;saveCurrentGame();queueMicrotask(showResultPopup);}archiveComplete();}
  else if(busy&&!human)$('#selection').textContent='电脑正在思考，你仍可查看卡牌。';
  else if(pending)showSelection(pending);
  else if(state.phase===1)$('#selection').textContent=`请选择要弃掉的球：${total(chosenBalls)} / ${discardNeed()}。使用球下方的加减按钮调整。`;
  else if(chosenBalls.some(Boolean))$('#selection').textContent='继续选择不同颜色凑成合法组合，或使用“拿两个同色”。点已选球可取消。';
  else if(selectedCard!==null||selectedDeck!==null)$('#selection').textContent='这张牌当前不能捕获、保留或进化。可长按查看卡面。';
  else $('#selection').textContent=state.phase===2?'选择可进化的目标牌，或跳过本回合进化。':'点选精灵球或卡牌，下方确认后执行。';
- $('#last-action').hidden=!lastAction;if(lastAction)$('#last-action').textContent=`${lastActor?'电脑刚刚':'你刚刚'}：${actionLabel(lastAction)}`;
+ $('#last-action').hidden=!lastAction;if(lastAction)$('#last-action').textContent=`${lastActor?'电脑（'+difficultyName()+'）刚刚':'你刚刚'}：${actionLabel(lastAction)}`;
  updateThinking();
 }
 function addLog(actor,a,elapsed,search){
+ replayFrames.push(replayFrame(state));
  lastAction=a;lastActor=actor;log.push({actor,turn:state.turn_number,action:a,elapsed_ms:elapsed,search,score:state.players.map(p=>p.score)});
- const li=document.createElement('li'),span=document.createElement('span');span.textContent=`${log.length} · ${actor?'电脑':'你'}`;li.append(span,document.createTextNode(actionLabel(a)+(elapsed?` · ${(elapsed/1000).toFixed(1)}秒`:'')));$('#history').prepend(li);
+ const li=document.createElement('li'),span=document.createElement('span');span.textContent=`${log.length} · ${actor?'电脑（'+difficultyName()+'）':'你'}`;li.append(span,document.createTextNode(actionLabel(a)+(elapsed?` · ${(elapsed/1000).toFixed(1)}秒`:'')));$('#history').prepend(li);
 }
 async function aiTurns(){
  busy=true;render();
  try{while(!state.terminal&&state.current_player===1){
+   $('#thinking .thinking-heading>span').textContent=`电脑（${difficultyName()}）正在思考`;
    thinkStart=performance.now();searchProgress=null;clearInterval(thinkTimer);thinkTimer=setInterval(updateThinking,200);updateThinking();
    const config={simple:{simulations:128,worlds:0,full:false},medium:{simulations:2048,worlds:4,full:false},hard:{simulations:2048,worlds:0,full:true}}[activeDifficulty];
    const m=await send({op:'ai',...config});clearInterval(thinkTimer);state=m.result;addLog(1,state.chosen,m.elapsed,state.search);render();
@@ -249,10 +263,14 @@ $('#new').onclick=async()=>{
     const m=await send({op:'new',seed:gameSeed,starting_player:first,full:nextDifficulty==='hard'});state=m.result;activeDifficulty=nextDifficulty;activeFirstOption=nextFirstOption;
     archiveOwner=owner;archiveId=crypto.randomUUID();startingPlayer=first;archiveStatus='idle';archiveBox.hidden=true;
     gameStartedAt=performance.now();gameFinishedAt=0;statsForGame=null;resultsBox.hidden=true;previewCache.clear();
+    replayFrames=[replayFrame(state)];finalStats=null;resultPopupPending=false;localSaveState='idle';updateLocalSave('完整结束后自动保存在当前浏览器。');
    log=[];lastAction=null;lastActor=null;$('#history').replaceChildren();if($('#setup-dialog').open)$('#setup-dialog').close();$('#hint').textContent='点选球，或选择一张卡牌。电脑回合仍可长按查看卡牌。';clearSelection();await aiTurns();
  }catch(e){busy=false;syncSetup();$('#new').textContent=state?'开始新对局':'开始对战 ↗';toast(e.message);}
 };
 $('#clear').onclick=clearSelection;
+document.querySelectorAll('[data-save-local]').forEach(b=>b.onclick=saveCurrentGame);
+$('#close-results').onclick=()=>$('#result-dialog').close();
+document.addEventListener('close',()=>{if(resultPopupPending)queueMicrotask(showResultPopup);},true);
 $('#confirm').onclick=async()=>{
  if(!pending||busy)return;const a=pending;busy=true;render();
  try{const m=await send({op:'apply',action:a});state=m.result;addLog(0,a,0);busy=false;clearSelection();await aiTurns();}
