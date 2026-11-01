@@ -1,0 +1,12 @@
+import {completeLocalMatch,replayFrame} from './local-matches.js?v=1';
+export function downloadMatch(input){const match=completeLocalMatch(input),url=URL.createObjectURL(new Blob([JSON.stringify(match)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`宝可梦对局-${new Date(match.created).toISOString().replace(/[:.]/g,'-')}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
+export async function verifyReplayFile(input,engine,catalog,onProgress=()=>{}){
+ if(input?.schema!=='pokemon-local-match-v1'||!Number.isInteger(input.seed)||input.seed<0||input.seed>4294967295||![0,1].includes(input.starting_player)||!['simple','medium','hard'].includes(input.difficulty)||!Array.isArray(input.actions)||input.actions.length<1||input.actions.length>2000)throw Error('不是支持的对局纪录文件，或文件内容不完整');
+ const call=async req=>{const r=JSON.parse(await engine.ccall('web_dispatch','string',['string'],[JSON.stringify(req)],{async:true}));if(r.error)throw Error(r.error);return r;};
+ const swap=s=>{s=structuredClone(s);s.players.reverse();s.turns_completed.reverse();for(const key of ['current_player','starting_player','end_triggered_by'])if(s[key]===0||s[key]===1)s[key]=1-s[key];for(const h of s.history??[])h.actor=1-h.actor;return s;};
+ await call({op:'init',data:catalog});let state=await call({op:'new',seed:input.seed,starting_player:input.starting_player,full:true});const frames=[replayFrame(state)];
+ for(let i=0;i<input.actions.length;i++){const entry=input.actions[i];if(state.terminal||entry?.actor!==state.current_player)throw Error(`第${i+1}步的行动顺序不正确`);const flipped=state.current_player===1;if(flipped)state=await call({op:'load',state:swap(state)});try{state=await call({op:'apply',action:entry.action});}catch{throw Error(`第${i+1}步不符合游戏规则`);}if(flipped)state=await call({op:'load',state:swap(state)});frames.push(replayFrame(state));if(i%20===0){onProgress(i+1,input.actions.length);await new Promise(r=>setTimeout(r,0));}}
+ if(!state.terminal)throw Error('这场对局尚未完整结束');const scores=state.players.map(p=>p.score);if(input.scores&&JSON.stringify(input.scores)!==JSON.stringify(scores))throw Error('文件中的比分与规则重算结果不一致');
+ // Reconstruct all snapshots from legal actions, rather than trusting file snapshots.
+ return completeLocalMatch({id:crypto.randomUUID(),created:Number.isFinite(input.created)?input.created:Date.now(),seed:input.seed,starting_player:input.starting_player,difficulty:input.difficulty,champion:String(input.champion??''),actions:input.actions.map(e=>({actor:e.actor,action:e.action})),frames});
+}

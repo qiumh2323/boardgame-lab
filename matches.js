@@ -1,5 +1,11 @@
-import {listLocalMatches,difficultyLabels} from './local-matches.js';
-const container=document.querySelector('#matches'),message=document.querySelector('#message');
-try{const matches=await listLocalMatches();message.textContent=matches.length?`共保存 ${matches.length} 场完整对局`:'还没有已保存的对局。完整打完一局后会自动保存。';
- for(const match of matches){const row=document.createElement('article');row.className='match';const text=document.createElement('div'),time=document.createElement('small'),score=document.createElement('strong'),detail=document.createElement('span'),link=document.createElement('a');time.textContent=new Date(match.created).toLocaleString('zh-CN');score.textContent=`你 ${match.scores[0]} : ${match.scores[1]} 电脑`;detail.textContent=difficultyLabels[match.difficulty]??match.difficulty;link.href='replay.html?local='+encodeURIComponent(match.id);link.textContent='查看回放 →';text.append(time,score,detail);row.append(text,link);container.append(row);}
-}catch(e){message.textContent=e.message;}
+import {saveLocalMatch} from './local-matches.js?v=1';
+import {verifyReplayFile} from './replay-file.js?v=1';
+const input=document.querySelector('#replay-file'),message=document.querySelector('#message');
+input.onchange=async()=>{const file=input.files[0];if(!file)return;input.disabled=true;
+ try{if(file.size>20*1024*1024)throw Error('文件过大，请选择20MB以内的对局JSON文件');let data;try{data=JSON.parse(await file.text());}catch{throw Error('文件无法解析，请选择保存的对局JSON文件');}
+ message.textContent='正在加载规则引擎，核对每一步行动…';
+ const [{default:createEngine},catalog]=await Promise.all([import('./engine.js'),fetch('./catalog.json').then(r=>{if(!r.ok)throw Error('无法读取卡牌资料');return r.json();})]);
+ const engine=await createEngine();const match=await verifyReplayFile(data,engine,catalog,(n,total)=>message.textContent=`正在核对行动 ${n}/${total}…`);
+ await saveLocalMatch(match);message.textContent='校验通过，正在打开回放…';location.href='replay.html?local='+encodeURIComponent(match.id);
+ }catch(e){message.textContent='读取失败：'+e.message;input.disabled=false;input.value='';}
+};

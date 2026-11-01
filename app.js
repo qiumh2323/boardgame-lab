@@ -3,21 +3,23 @@ import {api,currentUser} from './account-api.js';
 import {summarizeGame,renderGameStats} from './game-stats.js';
 import {createHoverPreview} from './hover-preview.js?v=3';
 import {createPreviewCache} from './preview-cache.js?v=1';
-import {replayFrame,saveLocalMatch} from './local-matches.js?v=1';
+import {replayFrame,saveLocalMatch,completeLocalMatch} from './local-matches.js?v=1';
+import {downloadMatch} from './replay-file.js?v=1';
 const previewCache=createPreviewCache();
 let replayFrames=[],finalStats=null,resultPopupPending=false,localSaveState='idle';
 let gameStartedAt=0,gameFinishedAt=0,statsForGame=null;
 const resultsBox=document.createElement('section');resultsBox.className='game-results';resultsBox.hidden=true;resultsBox.setAttribute('aria-label','本局对战统计');document.querySelector('.history-box').before(resultsBox);
+resultsBox.after(document.querySelector('.table-area > .local-match-tools'));
 let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
 // Account and replay pages remain available for local testing; navigation is paused.
 const archiveBox=document.createElement('div');archiveBox.className='hint';archiveBox.hidden=true;document.querySelector('.history-box').append(archiveBox);
-function updateLocalSave(message){document.querySelectorAll('[data-save-local]').forEach(b=>{b.disabled=!state?.terminal||localSaveState==='saving'||localSaveState==='saved';b.textContent=localSaveState==='saved'?'本局已保存':localSaveState==='saving'?'正在保存…':'保存本局';});document.querySelectorAll('[data-local-save-status]').forEach(n=>n.textContent=message);}
+function currentMatch(){return completeLocalMatch({id:archiveId,seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,champion:'V32.9',created:Date.now(),elapsedMs:gameFinishedAt-gameStartedAt,actions:log,frames:replayFrames});}
+function updateLocalSave(message){document.querySelectorAll('[data-save-local]').forEach(b=>{b.disabled=!state?.terminal;b.textContent='保存对局文件';});document.querySelectorAll('[data-local-save-status]').forEach(n=>n.textContent=message);document.querySelectorAll('[data-current-replay]').forEach(link=>{link.hidden=localSaveState!=='saved';link.href='replay.html?local='+encodeURIComponent(archiveId??'');});}
 async function saveCurrentGame(){
  if(!state?.terminal||localSaveState==='saving'||localSaveState==='saved')return;
- const savingId=archiveId;localSaveState='saving';updateLocalSave('正在保存到当前浏览器…');
- const input={id:archiveId,seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,champion:'V32.9',created:Date.now(),elapsedMs:gameFinishedAt-gameStartedAt,actions:log,frames:replayFrames};
- try{await saveLocalMatch(input);if(archiveId!==savingId)return;localSaveState='saved';updateLocalSave('完整对局已保存在当前浏览器，可在“已保存对局”中回看。');}
- catch(e){if(archiveId!==savingId)return;localSaveState='failed';updateLocalSave(e.message+'，可点击“保存本局”重试。');}
+ const savingId=archiveId;localSaveState='saving';updateLocalSave('正在准备本局回放…');
+ try{await saveLocalMatch(currentMatch());if(archiveId!==savingId)return;localSaveState='saved';updateLocalSave('可下载对局文件保存，或直接查看本局回放。');}
+ catch(e){if(archiveId!==savingId)return;localSaveState='failed';updateLocalSave('浏览器暂存失败，但仍可下载文件：'+e.message);}
 }
 function showResultPopup(){if(!state?.terminal||!finalStats)return;if(document.querySelector('dialog[open]')){resultPopupPending=true;return;}resultPopupPending=false;hideZoom();renderGameStats(document.querySelector('#result-dialog-stats'),finalStats);document.querySelector('#result-dialog').showModal();}
 function replayPayload(){return {schema:'pokemon-web-replay-v2',champion:'V32.9',seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,actions:log};}
@@ -262,12 +264,12 @@ $('#new').onclick=async()=>{
     const m=await send({op:'new',seed:gameSeed,starting_player:first,full:nextDifficulty==='hard'});state=m.result;activeDifficulty=nextDifficulty;activeFirstOption=nextFirstOption;
     archiveOwner=owner;archiveId=crypto.randomUUID();startingPlayer=first;archiveStatus='idle';archiveBox.hidden=true;
     gameStartedAt=performance.now();gameFinishedAt=0;statsForGame=null;resultsBox.hidden=true;previewCache.clear();
-    replayFrames=[replayFrame(state)];finalStats=null;resultPopupPending=false;localSaveState='idle';updateLocalSave('完整结束后自动保存在当前浏览器。');
+    replayFrames=[replayFrame(state)];finalStats=null;resultPopupPending=false;localSaveState='idle';updateLocalSave('完整结束后可下载对局文件。');
    log=[];lastAction=null;lastActor=null;$('#history').replaceChildren();if($('#setup-dialog').open)$('#setup-dialog').close();$('#hint').textContent='点选球，或选择一张卡牌。电脑回合仍可长按查看卡牌。';clearSelection();await aiTurns();
  }catch(e){busy=false;syncSetup();$('#new').textContent=state?'开始新对局':'开始对战 ↗';toast(e.message);}
 };
 $('#clear').onclick=clearSelection;
-document.querySelectorAll('[data-save-local]').forEach(b=>b.onclick=saveCurrentGame);
+document.querySelectorAll('[data-save-local]').forEach(b=>b.onclick=()=>{try{downloadMatch(currentMatch());updateLocalSave('已请求下载对局文件，请妥善保存。');}catch(e){toast(e.message);}});
 $('#close-results').onclick=()=>$('#result-dialog').close();
 document.addEventListener('close',()=>{if(resultPopupPending)queueMicrotask(showResultPopup);},true);
 $('#confirm').onclick=async()=>{
