@@ -1,7 +1,9 @@
 import {resolveSelection,toggleMainBall,adjustDiscard,cardAvailability} from './selection.js?v=10';
 import {api,currentUser} from './account-api.js';
 import {summarizeGame,renderGameStats} from './game-stats.js';
-import {createHoverPreview} from './hover-preview.js?v=1';
+import {createHoverPreview} from './hover-preview.js?v=2';
+import {createPreviewCache} from './preview-cache.js?v=1';
+const previewCache=createPreviewCache();
 let gameStartedAt=0,gameFinishedAt=0,statsForGame=null;
 const resultsBox=document.createElement('section');resultsBox.className='game-results';resultsBox.hidden=true;resultsBox.setAttribute('aria-label','本局对战统计');document.querySelector('.history-box').before(resultsBox);
 let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
@@ -50,16 +52,18 @@ function openSetup(){
 }
 function showDeck(d,modal){
  if(!state)return;
- hideZoom();const full=activeDifficulty==='hard'&&state.decks;
+ const full=activeDifficulty==='hard'&&state.decks;
  const known=new Set(state.market.flat());state.players.forEach(p=>{p.active.forEach(c=>known.add(c));p.tucked.forEach(c=>known.add(c));p.reserved.forEach(r=>{if(cards[r.card])known.add(r.card);});});
  const remaining=full?[...state.decks[d]].reverse():cards.map((c,i)=>i).filter(i=>cards[i].deck===d&&!known.has(i));
+ const signature=JSON.stringify([Boolean(full),state.deck_counts[d],remaining]);
+ const content=previewCache.get(`deck:${modal?'modal':'hover'}:${d}`,signature,()=>{
  const content=document.createElement('div');content.className='deck-preview';
  const title=document.createElement('h3');title.textContent=`${deckNames[d]}牌库 · 剩余 ${state.deck_counts[d]} 张`;content.append(title);
  const note=document.createElement('p');note.className='fine';note.textContent=(full?'实际顺序：从左到右、从上到下，第一张为牌库顶。':'以下为尚未公开的候选牌，不代表顺序；可能包含对手从牌库顶取得的隐藏保留牌。')+' 右键或长按牌库可打开完整列表。';content.append(note);
  const grid=document.createElement('div');grid.className='deck-preview-grid';remaining.forEach((c,i)=>{const el=document.createElement('div');el.append(cardSurface(c));const caption=document.createElement('small');caption.textContent=(full?`${i+1} · `:'')+cards[c].name;el.append(caption);grid.append(el);});content.append(grid);
- if(!remaining.length)grid.textContent='暂无剩余牌';
- if(modal){$('#detail-title').textContent='牌库信息';$('#detail-art').replaceChildren(content);if(!$('#card-dialog').open)$('#card-dialog').showModal();}
- else{$('#zoom').replaceChildren(content);$('#zoom').hidden=false;}
+ if(!remaining.length)grid.textContent='暂无剩余牌';return content;});
+ if(modal){hideZoom();$('#detail-title').textContent='牌库信息';$('#detail-art').replaceChildren(content);if(!$('#card-dialog').open)$('#card-dialog').showModal();}
+ else{if($('#zoom').firstElementChild!==content)$('#zoom').replaceChildren(content);$('#zoom').hidden=false;}
 }
 function toast(text){$('#toast').textContent=text;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,4000);}
 function send(req){return new Promise((resolve,reject)=>{req.id=++requestId;waiting.set(req.id,{resolve,reject});worker.postMessage(req);});}
@@ -83,7 +87,7 @@ function cardButton(c,cls='card'){
  const b=document.createElement('button');b.className=cls;b.dataset.card=c;b.title=cards[c].name+' · 长按查看';b.setAttribute('aria-label',cards[c].name);
  if(cls==='card')b.append(cardSurface(c));else {const name=document.createElement('span');name.className='owned-name';name.textContent=cards[c].name;b.append(name);}
  b.onclick=()=>{if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}chooseCard(c);};
- hoverPreview.bind(b,()=>{$('#zoom').replaceChildren(cardSurface(c));$('#zoom').hidden=false;});
+ hoverPreview.bind(b,()=>{const content=previewCache.get(`card:${c}`,cards[c].id,()=>cardSurface(c));if($('#zoom').firstElementChild!==content)$('#zoom').replaceChildren(content);$('#zoom').hidden=false;});
  b.onpointerdown=e=>{if(e.pointerType!=='touch')return;touchOrigin=[e.clientX,e.clientY];clearTimeout(touchTimer);touchTimer=setTimeout(()=>{b.dataset.suppressClick='1';showCardDetail(c);},500);};
  b.onpointermove=e=>{if(touchOrigin&&Math.hypot(e.clientX-touchOrigin[0],e.clientY-touchOrigin[1])>10)clearTimeout(touchTimer);};
  b.onpointerup=b.onpointercancel=()=>{clearTimeout(touchTimer);touchOrigin=null;};
@@ -244,7 +248,7 @@ $('#new').onclick=async()=>{
     const owner=await currentUser();
     const m=await send({op:'new',seed:gameSeed,starting_player:first,full:nextDifficulty==='hard'});state=m.result;activeDifficulty=nextDifficulty;activeFirstOption=nextFirstOption;
     archiveOwner=owner;archiveId=crypto.randomUUID();startingPlayer=first;archiveStatus='idle';archiveBox.hidden=true;
-    gameStartedAt=performance.now();gameFinishedAt=0;statsForGame=null;resultsBox.hidden=true;
+    gameStartedAt=performance.now();gameFinishedAt=0;statsForGame=null;resultsBox.hidden=true;previewCache.clear();
    log=[];lastAction=null;lastActor=null;$('#history').replaceChildren();if($('#setup-dialog').open)$('#setup-dialog').close();$('#hint').textContent='点选球，或选择一张卡牌。电脑回合仍可长按查看卡牌。';clearSelection();await aiTurns();
  }catch(e){busy=false;syncSetup();$('#new').textContent=state?'开始新对局':'开始对战 ↗';toast(e.message);}
 };
