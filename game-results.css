@@ -12,3 +12,4 @@
 .game-results{scroll-margin-top:100px}
 .settings .setting-help.public-information-notice{color:#8a3c2a;background:#fff0e6;border-left:3px solid #bb6247;padding:12px 14px;font-size:13px;line-height:1.8;border-radius:4px;margin-top:12px}
 .market .deck.selected{border-color:#397451;background:#e3efdf;box-shadow:0 0 0 3px #39745130;border-radius:9px}.market .deck.selected:hover{border-color:#397451}.market .deck.reservable>span:last-child{color:#315e43;background:#edf7e8}.market .deck.selected>span:last-child{background:#315f49;color:white}
+.market .deck{width:100%;justify-self:stretch}#zoom{z-index:1000}

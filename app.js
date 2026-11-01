@@ -1,6 +1,7 @@
 import {resolveSelection,toggleMainBall,adjustDiscard,cardAvailability} from './selection.js?v=10';
 import {api,currentUser} from './account-api.js';
 import {summarizeGame,renderGameStats} from './game-stats.js';
+import {createHoverPreview} from './hover-preview.js?v=1';
 let gameStartedAt=0,gameFinishedAt=0,statsForGame=null;
 const resultsBox=document.createElement('section');resultsBox.className='game-results';resultsBox.hidden=true;resultsBox.setAttribute('aria-label','本局对战统计');document.querySelector('.history-box').before(resultsBox);
 let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
@@ -15,11 +16,12 @@ async function archiveComplete(){
  catch(e){if(archiveId!==savingId)return;archiveStatus='failed';const retry=document.createElement('button');retry.textContent='重试保存';retry.onclick=()=>{archiveStatus='idle';archiveComplete();};archiveBox.replaceChildren(document.createTextNode('未保存：'+e.message+' '),retry);}
 }
 const $=s=>document.querySelector(s),names=['红球','蓝球','黑球','粉球','黄球','大师球'];
+const hoverPreview=createHoverPreview({onHide:()=>{$('#zoom').hidden=true;}});
 const colors=['red','blue','black','pink','yellow','master'],deckNames=['初级','进阶','高级','稀有','传说'];
 const deckFiles=['tier-1','tier-2','tier-3','rare','legendary'];
 let cards=[],state=null,boardState=null,busy=false,pending=null,selectedCard=null,selectedDeck=null;
 let chosenBalls=[0,0,0,0,0,0],requestId=0,log=[],gameSeed=0,activeDifficulty='simple',activeFirstOption='random',engineReady=false;
-let zoomTimer,touchTimer,touchOrigin,lastAction=null,lastActor=null,thinkTimer,thinkStart=0,searchProgress=null;
+let touchTimer,touchOrigin,lastAction=null,lastActor=null,thinkTimer,thinkStart=0,searchProgress=null;
 const worker=new Worker('./worker.js?v=7',{type:'module'}),waiting=new Map(),ballViews=[];
 const glareProfiles={'pdf-t3-alakazam-01':'top-right','pdf-t2-haunter-01':'right','pdf-t1-charmander-01':'right','pdf-legendary-mewtwo':'top-right'};
 const sprite=c=>`assets/balls/ball-${colors[c]}.png`,art=c=>`assets/cards/${cards[c].id}.jpg`;
@@ -74,15 +76,14 @@ function cardSurface(c){
  const image=document.createElement('img');image.src=art(c);image.alt=cards[c].name;image.draggable=false;surface.append(image);
  const correction=image.cloneNode();correction.alt='';correction.setAttribute('aria-hidden','true');correction.className='glare-correction';surface.append(correction);return surface;
 }
-function hideZoom(){clearTimeout(zoomTimer);$('#zoom').hidden=true;}
+function hideZoom(){hoverPreview.hide();}
 function showCardDetail(c){hideZoom();$('#detail-art').replaceChildren(cardSurface(c));$('#detail-title').textContent=cards[c].name;$('#card-dialog').showModal();}
 function chooseCard(c){if(busy||state?.terminal||state?.current_player!==0)return;selectedCard=selectedCard===c?null:c;selectedDeck=null;chosenBalls.fill(0);pending=null;render();}
 function cardButton(c,cls='card'){
  const b=document.createElement('button');b.className=cls;b.dataset.card=c;b.title=cards[c].name+' · 长按查看';b.setAttribute('aria-label',cards[c].name);
  if(cls==='card')b.append(cardSurface(c));else {const name=document.createElement('span');name.className='owned-name';name.textContent=cards[c].name;b.append(name);}
  b.onclick=()=>{if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}chooseCard(c);};
- b.onmouseenter=()=>{if(!matchMedia('(hover:hover)').matches)return;zoomTimer=setTimeout(()=>{$('#zoom').replaceChildren(cardSurface(c));$('#zoom').hidden=false;},550);};
- b.onmouseleave=hideZoom;b.onblur=hideZoom;
+ hoverPreview.bind(b,()=>{$('#zoom').replaceChildren(cardSurface(c));$('#zoom').hidden=false;});
  b.onpointerdown=e=>{if(e.pointerType!=='touch')return;touchOrigin=[e.clientX,e.clientY];clearTimeout(touchTimer);touchTimer=setTimeout(()=>{b.dataset.suppressClick='1';showCardDetail(c);},500);};
  b.onpointermove=e=>{if(touchOrigin&&Math.hypot(e.clientX-touchOrigin[0],e.clientY-touchOrigin[1])>10)clearTimeout(touchTimer);};
  b.onpointerup=b.onpointercancel=()=>{clearTimeout(touchTimer);touchOrigin=null;};
@@ -159,8 +160,7 @@ function renderBoard(){
  if(boardState!==state){
    const market=$('#market');market.replaceChildren();
    const deckButton=d=>{const b=document.createElement('button');b.className='deck';b.dataset.deck=String(d);b.innerHTML=`<span class="deck-surface"><img src="assets/cards/back-${deckFiles[d]}.jpg" alt="${deckNames[d]}牌库"></span><span>余 ${state.deck_counts[d]}</span>`;
-     const preview=()=>{clearTimeout(zoomTimer);zoomTimer=setTimeout(()=>showDeck(d,false),550);};
-     b.title='悬浮查看牌库 · 长按打开';b.onmouseenter=()=>{if(matchMedia('(hover:hover)').matches)preview();};b.onmouseleave=hideZoom;b.onfocus=preview;b.onblur=hideZoom;
+     b.title='悬浮查看牌库 · 长按打开';hoverPreview.bind(b,()=>showDeck(d,false));
      b.oncontextmenu=e=>{e.preventDefault();showDeck(d,true);};b.onpointerdown=e=>{if(e.pointerType==='touch')touchTimer=setTimeout(()=>{b.dataset.suppressClick='1';showDeck(d,true);},500);};b.onpointerup=b.onpointercancel=()=>clearTimeout(touchTimer);b.onpointermove=()=>clearTimeout(touchTimer);
      b.onclick=()=>{if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}if(busy||state.terminal||state.current_player!==0)return;hideZoom();selectedDeck=selectedDeck===d?null:d;selectedCard=null;chosenBalls.fill(0);pending=null;render();};return b;};
    const premium=document.createElement('div');premium.className='tier premium';
