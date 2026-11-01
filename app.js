@@ -47,6 +47,7 @@ function openSetup(){
  $('#setup-dialog').append(document.querySelector('.settings'));$('#setup-dialog').showModal();
 }
 function showDeck(d,modal){
+ if(!state)return;
  hideZoom();const full=activeDifficulty==='hard'&&state.decks;
  const known=new Set(state.market.flat());state.players.forEach(p=>{p.active.forEach(c=>known.add(c));p.tucked.forEach(c=>known.add(c));p.reserved.forEach(r=>{if(cards[r.card])known.add(r.card);});});
  const remaining=full?[...state.decks[d]].reverse():cards.map((c,i)=>i).filter(i=>cards[i].deck===d&&!known.has(i));
@@ -157,15 +158,17 @@ function renderPlayer(index,id){
 function renderBoard(){
  if(boardState!==state){
    const market=$('#market');market.replaceChildren();
-   const deckButton=d=>{const b=document.createElement('button');b.className='deck';b.innerHTML=`<span class="deck-surface"><img src="assets/cards/back-${deckFiles[d]}.jpg" alt="${deckNames[d]}牌库"></span><span>余 ${state.deck_counts[d]}</span>`;
-     b.title='悬浮查看牌库 · 长按打开';b.onmouseenter=()=>{if(matchMedia('(hover:hover)').matches)zoomTimer=setTimeout(()=>showDeck(d,false),550);};b.onmouseleave=hideZoom;b.onfocus=()=>{};
+   const deckButton=d=>{const b=document.createElement('button');b.className='deck';b.dataset.deck=String(d);b.innerHTML=`<span class="deck-surface"><img src="assets/cards/back-${deckFiles[d]}.jpg" alt="${deckNames[d]}牌库"></span><span>余 ${state.deck_counts[d]}</span>`;
+     const preview=()=>{clearTimeout(zoomTimer);zoomTimer=setTimeout(()=>showDeck(d,false),550);};
+     b.title='悬浮查看牌库 · 长按打开';b.onmouseenter=()=>{if(matchMedia('(hover:hover)').matches)preview();};b.onmouseleave=hideZoom;b.onfocus=preview;b.onblur=hideZoom;
      b.oncontextmenu=e=>{e.preventDefault();showDeck(d,true);};b.onpointerdown=e=>{if(e.pointerType==='touch')touchTimer=setTimeout(()=>{b.dataset.suppressClick='1';showDeck(d,true);},500);};b.onpointerup=b.onpointercancel=()=>clearTimeout(touchTimer);b.onpointermove=()=>clearTimeout(touchTimer);
-     b.onclick=()=>{if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}if(busy||state.terminal||state.current_player!==0)return;selectedDeck=selectedDeck===d?null:d;selectedCard=null;chosenBalls.fill(0);pending=null;render();};return b;};
+     b.onclick=()=>{if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}if(busy||state.terminal||state.current_player!==0)return;hideZoom();selectedDeck=selectedDeck===d?null:d;selectedCard=null;chosenBalls.fill(0);pending=null;render();};return b;};
    const premium=document.createElement('div');premium.className='tier premium';
    [3,4].forEach(d=>{premium.append(deckButton(d));if(state.market[d].length)state.market[d].forEach(c=>premium.append(cardButton(c)));else{const e=document.createElement('span');e.className='empty';e.textContent='空';premium.append(e);}});market.append(premium);
    [2,1,0].forEach(d=>{const row=document.createElement('div');row.className='tier';row.append(deckButton(d));state.market[d].forEach(c=>row.append(cardButton(c)));market.append(row);});
    renderPlayer(1,'#opponent');renderPlayer(0,'#human');boardState=state;
  }
+ document.querySelectorAll('.deck[data-deck]').forEach(b=>{const d=Number(b.dataset.deck),selected=selectedDeck===d,canReserve=state.actions.some(a=>a.kind===2&&a.source===3&&a.deck===d);b.classList.toggle('selected',selected);b.classList.toggle('reservable',canReserve);b.setAttribute('aria-pressed',String(selected));b.setAttribute('aria-label',`${deckNames[d]}牌库，剩余${state.deck_counts[d]}张${canReserve?'，可保留牌库顶':''}${selected?'，已选择':''}`);});
  document.querySelectorAll('[data-card]').forEach(b=>{const c=Number(b.dataset.card);b.classList.toggle('selected',selectedCard===c);
    const reserved=b.classList.contains('reserved-card'),eligible=b.classList.contains('card')||(reserved&&b.dataset.owner==='0');
    const available=cardAvailability(eligible?state.actions:[],c,reserved?2:1);
@@ -189,7 +192,7 @@ function updateThinking(){
  $('#search-count').textContent=p?`搜索 ${p.completed} / ${p.total}`:'正在评估当前局面…';
 }
 function render(){
- if(!state)return;hideZoom();
+ if(!state)return;if(boardState!==state)hideZoom();
  const terminal=state.terminal,human=state.current_player===0,phase=['主要行动','弃球','进化选择'][state.phase];
  document.body.classList.add('has-game');document.body.classList.toggle('ai-busy',busy&&!human);
  $('#game-lobby').hidden=true;$('#game-board').hidden=false;
