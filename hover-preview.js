@@ -1,10 +1,13 @@
 // Detect the actual input device, not the browser's primary-device media query.
 export function createHoverPreview({onHide,delay=350,pointerEvents=typeof PointerEvent!=='undefined',setTimer=setTimeout,clearTimer=clearTimeout}){
  let timer=null,owner=null,visible=false,source=null;
+ const dismissed=new WeakSet();
  function cancel(){if(timer!==null)clearTimer(timer);timer=null;}
  function hide(){cancel();owner=null;visible=false;source=null;onHide();}
- function leave(target){if(owner===target&&source==='pointer')hide();}
+ function leave(target){dismissed.delete(target);if(owner===target&&source==='pointer')hide();}
+ function dismiss(target){dismissed.add(target);hide();}
  function schedule(target,show,origin='pointer'){
+  if(dismissed.has(target))return;
   if(owner===target&&(timer!==null||visible))return;
   cancel();owner=target;visible=false;source=origin;
   timer=setTimer(()=>{timer=null;if(owner===target&&target.isConnected!==false){visible=true;show();}},delay);
@@ -17,8 +20,8 @@ export function createHoverPreview({onHide,delay=350,pointerEvents=typeof Pointe
   // Old browsers without Pointer Events still get a mouse-only fallback.
   target.onmouseenter=e=>{if(!pointerEvents&&!e.sourceCapabilities?.firesTouchEvents)schedule(target,show);};
   target.onmouseleave=()=>leave(target);
-  target.onfocus=()=>{if(target.matches(':focus-visible'))schedule(target,show,'keyboard');};
+  target.onfocus=()=>{if(target.matches(':focus-visible')){dismissed.delete(target);schedule(target,show,'keyboard');}};
   target.onblur=()=>{if(owner===target&&source==='keyboard')hide();};
  }
- return {bind,hide,cancel};
+ return {bind,hide,cancel,dismiss};
 }

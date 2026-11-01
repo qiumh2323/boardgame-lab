@@ -1,7 +1,7 @@
 import {resolveSelection,toggleMainBall,adjustDiscard,cardAvailability} from './selection.js?v=10';
 import {api,currentUser} from './account-api.js';
 import {summarizeGame,renderGameStats} from './game-stats.js';
-import {createHoverPreview} from './hover-preview.js?v=2';
+import {createHoverPreview} from './hover-preview.js?v=3';
 import {createPreviewCache} from './preview-cache.js?v=1';
 const previewCache=createPreviewCache();
 let gameStartedAt=0,gameFinishedAt=0,statsForGame=null;
@@ -86,7 +86,7 @@ function chooseCard(c){if(busy||state?.terminal||state?.current_player!==0)retur
 function cardButton(c,cls='card'){
  const b=document.createElement('button');b.className=cls;b.dataset.card=c;b.title=cards[c].name+' · 长按查看';b.setAttribute('aria-label',cards[c].name);
  if(cls==='card')b.append(cardSurface(c));else {const name=document.createElement('span');name.className='owned-name';name.textContent=cards[c].name;b.append(name);}
- b.onclick=()=>{if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}chooseCard(c);};
+ b.onclick=()=>{hoverPreview.dismiss(b);if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}chooseCard(c);};
  hoverPreview.bind(b,()=>{const content=previewCache.get(`card:${c}`,cards[c].id,()=>cardSurface(c));if($('#zoom').firstElementChild!==content)$('#zoom').replaceChildren(content);$('#zoom').hidden=false;});
  b.onpointerdown=e=>{if(e.pointerType!=='touch')return;touchOrigin=[e.clientX,e.clientY];clearTimeout(touchTimer);touchTimer=setTimeout(()=>{b.dataset.suppressClick='1';showCardDetail(c);},500);};
  b.onpointermove=e=>{if(touchOrigin&&Math.hypot(e.clientX-touchOrigin[0],e.clientY-touchOrigin[1])>10)clearTimeout(touchTimer);};
@@ -166,7 +166,7 @@ function renderBoard(){
    const deckButton=d=>{const b=document.createElement('button');b.className='deck';b.dataset.deck=String(d);b.innerHTML=`<span class="deck-surface"><img src="assets/cards/back-${deckFiles[d]}.jpg" alt="${deckNames[d]}牌库"></span><span>余 ${state.deck_counts[d]}</span>`;
      b.title='悬浮查看牌库 · 长按打开';hoverPreview.bind(b,()=>showDeck(d,false));
      b.oncontextmenu=e=>{e.preventDefault();showDeck(d,true);};b.onpointerdown=e=>{if(e.pointerType==='touch')touchTimer=setTimeout(()=>{b.dataset.suppressClick='1';showDeck(d,true);},500);};b.onpointerup=b.onpointercancel=()=>clearTimeout(touchTimer);b.onpointermove=()=>clearTimeout(touchTimer);
-     b.onclick=()=>{if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}if(busy||state.terminal||state.current_player!==0)return;hideZoom();selectedDeck=selectedDeck===d?null:d;selectedCard=null;chosenBalls.fill(0);pending=null;render();};return b;};
+     b.onclick=()=>{hoverPreview.dismiss(b);if(b.dataset.suppressClick){delete b.dataset.suppressClick;return;}if(busy||state.terminal||state.current_player!==0)return;selectedDeck=selectedDeck===d?null:d;selectedCard=null;chosenBalls.fill(0);pending=null;render();};return b;};
    const premium=document.createElement('div');premium.className='tier premium';
    [3,4].forEach(d=>{premium.append(deckButton(d));if(state.market[d].length)state.market[d].forEach(c=>premium.append(cardButton(c)));else{const e=document.createElement('span');e.className='empty';e.textContent='空';premium.append(e);}});market.append(premium);
    [2,1,0].forEach(d=>{const row=document.createElement('div');row.className='tier';row.append(deckButton(d));state.market[d].forEach(c=>row.append(cardButton(c)));market.append(row);});
