@@ -11,7 +11,6 @@ const resultsBox=document.createElement('section');resultsBox.className='game-re
 let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
 // Account and replay pages remain available for local testing; navigation is paused.
 const archiveBox=document.createElement('div');archiveBox.className='hint';archiveBox.hidden=true;document.querySelector('.history-box').append(archiveBox);
-const savedLink=document.createElement('a');savedLink.href='matches.html';savedLink.target='_blank';savedLink.rel='noopener';savedLink.textContent='已保存对局';document.querySelector('.game-header-right').append(savedLink);
 function updateLocalSave(message){document.querySelectorAll('[data-save-local]').forEach(b=>{b.disabled=!state?.terminal||localSaveState==='saving'||localSaveState==='saved';b.textContent=localSaveState==='saved'?'本局已保存':localSaveState==='saving'?'正在保存…':'保存本局';});document.querySelectorAll('[data-local-save-status]').forEach(n=>n.textContent=message);}
 async function saveCurrentGame(){
  if(!state?.terminal||localSaveState==='saving'||localSaveState==='saved')return;
