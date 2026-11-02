@@ -1,4 +1,4 @@
-import {track} from './analytics.js?v=1';
+import {track} from './analytics.js?v=2';
 import {resolveSelection,toggleMainBall,adjustDiscard,cardAvailability} from './selection.js?v=10';
 import {api,currentUser} from './account-api.js';
 import {summarizeGame,renderGameStats} from './game-stats.js';

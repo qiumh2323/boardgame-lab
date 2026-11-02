@@ -1,3 +1,3 @@
 // Public collection URL only. Never put an API token or dashboard password here.
-// Leave empty until the owner creates and approves the analytics site.
-export const analyticsSite = '';
+// Owner-provided analytics site; this is a public collection address, not a secret.
+export const analyticsSite = 'https://qiumh2323.goatcounter.com';

@@ -1,5 +1,6 @@
-import {analyticsSite} from './analytics-config.js?v=1';
+import {analyticsSite} from './analytics-config.js?v=2';
 const difficulties={simple:'blue',medium:'green',hard:'red'};
+export function sanitizeCounterData(data){const clean={...data};delete clean.q;return clean;}
 export function analyticsEvent(name,difficulty){
  if(!['open_game','difficulty_selected','game_started','game_completed'].includes(name))return null;
  const suffix=difficulties[difficulty];
@@ -22,7 +23,7 @@ function loadCounter(endpoint){return new Promise((resolve,reject)=>{
  window.goatcounter={no_onload:true,no_events:true,endpoint};
  const script=document.createElement('script');script.src='https://gc.zgo.at/count.js';script.async=true;script.referrerPolicy='no-referrer';
  const timeout=setTimeout(()=>reject(Error('analytics timeout')),8000);
- script.onload=()=>{clearTimeout(timeout);if(typeof window.goatcounter?.count!=='function')return reject(Error('analytics unavailable'));resolve(data=>window.goatcounter.count(data));};
+ script.onload=()=>{clearTimeout(timeout);if(typeof window.goatcounter?.count!=='function'||typeof window.goatcounter?.get_data!=='function')return reject(Error('analytics unavailable'));const original=window.goatcounter.get_data;window.goatcounter.get_data=vars=>sanitizeCounterData(original(vars));resolve(data=>window.goatcounter.count(data));};
  script.onerror=()=>{clearTimeout(timeout);reject(Error('analytics blocked'));};document.head.append(script);
 });}
 const analytics=typeof window==='undefined'?null:createAnalytics({site:analyticsSite,host:location.hostname,pathname:location.pathname,referrer:document.referrer,navigator:window.navigator,load:loadCounter});
