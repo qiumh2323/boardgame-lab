@@ -1,3 +1,4 @@
+import {track} from './analytics.js?v=1';
 import {resolveSelection,toggleMainBall,adjustDiscard,cardAvailability} from './selection.js?v=10';
 import {api,currentUser} from './account-api.js';
 import {summarizeGame,renderGameStats} from './game-stats.js';
@@ -231,7 +232,7 @@ function render(){
    b.onclick=()=>{pending=a;render();};options.append(b);});options.scrollTop=oldScroll;
  if(!busy&&!terminal&&!human){const retry=document.createElement('button');retry.className='action';retry.textContent='重试电脑行动';retry.onclick=aiTurns;options.append(retry);}
  if(terminal){const viewStats=document.createElement('button');viewStats.className='action';viewStats.textContent='查看本局统计';viewStats.onclick=showResultPopup;options.append(viewStats);$('#confirm').textContent='本局已结束';}
- if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';if(statsForGame!==archiveId){gameFinishedAt=performance.now();finalStats=summarizeGame(state,cards,log,gameFinishedAt-gameStartedAt);renderGameStats(resultsBox,finalStats);statsForGame=archiveId;saveCurrentGame();queueMicrotask(showResultPopup);}archiveComplete();}
+ if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';if(statsForGame!==archiveId){gameFinishedAt=performance.now();finalStats=summarizeGame(state,cards,log,gameFinishedAt-gameStartedAt);renderGameStats(resultsBox,finalStats);statsForGame=archiveId;track('game_completed',activeDifficulty);saveCurrentGame();queueMicrotask(showResultPopup);}archiveComplete();}
  else if(busy&&!human)$('#selection').textContent='电脑正在思考，你仍可查看卡牌。';
  else if(pending)showSelection(pending);
  else if(state.phase===1)$('#selection').textContent=`请选择要弃掉的球：${total(chosenBalls)} / ${discardNeed()}。使用球下方的加减按钮调整。`;
@@ -262,7 +263,7 @@ $('#new').onclick=async()=>{
    const first=$('#first').value==='random'?crypto.getRandomValues(new Uint32Array(1))[0]%2:Number($('#first').value);
     const owner=await currentUser();
     const m=await send({op:'new',seed:gameSeed,starting_player:first,full:nextDifficulty==='hard'});state=m.result;activeDifficulty=nextDifficulty;activeFirstOption=nextFirstOption;
-    archiveOwner=owner;archiveId=crypto.randomUUID();startingPlayer=first;archiveStatus='idle';archiveBox.hidden=true;
+    archiveOwner=owner;archiveId=crypto.randomUUID();startingPlayer=first;archiveStatus='idle';archiveBox.hidden=true;track('game_started',activeDifficulty);
     gameStartedAt=performance.now();gameFinishedAt=0;statsForGame=null;resultsBox.hidden=true;previewCache.clear();
     replayFrames=[replayFrame(state)];finalStats=null;resultPopupPending=false;localSaveState='idle';updateLocalSave('完整结束后可下载对局文件。');
    log=[];lastAction=null;lastActor=null;$('#history').replaceChildren();if($('#setup-dialog').open)$('#setup-dialog').close();$('#hint').textContent='点选球，或选择一张卡牌。电脑回合仍可长按查看卡牌。';clearSelection();await aiTurns();
@@ -281,7 +282,7 @@ $('#open-setup').onclick=openSetup;$('#close-setup').onclick=()=>$('#setup-dialo
 $('#setup-dialog').addEventListener('close',()=>{if(state){$('#difficulty').value=activeDifficulty;$('#first').value=activeFirstOption;syncSetup();}});
 $('#setup-dialog').addEventListener('click',e=>{const d=e.currentTarget;if(e.target===d&&!busy){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}});
 $('#setup-dialog').addEventListener('cancel',e=>{if(busy)e.preventDefault();});
-document.querySelectorAll('[data-difficulty]').forEach((b,i,all)=>{b.onclick=()=>{$('#difficulty').value=b.dataset.difficulty;syncSetup();};b.onkeydown=e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();const next=all[(i+(['ArrowUp','ArrowLeft'].includes(e.key)?-1:1)+all.length)%all.length];next.click();next.focus();}};});
+document.querySelectorAll('[data-difficulty]').forEach((b,i,all)=>{b.onclick=()=>{if($('#difficulty').value!==b.dataset.difficulty)track('difficulty_selected',b.dataset.difficulty);$('#difficulty').value=b.dataset.difficulty;syncSetup();};b.onkeydown=e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();const next=all[(i+(['ArrowUp','ArrowLeft'].includes(e.key)?-1:1)+all.length)%all.length];next.click();next.focus();}};});
 $('#difficulty').onchange=syncSetup;$('#retry-load').onclick=()=>location.reload();
 document.querySelectorAll('.lab-home-link').forEach(a=>a.onclick=e=>{if(state&&!state.terminal){e.preventDefault();hideZoom();$('#leave-dialog').showModal();}});$('#stay-game').onclick=()=>$('#leave-dialog').close();
 $('#close-card').onclick=()=>$('#card-dialog').close();
