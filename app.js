@@ -1,7 +1,7 @@
 import {track} from './analytics.js?v=2';
 import {resolveSelection,toggleMainBall,adjustDiscard,cardAvailability} from './selection.js?v=10';
 import {api,currentUser} from './account-api.js';
-import {summarizeGame,renderGameStats} from './game-stats.js';
+import {summarizeGame,renderGameStats} from './game-stats.js?v=2';
 import {createHoverPreview} from './hover-preview.js?v=3';
 import {createPreviewCache} from './preview-cache.js?v=1';
 import {replayFrame,saveLocalMatch,completeLocalMatch} from './local-matches.js?v=1';
@@ -232,7 +232,7 @@ function render(){
    b.onclick=()=>{pending=a;render();};options.append(b);});options.scrollTop=oldScroll;
  if(!busy&&!terminal&&!human){const retry=document.createElement('button');retry.className='action';retry.textContent='重试电脑行动';retry.onclick=aiTurns;options.append(retry);}
  if(terminal){const viewStats=document.createElement('button');viewStats.className='action';viewStats.textContent='查看本局统计';viewStats.onclick=showResultPopup;options.append(viewStats);$('#confirm').textContent='本局已结束';}
- if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';if(statsForGame!==archiveId){gameFinishedAt=performance.now();finalStats=summarizeGame(state,cards,log,gameFinishedAt-gameStartedAt);renderGameStats(resultsBox,finalStats);statsForGame=archiveId;track('game_completed',activeDifficulty);saveCurrentGame();queueMicrotask(showResultPopup);}archiveComplete();}
+ if(terminal){const r=state.rewards[0];$('#selection').textContent=`${r>0?'你获胜了！':r<0?'电脑获胜。':'本局平局。'} 你 ${state.players[0].score} 分，电脑 ${state.players[1].score} 分。`;$('#hint').textContent='本回合所有行动已结算，对局结束。';if(statsForGame!==archiveId){gameFinishedAt=performance.now();finalStats=summarizeGame(state,cards,log,gameFinishedAt-gameStartedAt,activeDifficulty);renderGameStats(resultsBox,finalStats);statsForGame=archiveId;track('game_completed',activeDifficulty);saveCurrentGame();queueMicrotask(showResultPopup);}archiveComplete();}
  else if(busy&&!human)$('#selection').textContent='电脑正在思考，你仍可查看卡牌。';
  else if(pending)showSelection(pending);
  else if(state.phase===1)$('#selection').textContent=`请选择要弃掉的球：${total(chosenBalls)} / ${discardNeed()}。使用球下方的加减按钮调整。`;
