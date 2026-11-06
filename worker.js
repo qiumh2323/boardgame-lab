@@ -23,13 +23,13 @@ async function dispatch(req){
 async function initialize(){
  const status=(step,message)=>postMessage({type:'loading',step,totalSteps:5,message:preparationLabel(step,message)});
  status(1,'读取卡牌数据…');
- const catalog=await fetch('./catalog.json?v=dratini-yellow-20261106');if(!catalog.ok)throw Error(`卡牌数据读取失败 (${catalog.status})`);data=await catalog.json();
+ const catalog=await fetch('./catalog.json?v=v3210-20261106');if(!catalog.ok)throw Error(`卡牌数据读取失败 (${catalog.status})`);data=await catalog.json();
  status(2,'读取搜索引擎…');
  const wasmBinary=await fetchWithProgress(new URL('./engine.wasm?v=4',import.meta.url),(n,total)=>status(2,loadingLabel('读取搜索引擎',n,total)));
  status(3,'初始化搜索引擎…');
  engine=await createEngine({wasmBinary,locateFile:name=>new URL(name+'?v=4',import.meta.url).href});
  status(4,'读取冠军模型…');
- const model=await fetchWithProgress(new URL('./champion.onnx',import.meta.url),(n,total)=>status(4,loadingLabel('读取冠军模型',n,total)));
+ const model=await fetchWithProgress(new URL('./champion.onnx?v=v3210-20261106',import.meta.url),(n,total)=>status(4,loadingLabel('读取冠军模型',n,total)));
  status(5,'启动推理运行时…');
  session=await ort.InferenceSession.create(model,{executionProviders:['wasm'],graphOptimizationLevel:'all'});
  status(5,'校验游戏规则…');

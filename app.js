@@ -14,7 +14,7 @@ resultsBox.after(document.querySelector('.table-area > .local-match-tools'));
 let archiveOwner=null,archiveId=null,startingPlayer=0,archiveStatus='idle';
 // Account and replay pages remain available for local testing; navigation is paused.
 const archiveBox=document.createElement('div');archiveBox.className='hint';archiveBox.hidden=true;document.querySelector('.history-box').append(archiveBox);
-function currentMatch(){return completeLocalMatch({id:archiveId,seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,champion:'V32.9',created:Date.now(),elapsedMs:gameFinishedAt-gameStartedAt,actions:log,frames:replayFrames});}
+function currentMatch(){return completeLocalMatch({id:archiveId,seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,champion:'V32.10',created:Date.now(),elapsedMs:gameFinishedAt-gameStartedAt,actions:log,frames:replayFrames});}
 function updateLocalSave(message){document.querySelectorAll('[data-save-local]').forEach(b=>{b.disabled=!state?.terminal;b.textContent='保存对局文件';});document.querySelectorAll('[data-local-save-status]').forEach(n=>n.textContent=message);document.querySelectorAll('[data-current-replay]').forEach(link=>{link.hidden=localSaveState!=='saved';link.href='replay.html?local='+encodeURIComponent(archiveId??'');});}
 async function saveCurrentGame(){
  if(!state?.terminal||localSaveState==='saving'||localSaveState==='saved')return;
@@ -23,7 +23,7 @@ async function saveCurrentGame(){
  catch(e){if(archiveId!==savingId)return;localSaveState='failed';updateLocalSave('浏览器暂存失败，但仍可下载文件：'+e.message);}
 }
 function showResultPopup(){if(!state?.terminal||!finalStats)return;if(document.querySelector('dialog[open]')){resultPopupPending=true;return;}resultPopupPending=false;hideZoom();renderGameStats(document.querySelector('#result-dialog-stats'),finalStats);document.querySelector('#result-dialog').showModal();}
-function replayPayload(){return {schema:'pokemon-web-replay-v2',champion:'V32.9',seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,actions:log};}
+function replayPayload(){return {schema:'pokemon-web-replay-v2',champion:'V32.10',seed:gameSeed,starting_player:startingPlayer,difficulty:activeDifficulty,actions:log};}
 async function archiveComplete(){
  if(!state?.terminal||archiveStatus!=='idle')return;
  if(!archiveOwner){archiveStatus='guest';return;}
@@ -38,7 +38,7 @@ const deckFiles=['tier-1','tier-2','tier-3','rare','legendary'];
 let cards=[],state=null,boardState=null,busy=false,pending=null,selectedCard=null,selectedDeck=null;
 let chosenBalls=[0,0,0,0,0,0],requestId=0,log=[],gameSeed=0,activeDifficulty='simple',activeFirstOption='random',engineReady=false;
 let touchTimer,touchOrigin,lastAction=null,lastActor=null,thinkTimer,thinkStart=0,searchProgress=null;
-const worker=new Worker('./worker.js?v=8',{type:'module'}),waiting=new Map(),ballViews=[];
+const worker=new Worker('./worker.js?v=9',{type:'module'}),waiting=new Map(),ballViews=[];
 const glareProfiles={'pdf-t3-alakazam-01':'top-right','pdf-t2-haunter-01':'right','pdf-t1-charmander-01':'right','pdf-legendary-mewtwo':'top-right'};
 const sprite=c=>`assets/balls/ball-${colors[c]}.png`,art=c=>`assets/cards/${cards[c].id}.jpg`;
 const total=v=>v.reduce((a,b)=>a+b,0),countText=v=>v.map((n,i)=>n?`${names[i]}×${n}`:'').filter(Boolean).join('、')||'无需支付';
