@@ -23,7 +23,7 @@ async function dispatch(req){
 async function initialize(){
  const status=(step,message)=>postMessage({type:'loading',step,totalSteps:5,message:preparationLabel(step,message)});
  status(1,'读取卡牌数据…');
- const catalog=await fetch('./catalog.json');if(!catalog.ok)throw Error(`卡牌数据读取失败 (${catalog.status})`);data=await catalog.json();
+ const catalog=await fetch('./catalog.json?v=dratini-yellow-20261106');if(!catalog.ok)throw Error(`卡牌数据读取失败 (${catalog.status})`);data=await catalog.json();
  status(2,'读取搜索引擎…');
  const wasmBinary=await fetchWithProgress(new URL('./engine.wasm?v=4',import.meta.url),(n,total)=>status(2,loadingLabel('读取搜索引擎',n,total)));
  status(3,'初始化搜索引擎…');

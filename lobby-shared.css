@@ -1,0 +1,101 @@
+/* The preparation screens share the shelf's paper and forest palette. */
+body:has(#game-lobby:not([hidden])),
+body:has(#lobby:not([hidden])) {
+  background: #f6f5f1;
+  color: #24322e;
+  font-family: system-ui, "Microsoft YaHei", sans-serif;
+}
+
+body:has(#game-lobby:not([hidden])) .game-header,
+body:has(#lobby:not([hidden])) .site-header {
+  background: #f6f5f1;
+  border-bottom: 1px solid #dedfd4;
+}
+
+#game-lobby .lobby-layout,
+#lobby.lobby {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 5vw, 64px);
+}
+
+#lobby.lobby {
+  max-width: 1120px;
+  min-height: 0;
+  margin: 38px auto;
+}
+
+#lobby .intro { min-height: 0; padding: 0; }
+
+#game-lobby .lobby-story > h1,
+#lobby .intro > h1 {
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1.15;
+  letter-spacing: -.035em;
+  color: #233d31;
+}
+
+#game-lobby .lobby-kicker,
+#lobby .kicker { color: #496e58; }
+
+#game-lobby .lobby-intro,
+#lobby .intro > p:not(.kicker) {
+  color: #536459;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+#game-lobby #lobby-settings > .settings,
+#lobby > .setup {
+  width: 100%;
+  padding: clamp(18px, 3vw, 30px);
+  background: #fffdf8;
+  border: 1px solid #dedfd4;
+  border-radius: 20px;
+  box-shadow: 0 8px 28px #263d2d0b;
+}
+
+#game-lobby #setup-title,
+#lobby .setup-heading h2 { font-size: 26px; color: #233d31; }
+
+#game-lobby .difficulty-choice,
+#lobby .mode-choices button,
+#game-lobby .settings select,
+#lobby .setup select {
+  background: #fffdf8;
+  border-color: #d6ded2;
+  border-radius: 10px;
+}
+
+#game-lobby .difficulty-choice[aria-checked="true"],
+#lobby .mode-choices button[aria-checked="true"] {
+  background: #e8efe4;
+  border-color: #73927a;
+  color: #233d31;
+}
+
+#game-lobby .settings #new,
+#lobby .setup #start {
+  background: #244d3e;
+  color: white;
+  border: 1px solid #244d3e;
+  border-radius: 10px;
+  min-height: 46px;
+}
+
+#game-lobby .settings #new:not(:disabled):hover,
+#lobby .setup #start:not(:disabled):hover { background: #32624f; }
+
+#lobby .hero-scene {
+  background: #e8eadc;
+  border: 1px solid #d9dfd1;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  #game-lobby .lobby-layout,
+  #lobby.lobby { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  #lobby.lobby { margin: 22px auto; }
+}
