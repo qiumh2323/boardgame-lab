@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>合久必分 · 规则书 v3.41</title><style>
+:root{--ink:#302a23;--muted:#756a58;--red:#883c2f;--line:#d8cbb3;--paper:#f3eddf;--panel:#fffdf7;--soft:#eee5d4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.85 system-ui,"Microsoft YaHei",sans-serif}a{color:var(--red)}
+header{border-bottom:1px solid var(--line);background:var(--panel)}.wrap{max-width:1440px;margin:auto;padding:0 26px}.top{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 0}.kicker{font-size:12px;letter-spacing:.12em;color:var(--muted)}h1{font:700 28px/1.3 "SimSun",serif;margin:3px 0}.top nav{display:flex;flex-wrap:wrap;gap:15px;font-size:14px}
+.layout{display:grid;grid-template-columns:228px minmax(0,1fr);gap:28px;padding-top:22px;padding-bottom:60px}.side{position:sticky;top:15px;align-self:start;max-height:calc(100vh - 30px);overflow:auto;font-size:13px}.side b{display:block;margin:6px 8px;color:var(--muted)}.side a{display:block;padding:5px 8px;text-decoration:none;border-radius:4px;color:var(--ink);line-height:1.5}.side a:hover,.side a:focus{background:var(--soft);color:var(--red)}main{min-width:0}
+section{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:22px 26px;margin:0 0 16px;scroll-margin-top:15px}h2{font-size:23px;line-height:1.45;margin:0 0 13px;color:var(--red)}h3{font-size:17px;margin:16px 0 8px}p{margin:9px 0}li{margin:6px 0}ul,ol{padding-left:1.5em;margin:10px 0}strong{color:#5e2c23}.intro{color:var(--muted);font-size:14px;margin:0 0 12px}.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 16px}.overview div{border-left:3px solid var(--red);padding:8px 13px;background:var(--panel);font-size:14px}.overview b{display:block;font-size:17px}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}button{border:1px solid var(--line);border-radius:4px;padding:6px 12px;cursor:pointer;background:var(--panel);color:var(--ink);font:inherit;font-size:13px}button:hover{background:var(--soft)}
+details.rule-detail{border-top:1px solid var(--line);margin-top:9px}summary{cursor:pointer;list-style-position:outside}details.rule-detail>summary{padding:11px 0;font-weight:650;font-size:17px}details.rule-detail[open]>summary{color:var(--red)}.detail-body{padding:0 0 8px}.table-wrap{overflow:auto;margin:12px 0}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.65}th,td{padding:9px 11px;text-align:left;vertical-align:top;border:1px solid var(--line)}th{background:var(--soft);font-weight:650}tr:nth-child(even) td{background:#faf6ee}.wide-table{min-width:1050px}.wide-table th:nth-child(1){width:8%}.wide-table th:nth-child(2){width:4%}.wide-table th:nth-child(3){width:6%}.wide-table th:nth-child(4){width:4%}.wide-table th:nth-child(5){width:23%}.wide-table th:nth-child(6){width:25%}.wide-table th:nth-child(7){width:24%}.wide-table th:nth-child(8){width:6%}blockquote{border-left:3px solid #b58a45;background:#f3ead8;margin:14px 0;padding:9px 14px;color:#615640}.foot{font-size:13px;color:var(--muted);padding:6px}
+.term-search{width:100%;max-width:450px;padding:9px 12px;border:1px solid var(--line);border-radius:4px;background:white;font:inherit}.term-index{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}.term-index a{font-size:13px;border:1px solid var(--line);padding:2px 7px;text-decoration:none;border-radius:3px}.term-entry{border-top:1px solid var(--line);scroll-margin-top:16px}.term-entry summary{padding:9px 0;font-weight:600}.term-entry small{display:block;color:var(--muted);font-size:13px;font-weight:400}.term-entry p{padding-bottom:10px}.term-entry[hidden]{display:none}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.side{position:static;max-height:none;display:flex;gap:4px;flex-wrap:wrap}.side b{width:100%}.side a{background:var(--panel);border:1px solid var(--line)}}
+@media(max-width:640px){.wrap{padding:0 12px}.top{align-items:flex-start;flex-direction:column;gap:10px}.layout{padding-top:12px;gap:12px}.overview{grid-template-columns:1fr;gap:5px}section{padding:17px}h2{font-size:21px}th,td{padding:7px;font-size:13px}}
+@media print{.side,.toolbar,header nav{display:none}.layout{display:block}.wrap{max-width:none}body{background:white}section{border:0;break-before:auto}details.rule-detail>.detail-body{display:block!important}.overview{display:none}}
+</style></head>
+<body id="top"><header><div class="wrap"><div class="top"><div><div class="kicker">规则书 V3.41 · 2026.11.03 双人规则修订</div><h1>合久必分</h1></div><nav aria-label="文件与游戏"><a href="./">返回游戏</a><a href="./合久必分_完整规则_v3.41.pdf" download>完整 PDF</a><a href="./rules-v3.41.md" download>Markdown</a></nav></div></div></header>
+<div class="wrap layout"><nav class="side" aria-label="规则章节"><b>主规则与查阅附录</b><a href="#rule-1">1. 游戏目标与全局框架</a><a href="#rule-2">2. 开局设置</a><a href="#rule-3">3. 通用概念</a><a href="#rule-4">4. 议事阶段</a><a href="#rule-5">5. 内政阶段</a><a href="#rule-6">6. 招贤、搜寻与展示区</a><a href="#rule-7">7. 军事阶段</a><a href="#rule-8">8. 战斗</a><a href="#rule-9">9. 朝会阶段</a><a href="#rule-10">10. 太守</a><a href="#rule-11">11. 主公、汉天子与迁都</a><a href="#appendix-a">附录A　地图与地区</a><a href="#appendix-b">附录B　完整人物卡表</a><a href="#appendix-c">附录C　完整锦囊表</a><a href="#appendix-d">附录D　双人变体</a><a href="#appendix-e">附录E　快速查阅</a><a href="#glossary">概念百科</a><a href="#top">返回顶部 ↑</a></nav>
+<main><div class="overview"><div><b>16 威望／7 地区</b>7地区仅群雄逐鹿时期生效；全员朝会结束检查，最迟192年冬。</div><div><b>两个时期</b>讨董联军 → 群雄逐鹿。</div><div><b>四阶段</b>议事 → 内政 → 军事 → 朝会。</div></div>
+<p class="intro">首次游玩读第1—3章，再按第4—9章完成一季。点击小节标题展开明细；双人局另读附录D。</p>
+<div class="toolbar"><button type="button" id="expand-all">展开全部明细</button><button type="button" id="collapse-all">收起全部明细</button><button type="button" id="expand-core">展开主规则</button></div>
+<section id="rule-1"><h2>1. 游戏目标与全局框架</h2>
+<p class="intro">先了解何时获胜、敌友关系，以及一季的四阶段。</p>
+<p>你将扮演董卓、袁绍、曹操或孙坚，通过经营地区、招募人才与战斗争取威望。</p>
+<details class="rule-detail" id="section-1-1" open><summary>1.1 胜利与时限</summary><div class="detail-body"><p>游戏从190年春开始，每轮为一季，依次经过春、夏、秋、冬，最多进行到192年冬，共12季。</p>
+<p>每季全体玩家完成朝会、朝贡和锦囊限额结算后，检查胜利：任一玩家达到<strong>16威望</strong>，或在<strong>群雄逐鹿时期</strong>拥有<strong>至少7个地区</strong>（含关隘），即可结束游戏。若触发7地区条件，仅比较达到7地区或16威望的玩家；否则按原规则比较全体。最迟192年冬结束。先结算终局锦囊，再比较威望。平手依次比较：是否控制洛阳、拥有地区数、普通士兵总数、金与粮总和；仍同分则共同获胜。中途达标不立即结束游戏。</p></div></details>
+<details class="rule-detail" id="section-1-2" open><summary>1.2 两个时期</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>时期</th><th>敌友关系</th><th>战功</th></tr></thead><tbody><tr><td>讨董联军时期</td><td>袁绍、曹操、孙坚和中立势力互为友军；董卓与其余各方敌对</td><td>胜方按敌方实际阵亡数获得；与中立军团交战不获得。每人每季上限2</td></tr><tr><td>群雄逐鹿时期</td><td>各玩家与中立势力彼此敌对</td><td>胜方按敌方实际阵亡数获得，包含中立。每人每季上限3</td></tr></tbody></table></div>
+<p>友军不能互相进攻。董卓失去洛阳或焚毁洛阳时，登记联军解散，<strong>下一季议事阶段</strong>才进入群雄逐鹿时期。当前季仍使用原时期规则。时期不会逆转，转换也不改变地区所有权。</p></div></details>
+<details class="rule-detail" id="section-1-3" open><summary>1.3 四阶段循环</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>阶段</th><th>做什么</th><th>如何结束</th></tr></thead><tbody><tr><td>议事</td><td>时期转换、太守收入、补牌、联盟目标</td><td>完成共同准备</td></tr><tr><td>内政</td><td>轮流打出人物，执行1次内政行动</td><td>各自PASS，全员退出</td></tr><tr><td>军事</td><td>轮流打牌、部署、行军和战斗</td><td>各自PASS，全员退出</td></tr><tr><td>朝会</td><td>回收人物；依次完成个人朝会、任命与朝贡</td><td>统一计分、检查终局、清场</td></tr></tbody></table></div>
+<p>本季各阶段均从首位玩家起，按固定座次行动。首位标记只由朝贡改变，不自动顺延。</p></div></details>
+</section>
+<section id="rule-2"><h2>2. 开局设置</h2>
+<p class="intro">按四人局摆放地图、资源和牌组；双人差异统一见附录D。</p>
+<p>以下为四人标准局；双人局先应用附录D的开局差异。</p>
+<details class="rule-detail" id="section-2-1" open><summary>2.1 组件与公共区</summary><div class="detail-body"><p>准备地图、4块主公面板、人物牌、锦囊牌，以及普通士兵、所有权、繁荣、太守、部署、渡河和资源标记。</p>
+<p>公共人才库共80张：关陇、中原、河北、楚地各7张具名人物和13张通用人物，<strong>全部洗混为一库</strong>。锦囊共40张。桃园三英、貂蝉放在独立特殊牌展示位。</p>
+<p>设置6个公共区域：移出游戏区、人才库、人物展示区、人物弃牌区、锦囊牌库、锦囊弃牌堆。展示区翻开3张常规人物；移出游戏区、两种弃牌堆开局为空。搜寻效果使用的临时第4展示位暂空。</p></div></details>
+<details class="rule-detail" id="section-2-2" open><summary>2.2 地图与资源</summary><div class="detail-body"><p>依下表放置所有权和普通士兵。各地区繁荣等于上限（附录A）；汉天子放洛阳，迁都进度为0。</p>
+<div class="table-wrap"><table><thead><tr><th>势力</th><th>基础金</th><th>基础军粮</th><th>基础威望</th><th>初始所有权与驻军</th><th>初始太守机会</th></tr></thead><tbody><tr><td>董卓</td><td>4</td><td>4</td><td>0</td><td>长安2、函谷关1、洛阳3、虎牢关2、伊阙关2、荥阳2、梁县2</td><td>0</td></tr><tr><td>袁绍</td><td>4</td><td>4</td><td>0</td><td>河内2、白马2</td><td>0</td></tr><tr><td>曹操</td><td>4</td><td>4</td><td>0</td><td>陈留2、酸枣2</td><td>0</td></tr><tr><td>孙坚</td><td>4</td><td>4</td><td>0</td><td>南阳2、鲁阳2</td><td>0</td></tr><tr><td>中立诸侯</td><td>—</td><td>—</td><td>—</td><td>金城3、河东3、邺3、颍川3、汝南3</td><td>—</td></tr></tbody></table></div>
+<p>袁绍的【四世三公】另加2金、2粮、2威望，因此实际以6金、6粮、2威望开局。其余标记、战功、军令和已触发里程碑均为0；开局无太守。</p></div></details>
+<details class="rule-detail" id="section-2-3" open><summary>2.3 牌组与顺位</summary><div class="detail-body"><ol><li>每人取2张州府佐吏、2张江湖游士、2张郡国戍卫，加本势力4张起始具名人物，组成10张牌，洗混后抽5张。</li><li>董卓固定第一，袁绍、曹操、孙坚随机排列其后，形成全局固定座次。</li><li>第三位额外获得1金，第四位额外获得2金。首位标记给董卓。</li><li>进入190年春议事阶段；已抽取的开局手牌计入本季补牌数量。</li></ol></div></details>
+</section>
+<section id="rule-3"><h2>3. 通用概念</h2>
+<p class="intro">资源、牌区、地区特色与卡牌流转集中定义，后文直接引用。</p>
+
+<details class="rule-detail" id="section-3-1"><summary>3.1 资源与标记</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>名称</th><th>用途与限制</th></tr></thead><tbody><tr><td>威望</td><td>决定胜负；不能低于0。失去威望时每少扣1点，改获1枚起义标记</td></tr><tr><td>战功</td><td>本季战斗奖励；个人朝会按1:1转为威望并清空；夺取地区不另给战功</td></tr><tr><td>金</td><td>支付募兵、影响费、贸易、朝贡与牌面代价</td></tr><tr><td>粮</td><td>行军与牌面代价；每移动1步，通常按实际移动普通士兵数支付</td></tr><tr><td>军令</td><td>军事阶段的公共可见资源；用于移动、进攻和战斗加力，跨行动保留</td></tr><tr><td>普通士兵</td><td>每名提供3战力；每地区、每势力至多6名</td></tr><tr><td>繁荣</td><td>地区的内政基础强度；范围为0至该地区上限</td></tr><tr><td>治民／起义标记</td><td>影响议事补牌；取得时与另一种逐枚抵消，无持有上限</td></tr></tbody></table></div>
+<p>金、粮无通用上限，不能负债支付。威望增加按效果时机生效，不必经过战功；只有战斗结果产生战功。减少威望不减少战功。</p></div></details>
+<details class="rule-detail" id="section-3-2"><summary>3.2 地区、军团与冲突</summary><div class="detail-body"><p>地区所有权与驻军独立记录。友军共处、撤空守军、移动进入或时期转换，均不自动改变所有权。</p>
+<p>同一势力在同一地区的全部普通士兵组成1支军团；敌对军团共处时，该地区为<strong>冲突地区</strong>。冲突本身不限制内政、兵力部署、任命太守或太守效果。</p>
+<p>地区包含城市、大城和关隘；效果写“城市”时包含大城，不含关隘。牌面写“己方地区”按所有权判断，不按驻军判断。兵牌不是普通士兵，不增加兵数、行军耗粮或战损人数，也不能独立维持军团或参加斗将。</p></div></details>
+<details class="rule-detail" id="section-3-3"><summary>3.3 五个玩家牌区</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>区域</th><th>功能</th></tr></thead><tbody><tr><td>牌库</td><td>自己已拥有的人物牌；抽空时洗混自己的弃牌区继续抽取</td></tr><tr><td>手牌</td><td>唯一能正常打出人物的区域；人物与锦囊分开摆放</td></tr><tr><td>打出区</td><td>本季已打出的人物；内政、军事、朝会共用</td></tr><tr><td>弃牌区</td><td>弃置人物；以后可洗回牌库</td></tr><tr><td>太守区</td><td>已任命人物，跨季保留</td></tr></tbody></table></div>
+<p>“牌组数量”包括以上五区的人物牌，不包括移出游戏区。公共人才库与个人牌库不能混用。</p></div></details>
+<details class="rule-detail" id="section-3-4"><summary>3.4 打出、回收与移除</summary><div class="detail-body"><p>人物牌有内政、军事、朝会三栏。<strong>从手牌打出时只结算当前阶段的一栏</strong>，牌放入打出区。当前阶段必须有合法用途：</p>
+<ul><li>内政：至少有1项能实际执行的内政行动。</li><li>军事：【武】有军令、战力或可生效军事效果；【文】可部署以增加锦囊限额；【兵】有合法部署军团且军事栏有用途。</li><li>朝会：该栏有收益，且当前满足条件、能支付代价。</li></ul>
+<p>“弃置”将牌放回所属玩家弃牌区；“移除卡牌”将牌放入公共移出游戏区。自由选择己方人物来<strong>任命或移除</strong>时，可选手牌、打出区、弃牌区；指定某张牌、敌方牌或失地太守的效果按指定对象处理。</p>
+<p>回到手牌的人物可依当前阶段规则再次打出，但不重置每季／每局次数。<strong>卡牌发动的回手效果不能选择发动牌自身</strong>，其他同名实体牌可选。通用朝会回收不受此限制。</p>
+<p>部署标记与实体人物牌一一对应。同名牌必须能区分；取回或移除来源牌时，清除它的配对部署标记。战斗退场与强制召回的区别见7.2。</p></div></details>
+<details class="rule-detail" id="section-3-5"><summary>3.5 地区特色的使用</summary><div class="detail-body"><p><strong>每个地区、全体势力合计，每季只有1次特色机会。</strong></p>
+<p>城市本季第1次内政行动后即耗用特色机会；只有行动类型匹配时才取得加成，后来其他玩家也不能再用。文官太守的强化共用同一次机会。关隘则在本季第1场战斗中提供防守+2，战后耗用；关隘执行内政不消耗这项防御机会。</p>
+<p>除中立地区议事恢复外，繁荣不自动恢复。已执行内政、特色已耗用及关隘已交战均需记录。</p></div></details>
+<details class="rule-detail" id="section-3-6"><summary>3.6 信息与裁定</summary><div class="detail-body"><p>公开：资源与标记、地区状态、部署人物及来源、各牌堆数量、人物手牌和锦囊数量、打出区／弃牌区／太守区内容、公开人物及投资、顺位、联盟目标、技能使用和本季行动记录。</p>
+<p>隐藏：他人手牌内容、牌库顺序、未公开的战斗锦囊与军令提交。除牌面允许外不能查看。自己的手牌可随时查看；锦囊使用后面朝下放入公共锦囊弃牌堆，牌库抽空时洗混该堆。</p>
+<p>明确的“不能、无视、改为”效果优先，其次地区与太守效果，最后通用规则。同一时点先由行动玩家处理自己的效果，再按本季顺位处理其他势力。除法未注明时向下取整；募兵例外向上取整。</p></div></details>
+</section>
+<section id="rule-4"><h2>4. 议事阶段</h2>
+<p class="intro">全体先结算太守收入，再处理标记和补牌，最后设定联盟目标。</p>
+<p>每季依次执行：</p>
+<ol><li><strong>更新政局</strong>：若上季登记联军解散，进入群雄逐鹿时期；双人局先完成联军分裂（附录D）。</li><li><strong>季度准备</strong>：核对持续效果，重置每季次数、地区特色和地区战斗次数，洗混剩余锦囊牌库；各中立地区繁荣+1，不超过上限。</li><li><strong>地区兜底（仅四人）</strong>：拥有地区少于2个的玩家，可接管1个属于自己初始地域的普通中立地区，将其全部士兵变为己方士兵。每人每季至多1次，可放弃。初始地域为董卓关陇、袁绍河北、曹操中原、孙坚楚地。</li><li><strong>太守收入</strong>：按顺位结算全部太守区收入（10.2），同一玩家自行排列太守顺序；其间获得的治民或起义标记当季可用。全体收入完成后才补牌。</li><li><strong>补牌</strong>：每人通常补手牌至5张，再处理至多1枚治民或起义标记。治民：移除1枚，额外抽1张，即使原手牌已满也可用。起义：本次少抽1张；只有原本能抽牌时才移除，否则保留。</li><li><strong>联盟目标</strong>：讨董联军时期，袁绍可指定1个董卓控制地区为本季目标，也可不设（11.2）。议事阶段不打出人物。</li></ol>
+<blockquote>补牌例：手牌3张且有2枚起义标记，原应抽2张；移除1枚起义标记，只抽1张，另1枚保留。手牌5张且有治民标记，仍可移除1枚并抽1张。</blockquote>
+</section>
+<section id="rule-5"><h2>5. 内政阶段</h2>
+<p class="intro">每次选择人物、行动与地区，完整结算一次，再轮到下一位。</p>
+
+<details class="rule-detail" id="section-5-1"><summary>5.1 行动步骤与进入条件</summary><div class="detail-body"><p>从首位起轮流行动。每次打出1张人物，选择其列出的1项内政行动和1个地区，完成全部效果后结束本次行动；也可PASS，退出本阶段。所有人PASS后进入军事。</p>
+<ol><li><strong>先检查资格与费用</strong>：能否进入该地区、最终强度是否足够、能否支付影响费和行动代价、行动是否有效。</li><li>支付影响费，开始行动，处理行动前效果；搜寻、刷新等附带选择不另收影响费。</li><li>计算强度，选择实际数量，支付并结算内政行动。</li><li>先结算地区特色，再结算人物的行动后效果；明确写在行动前或其他时机的效果按牌面处理，完成全部选择。</li></ol>
+<div class="table-wrap"><table><thead><tr><th>地区所有者</th><th>进入条件</th></tr></thead><tbody><tr><td>自己</td><td>无影响费</td></tr><tr><td>友好的中立势力</td><td>支付2金影响费</td></tr><tr><td>其他玩家或敌对中立势力</td><td>须使用【细作】，免影响费</td></tr></tbody></table></div>
+<p>所有内政行动均适用，包括招贤。己方士兵驻扎、地区冲突或路程不改变进入条件。【细作】只免影响费，仍须支付行动本身的费用。</p></div></details>
+<details class="rule-detail" id="section-5-2"><summary>5.2 强度与七种行动</summary><div class="detail-body"><p>行动强度＝行动前繁荣＋可用地区特色＋人物、太守、技能及锦囊修正。繁荣为0仍可行动，只要修正后的强度至少1；巡查不依赖强度。</p>
+<div class="table-wrap"><table><thead><tr><th>行动</th><th>支付与收益</th><th>繁荣变化</th></tr></thead><tbody><tr><td>征税</td><td>获得等于强度的金</td><td>-1</td></tr><tr><td>筹措</td><td>获得等于强度的粮</td><td>-1</td></tr><tr><td>募兵</td><td>至多募得强度÷2向上取整的兵，每兵支付1金；可少募，不能超过容量</td><td>-1</td></tr><tr><td>招贤</td><td>获得等于强度的招募点，按第6章使用</td><td>-1</td></tr><tr><td>贸易</td><td>春、秋：每1金换2粮；夏、冬：每1粮换2金。投入数量至多等于强度</td><td>+1</td></tr><tr><td>巡查</td><td>支付1金，获得1枚治民标记；地区须能恢复繁荣</td><td>+1</td></tr><tr><td>掠夺</td><td>同时获得等于强度的金和粮，获得1枚起义标记</td><td>-2</td></tr></tbody></table></div>
+<p>繁荣变化始终受0与上限约束。募兵还受现有金与本地区6兵上限限制；贸易须至少兑换1份。掠夺不失去威望，无通用次数限制。</p></div></details>
+<details class="rule-detail" id="section-5-3"><summary>5.3 内政锦囊与恢复</summary><div class="detail-body"><p>每次内政行动可使用1张相应锦囊，依附录C所列窗口结算。【人脉】可在自己的内政行动回合独立发动，不必执行招贤。</p>
+<p>恢复繁荣可通过巡查、贸易、人物或锦囊效果完成。友军／敌军在场不妨碍恢复；正常内政的进入条件仍适用。</p></div></details>
+</section>
+<section id="rule-6"><h2>6. 招贤、搜寻与展示区</h2>
+<p class="intro">先放自动点数，再处理搜寻或刷新，最后自由分配招募点。</p>
+
+<details class="rule-detail" id="section-6-1"><summary>6.1 一次招贤的顺序</summary><div class="detail-body"><ol><li><strong>先放自动点数</strong>：开始招贤时，向当时展示区所有与行动地区同地域的人物各放己方1点；曹操【求贤令】再向当时全部展示人物各放1点。两者可叠加。</li><li>处理人物附带的搜寻或可选刷新。自动点数先于这些效果；本次新补出的牌不补放自动点数。</li><li>获得行动强度对应的招募点，可自由分配至任意公开人物，也可每支付2点访贤、抽1张锦囊。</li><li>任何人物上的己方点数达到招募费用，立即招募。继续分配剩余点数；行动结束未用点数失去。</li></ol>
+<p>地域只影响自动点数，不限制投资和招募。通常招募所得人物：讨董联军时期放入个人弃牌区，群雄逐鹿时期放到个人牌库顶；牌面另有说明时按牌面。招贤以外获得的招募点也立即使用，但不触发地区或求贤令的开始奖励；未指定用途的点数可投资或访贤。</p></div></details>
+<details class="rule-detail" id="section-6-2"><summary>6.2 人物离场与投资奖励</summary><div class="detail-body"><p>公开人物被招募或弃置时，检查该牌上的所有投资：</p>
+<ul><li>每名投入<strong>至少3点</strong>的玩家，各获得1次该人物太守栏的收入；“无”不奖励。这不是任命太守。</li><li>常规位离场即补足3张，随后结算奖励，最后清空该牌投资。【名】奖励的3点只能投资公开人物，不能访贤。</li><li>弃置公开人物时，若有唯一最高投资者，由其取得人物并放入个人弃牌区；并列最高或无人投资则放入公共人物弃牌区。<strong>刷新除外</strong>，见6.4。</li></ul>
+<p>常规人物最多3张。人才库抽空时，洗混公共人物弃牌区继续抽取；无牌可抽时才不足3张。</p></div></details>
+<details class="rule-detail" id="section-6-3"><summary>6.3 搜寻：临时第4位</summary><div class="detail-body"><p>按指定标签（地域、文／武／兵或太守简称）翻开人才库，直到找到符合者；【人脉】也可指定费用。未选中的牌弃置；将找到的人物放入临时第4位。</p>
+<p>已有搜寻人物时，先按6.2弃置旧牌，新牌替换它。搜寻人物被招募或弃置后<strong>不补位</strong>；因此展示区最多4张。无符合人物则搜寻无结果。</p>
+<p>搜寻不收独立费用，也不额外提供招募点；具体牌面给予的点数照常结算。</p></div></details>
+<details class="rule-detail" id="section-6-4"><summary>6.4 刷新与清流议士</summary><div class="detail-body"><p>刷新把3张常规人物放入公共人物弃牌区，不能按最高投资取得；但仍给予所有至少3点投资者离场奖励，然后补足3张。临时搜寻位不受影响。</p>
+<p>清流议士在招贤行动中可刷新1次：自动点数放完后即可选择，也可先投入部分点数再刷新。执行贸易时，则在行动前刷新。</p></div></details>
+</section>
+<section id="rule-7"><h2>7. 军事阶段</h2>
+<p class="intro">打牌和花军令可以分开选择；兵牌不占文／武出牌额度。</p>
+
+<details class="rule-detail" id="section-7-1"><summary>7.1 每次行动</summary><div class="detail-body"><p>从首位起轮流行动。每次可打出至多1张【文】或【武】，并使用已有军令行军或进攻；不必为了使用军令而打牌。<strong>兵牌不占这1张额度，可单独打出，也可打出多张。</strong></p>
+<p>只要打出人物或消耗军令，就算一次行动；两者都不做则PASS。已PASS者退出本阶段，剩余军令弃掉，但仍能防守、紧急部署并使用由此获得的军令，不重新加入主动行动。无手牌且无军令时自动PASS。所有玩家PASS后结束军事。</p>
+<p>军事人物打出即取得牌面军令；军令跨本阶段行动保留，战斗结束不清空。紧急部署也提供军令。</p></div></details>
+<details class="rule-detail" id="section-7-2"><summary>7.2 部署与容量</summary><div class="detail-body"><p>打出军事人物时，可普通打出，或将其部署到1支己方军团，放置与来源牌配对的标记。部署失败不放标记，卡牌仍进打出区，能结算的效果照常结算。</p>
+<div class="table-wrap"><table><thead><tr><th>类别</th><th>军团容量</th><th>部署后的通用收益</th></tr></thead><tbody><tr><td>文、武</td><td>合计最多2张</td><td>各自战力及军事效果；每张【文】另使本军团战斗锦囊限额+1</td></tr><tr><td>兵</td><td>不计入上述2张；最多等于军团普通士兵数</td><td>牌面战力与效果；不提供军令</td></tr></tbody></table></div>
+<p>军团可有多个将领，全部生效，不区分主副将；文官即使军事栏无其他效果，也可部署以提供锦囊额度。</p>
+<p>同季不能主动替换已部署人物。合军导致文／武超出容量时，选择超额人物强制召回。普通士兵减少或合军后兵牌超额时，选择多余兵牌清除部署标记，来源牌留在打出区。普通打出但未部署的人物不能在之后补部署。</p>
+<p><strong>战斗退场</strong>只清除标记，人物留在打出区；<strong>强制召回</strong>清除标记，并将人物从打出区弃置。均不退还已取得或花费的军令。军团无兵时不能维持部署；战后无兵清除全部标记、来源牌留在打出区。</p></div></details>
+<details class="rule-detail" id="section-7-3"><summary>7.3 行军</summary><div class="detail-body"><ol><li>选择1支己方军团、相邻目的地及移动兵数。通常每步支付<strong>1军令＋每移动兵1粮</strong>；从敌方地区移向敌方地区时改付2军令。</li><li>移动全部或部分普通士兵。拆分时选择每张部署牌随哪支军团，两边均须有兵且不超容量；合军后按7.2处理容量。</li><li>跨河不付金，但立即停止本次行动，获得渡河标记；在该玩家<strong>下一次正常军事行动开始</strong>时移除。防守响应不算下一次正常行动。</li><li>进入有敌军的地区停止继续移动。可依法发起进攻；一旦完成1场进攻，本次行动结束。</li></ol>
+<p>免费调兵免军令、粮与金，仍须相邻、符合容量，并遵守渡河等移动限制。牌面允许直接部署募得士兵到邻地时，按牌面处理。</p></div></details>
+<details class="rule-detail" id="section-7-4"><summary>7.4 发动进攻</summary><div class="detail-body"><p>支付1军令，在己方军团所在地区选择1支敌方军团，按第8章战斗。每地区每季至多2场战斗；同一行动不能在同一地区连续发起两场。</p>
+<p>若地区属敌方且无敌对驻军，可支付1军令进攻空城，直接取得所有权，不进入战斗，不耗战斗次数，不给战功或战败锦囊补偿。移动进来本身不会自动占领。</p></div></details>
+</section>
+<section id="rule-8"><h2>8. 战斗</h2>
+<p class="intro">按六步结算战斗；战损、战功与地区易主分别判断。</p>
+
+<details class="rule-detail" id="section-8-1"><summary>8.1 六步结算</summary><div class="detail-body"><ol><li><strong>指定敌军</strong>：进攻方选1支防守军团；同地区其他军团不协战、不承受战损。</li><li><strong>紧急部署</strong>：若防守军团没有任何部署标记，可从手牌部署至多1张文／武，以及至多等于普通士兵数的兵牌；也可只部署兵牌。正常部署规则适用，不消耗之后主动打牌额度。已PASS者也可响应。</li><li><strong>秘密提交</strong>：双方各选择合法锦囊、主动技能及投入军令。通常各可用1张战斗锦囊，每部署1张文另加1张；主公技能不占限额。每投入1军令，战力+1，立即支付且不能重复使用。</li><li><strong>同时公开</strong>：先判断克制，再依次处理有效【疑阵】、【斗将】及其他修正。郭嘉的例外按牌面：先看敌方提交的锦囊和军令，再提交己方。</li><li><strong>比较战力与战损</strong>：依8.2—8.3结算。处理伤亡增减、撤退及部署超额。</li><li><strong>结算结果</strong>：胜败效果、战功、战败补偿与地区易主（8.4），随后结束本次进攻行动。</li></ol>
+<p>战斗预测只展示公开信息，不含未揭示锦囊、军令与技能选择。双方提交期间，不得依据对方未公开内容改选。</p></div></details>
+<details class="rule-detail" id="section-8-2"><summary>8.2 战力</summary><div class="detail-body"><p><strong>总战力＝参战普通士兵数×3＋部署人物＋地形／太守／主公／锦囊＋投入军令－减益。</strong></p>
+<p>只计算本场目标军团。关隘首次防守加成见3.5；太守范围见10.3。两项通用减益：</p>
+<ul><li><strong>渡河：-5</strong>。军团有渡河标记时适用。</li><li><strong>断粮：-5</strong>。在己方地区不算断粮；否则须相邻至少1个己方、友军或友好中立控制地区才能免除，连接地区处于冲突也有效。仅有己方驻军、但所有权敌对的地区不提供补给。</li></ul>
+<p>两项可叠加。鲁肃免疫适用的战力减益，包括断粮、渡河与火攻；不阻止斗将退场，也不改变伤亡。</p></div></details>
+<details class="rule-detail" id="section-8-3"><summary>8.3 战损与撤退</summary><div class="detail-body"><p>战力差取双方总战力差的绝对值。差0—1视为平局；其余较高者胜。</p>
+<div class="table-wrap"><table><thead><tr><th>战力差</th><th>胜方基础伤亡</th><th>败方基础伤亡</th></tr></thead><tbody><tr><td>0—1（平局）</td><td>双方0</td><td>双方0</td></tr><tr><td>2—5</td><td>1</td><td>1</td></tr><tr><td>6—9</td><td>1</td><td>2</td></tr><tr><td>10及以上</td><td>0</td><td>2</td></tr></tbody></table></div>
+<p>先按基础值及“伤亡+X”确定离开战场的兵数，最多为现有士兵数；“伤亡-X”则将其中至多X名从阵亡改为撤退。<strong>增伤与减伤不互相抵消</strong>。</p>
+<p>撤退至相邻、非冲突且有容量的己方或友军地区，不能跨河。多个合法地点由该玩家选择，可分配；无合法地点则仍阵亡。撤退兵保留原势力颜色。</p>
+<blockquote>伤亡1且有“伤亡-1”：仍有1兵离开战场；有合法地点便撤退，否则阵亡。战功只按实际阵亡，不按离开战场的总数。</blockquote></div></details>
+<details class="rule-detail" id="section-8-4"><summary>8.4 战功、补偿与易主</summary><div class="detail-body"><ul><li><strong>战功</strong>：仅实际胜方，按败方本场阵亡普通士兵数取得，受时期对象及每季2／3上限约束（1.2）。平局、败方、空城与夺城本身不获战功。</li><li><strong>战败补偿</strong>：实际败方玩家抽1张锦囊；中立军团不抽，平局也不抽。</li><li><strong>取得所有权</strong>：防守方是原地区所有者、进攻方获胜后仍有兵，且地区已无其他敌对军团，才取得该地区。双方都无兵时不易主。</li><li><strong>群雄逐鹿时期</strong>：夺取城市或大城获得1枚起义标记，关隘不产生此标记。</li><li><strong>失地</strong>：不扣金粮、不加起义；失去太守标记按10.4处理。</li></ul>
+<p>祖茂的“视为胜利”只触发胜利类效果（含孙坚连胜），不改变实际胜负、伤亡、战功、战败补偿或所有权。</p></div></details>
+<details class="rule-detail" id="section-8-5"><summary>8.5 三角克制与斗将</summary><div class="detail-body"><p>三角关系：<strong>疑阵克伏击，伏击克斗将，斗将克疑阵</strong>。被克制锦囊无效；同名锦囊均正常结算；火攻不参与克制。完整锦囊见附录C。</p>
+<p>四种战斗锦囊都没有额外发动条件，通用窗口、封锁和使用限额仍适用。【疑阵】先结算：敌方1名普通士兵沿合法退路撤离，不计战损；无路可退时留在原地，本场不参战且不承受战损。鲁肃仍可免疫疑阵。</p>
+<p>有效【斗将】的使用方先获本场战力+1。双方各选1名参战【武】人物，按牌面战力掷等量骰（0／0／1／1／2／2★），由当前行动玩家一次掷出双方骰子。2★也计2点。比较总点数，平局无胜方；只有一方有武将时该方自动获胜，无须掷骰；双方都无武将则无胜方。胜方若使用了有效【斗将】，本场额外+3。仅当胜方的2★严格多于败方，才撤下败将部署标记，人物牌留在打出区。双方均使用也只决斗1次，不追加军令或扣除败将牌面军令。</p></div></details>
+<details class="rule-detail" id="section-8-6"><summary>8.6 诈降士兵</summary><div class="detail-body"><p>将1名普通士兵横置，仍属原势力并计入兵数。其军团战斗开始、选择锦囊前，把本地区己方诈降士兵恢复普通士兵：本场己方锦囊不受三角克制，且造成的最终战力修正翻倍；多名不叠加。</p>
+<p>诈降不改变使用窗口、限额或费用。【疑阵】仍只处理1名普通士兵，不额外迫使另一名士兵或兵牌退场；诈降强化另使该敌军战力-3。诈降士兵离开地区或地区不再冲突时，亦恢复普通士兵。</p></div></details>
+</section>
+<section id="rule-9"><h2>9. 朝会阶段</h2>
+<p class="intro">全体先回收，再逐人完成打牌、结算、任命与出价。</p>
+
+<details class="rule-detail" id="section-9-1"><summary>9.1 全体先回收人物</summary><div class="detail-body"><p>在任何个人朝会前，按顺位，每人可从<strong>自己的打出区或太守区回收1张人物到手牌</strong>；可放弃，机会不累积。回收部署人物清除配对标记；回收太守牌同时撤下1枚己方同文／武标记，多个可选。</p>
+<p>回收不撤销已结算行动，不重置次数。所有人完成后，才从首位起依次进行个人朝会。</p></div></details>
+<details class="rule-detail" id="section-9-2"><summary>9.2 一次个人朝会</summary><div class="detail-body"><p>轮到自己时连续完成，结束后不再重新进入：</p>
+<ol><li><strong>逐张打牌</strong>：每张先检查当前条件与代价，立即结算，然后可继续。前一张牌可以使后一张满足条件；可保留不打。按窗口使用朝会锦囊和主公技能。</li><li><strong>战功转化</strong>：全部战功按1:1转威望并清空；非董卓玩家每转化1战功，迁都进度+1（11.4）。</li><li><strong>任命太守</strong>：新跨过4／8／12威望各获1次机会，使用任意已存机会任命（第10章）。</li><li><strong>完成个人结算</strong>：可弃置任意人物手牌。董卓检查焚城迁都；袁绍结算本季联盟目标（第11章）。</li><li><strong>朝贡出价</strong>：公开出价1次，之后轮到下一名玩家。</li></ol></div></details>
+<details class="rule-detail" id="section-9-3"><summary>9.3 朝贡</summary><div class="detail-body"><p>每人仅1次机会：选0表示不出价，或出<strong>1—9金且高于当前最高价</strong>。出价不得超出可用金。立即锁定等额金，不能支付其他费用；被超过时解锁，不能重新竞价。</p>
+<p>全员结束个人朝会后，最终最高者支付出价，获得下季首位标记。无人出价则原首位保留，座次不变。最高价至少6金时，获胜者额外获得1威望；汉天子所在地区控制者另得1威望，两项独立。</p>
+<p>此时跨过的太守里程碑照常获得机会，留待之后使用，不重开个人朝会。</p></div></details>
+<details class="rule-detail" id="section-9-4"><summary>9.4 季末检查与清场</summary><div class="detail-body"><p>全员个人朝会完成后，依次：</p>
+<ol><li>结算朝贡与汉天子收益。</li><li>吕布主公弃置全部锦囊；其他玩家锦囊超过5张时弃至5张。平时可以超过5张。</li><li>检查16威望、群雄逐鹿7地区或192年冬时限；若结束，结算终局锦囊、依1.1排名。</li><li>若继续，结算季末指定移除效果，清除全部军团部署，将打出区剩余人物放入个人弃牌区；<strong>冲突地区也不保留部署</strong>。</li><li>保留太守牌、未打出手牌和持续资源；清除本季临时状态，推进季度。明确写有持续期限的特殊效果按牌面期限处理。</li></ol></div></details>
+</section>
+<section id="rule-10"><h2>10. 太守</h2>
+<p class="intro">牌在太守区，地图只放文／武标记；收入与地区基础效果分别结算。</p>
+
+<details class="rule-detail" id="section-10-1"><summary>10.1 机会与任命</summary><div class="detail-body"><p>首次达到或跨过<strong>4／8／12威望</strong>，各获得1次任命机会，永久勾选；威望下降不撤销，也不重复发放。机会可保留，部分牌也可给予机会。</p>
+<p>个人朝会战功转化后、朝贡前，每花1次机会，从手牌、打出区或弃牌区选择1张可任命的文／武人物放入太守区，在己方1个无太守地区放相应文／武标记。<strong>冲突地区与关隘均可</strong>；每地区至多1枚。兵牌、特殊人物和太守栏为“无”的人物不可任命。</p>
+<p>任命不算打出，不触发人物三栏。人物牌不绑定具体地点，地区只记录太守类别。</p></div></details>
+<details class="rule-detail" id="section-10-2"><summary>10.2 太守收入</summary><div class="detail-body"><p>人物的太守简称有两种用途：</p>
+<ul><li><strong>离场奖励</strong>：公开人物被招募或弃置时，所有至少投入3点的玩家各领1次（6.2）。</li><li><strong>在任收入</strong>：任命后从下一季起，每次议事按太守区各牌结算1次，且早于补牌。</li></ul>
+<div class="table-wrap"><table><thead><tr><th>太守效果</th><th>议事阶段收入</th></tr></thead><tbody><tr><td>无</td><td>不可任命</td></tr><tr><td>校</td><td>在任一己方地区获得1兵</td></tr><tr><td>勇</td><td>二选一：在任意与己方处于冲突的地区移除1名敌方普通士兵；或令1名玩家获得1枚起义Token</td></tr><tr><td>督</td><td>获得3军令；可留至本季军事阶段使用</td></tr><tr><td>屯</td><td>获得3粮</td></tr><tr><td>商</td><td>获得3金</td></tr><tr><td>谋</td><td>抽取2张锦囊，再弃置1张锦囊</td></tr><tr><td>名</td><td>获得3招募点，仅可自由投入公开人物，不可访贤</td></tr><tr><td>佐</td><td>获得1治民Token</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-10-3"><summary>10.3 地区上的基础效果</summary><div class="detail-body"><p><strong>文太守</strong>：强化该地区印刷的内政／抽牌特色，仅供太守所属势力使用。强度+1通常变为+2；洛阳抽1人物变为抽2弃1，长安抽1锦囊变为抽2弃1。仍须特色机会未使用（3.5）。</p>
+<p><strong>武太守</strong>：己方军团在该地区或相邻地区战斗时战力+1，进攻防守均可，不同太守可叠加。</p>
+<p>冲突不使太守失效。友军与敌军不借用太守强化。沮授军事效果使己方文、武太守都提供战力+1，范围扩至两步，不把数值再翻倍。</p></div></details>
+<details class="rule-detail" id="section-10-4"><summary>10.4 失地、回收与迁移</summary><div class="detail-body"><p>失去有太守的地区时，清除地区标记，并由失地方从太守区选择1张相同文／武牌移出游戏；机会不返还。</p>
+<p>回收太守牌时选择撤下1枚己方相同文／武标记；移除该实体牌有配对的部署标记时一并清除。</p>
+<p>州郡治中可在己方领地内迁移任意1枚己方太守标记至另一己方无太守地区，类别不变；冲突地区与关隘均可。只移标记，不换卡牌。</p></div></details>
+</section>
+<section id="rule-11"><h2>11. 主公、汉天子与迁都</h2>
+<p class="intro">主公技能、联盟目标、汉天子和迁都集中查阅。</p>
+<p>主公不是人物牌。主动技能不占行动，使用后继续当前行动；每季一次在议事重置。</p>
+<details class="rule-detail" id="section-11-1"><summary>11.1 四位主公</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>主公</th><th>主动技能</th><th>被动技能</th></tr></thead><tbody><tr><td>董卓</td><td><strong>掌控朝政</strong>：个人朝会每季1次，获得1枚起义标记，移除自己1张人物，迁都进度+1</td><td><strong>西凉铁骑</strong>：本势力所有战斗战力+1</td></tr><tr><td>袁绍</td><td><strong>盟主号令</strong>：讨董联军时期议事选本季目标，也可不选；见11.2</td><td><strong>四世三公</strong>：开局额外2金、2粮、2威望</td></tr><tr><td>曹操</td><td><strong>宁我负人</strong>：每季1次，本势力实际平局或战败后，可移除自己1张人物</td><td><strong>求贤令</strong>：招贤开始，给当时全部公开人物各放己方1招募点</td></tr><tr><td>孙坚</td><td><strong>先登破阵</strong>：每季1次，作为进攻方在锦囊公开前发动；本场胜则敌方伤亡+1，败则己方伤亡+1，平局无效果</td><td><strong>所向披靡</strong>：连续第2场及之后每场胜利，直接获得1威望；平局或战败归零</td></tr></tbody></table></div>
+<p>自由选择移除的牌源见3.4；不能借技能移除太守。主公效果不凭空产生战功。</p></div></details>
+<details class="rule-detail" id="section-11-2"><summary>11.2 联盟目标</summary><div class="detail-body"><p>袁绍可选任意董卓控制地区，包含关隘。<strong>袁绍个人朝会结束、朝贡前</strong>检查：目标由袁绍、曹操或孙坚控制，袁绍+1威望，控制者+3金；同一玩家可兼得。没有目标或未完成，均无收益与惩罚。</p>
+<p>本季登记联军解散不取消现有目标。下一季进入群雄逐鹿后不再设目标。</p></div></details>
+<details class="rule-detail" id="section-11-3"><summary>11.3 汉天子</summary><div class="detail-body"><p>汉天子随所在地区所有权转移。全体朝贡结束时，控制者获得1威望；与朝贡获胜的收益独立。</p></div></details>
+<details class="rule-detail" id="section-11-4"><summary>11.4 迁都与洛阳</summary><div class="detail-body"><p>非董卓玩家在个人朝会将战功转为威望时，每转化1战功，迁都进度+1。人物牌的特殊推进按牌面结算。迁都进度范围为0—10。</p>
+<p>董卓可用【掌控朝政】增加1进度；进度已满不能发动。双人局若迁都机会仍在，全体朝会结束时自然增加1进度，并再次检查焚城条件。</p>
+<p>在董卓个人朝会结算时，若进度至少10、仍控制洛阳且焚城机会未失去，<strong>无论洛阳是否冲突</strong>，焚毁洛阳并执行：</p>
+<ol><li>董卓失去1威望。</li><li>汉天子移到长安。</li><li>洛阳当前繁荣与上限永久变为1；仍保留原抽牌特色及文太守强化。</li><li>登记联军解散，下季议事进入群雄逐鹿。</li></ol>
+<p>董卓在焚毁前失去洛阳，也登记下季解散，但不焚城，汉天子留原地，且永久失去焚城迁都机会；夺回洛阳不能恢复。</p></div></details>
+<details class="rule-detail" id="section-11-5"><summary>11.5 吕布彩蛋主公</summary><div class="detail-body"><p>貂蝉朝会效果可把董卓主公面板永久换为吕布，原两技能立即失效；座次、颜色、地区与资源不变。</p>
+<ul><li><strong>无双飞将（主动，每季1次）</strong>：战斗锦囊／技能提交窗口，若本场己方军团未部署【武】，战力+4；不消耗军令、不占锦囊限额。紧急部署后再检查。</li><li><strong>不纳谋臣（被动）</strong>：每季结束弃置全部锦囊。</li></ul></div></details>
+</section>
+<section id="appendix-a"><h2>附录A　地图与地区</h2>
+<p class="intro">查地区特色、繁荣上限与相邻路线。</p>
+
+<details class="rule-detail" id="section-A-1"><summary>A.1 地区表</summary><div class="detail-body"><p>地域颜色用于识别来源，不限制人物招募。初始繁荣等于上限。</p>
+<div class="table-wrap"><table><thead><tr><th>地区</th><th>地域／UI色</th><th>类型</th><th>繁荣上限（开局即满）</th><th>地区效果</th></tr></thead><tbody><tr><td>长安</td><td>关陇／黑</td><td>大城</td><td>5</td><td>完成内政后抽取1张锦囊；全场每城每季一次；己方文官太守强化为抽取2张锦囊、弃置1张</td></tr><tr><td>金城</td><td>关陇／黑</td><td>城市</td><td>3</td><td>招贤强度+1</td></tr><tr><td>函谷关</td><td>关陇／黑</td><td>关隘</td><td>2</td><td>本季首场战斗防守战力+2，战后失效</td></tr><tr><td>洛阳</td><td>关陇／黑</td><td>大城</td><td>5</td><td>完成内政后抽取1张人物牌；全场每城每季一次；己方文官太守强化为抽取2张人物牌、弃置1张</td></tr><tr><td>虎牢关</td><td>关陇／黑</td><td>关隘</td><td>2</td><td>本季首场战斗防守战力+2，战后失效</td></tr><tr><td>伊阙关</td><td>关陇／黑</td><td>关隘</td><td>2</td><td>本季首场战斗防守战力+2，战后失效</td></tr><tr><td>荥阳</td><td>中原／蓝</td><td>城市</td><td>3</td><td>筹措强度+1</td></tr><tr><td>酸枣</td><td>中原／蓝</td><td>城市</td><td>3</td><td>募兵强度+1</td></tr><tr><td>陈留</td><td>中原／蓝</td><td>城市</td><td>3</td><td>征税强度+1</td></tr><tr><td>颍川</td><td>中原／蓝</td><td>城市</td><td>3</td><td>招贤强度+1</td></tr><tr><td>邺</td><td>河北／绿</td><td>城市</td><td>3</td><td>招贤强度+1</td></tr><tr><td>河内</td><td>河北／绿</td><td>城市</td><td>3</td><td>筹措强度+1</td></tr><tr><td>河东</td><td>河北／绿</td><td>城市</td><td>3</td><td>募兵强度+1</td></tr><tr><td>白马</td><td>河北／绿</td><td>城市</td><td>3</td><td>征税强度+1</td></tr><tr><td>南阳</td><td>楚地／红</td><td>城市</td><td>3</td><td>征税强度+1</td></tr><tr><td>鲁阳</td><td>楚地／红</td><td>城市</td><td>3</td><td>筹措强度+1</td></tr><tr><td>梁县</td><td>楚地／红</td><td>城市</td><td>3</td><td>募兵强度+1</td></tr><tr><td>汝南</td><td>楚地／红</td><td>城市</td><td>3</td><td>招贤强度+1</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-A-2"><summary>A.2 相邻路线</summary><div class="detail-body"><ul><li>西线：金城—长安—函谷关—洛阳。</li><li>中线：洛阳—虎牢关—荥阳—酸枣—陈留。</li><li>北线：邺—河内、邺—白马、河内—白马、河内—河东。</li><li>南线：南阳—鲁阳—梁县—伊阙关—洛阳。</li><li>侧线：荥阳—颍川—鲁阳；颍川—陈留；颍川—汝南；鲁阳—汝南。</li><li><strong>跨河</strong>：河内—洛阳、白马—酸枣、河东—长安。金城与河东不相连。</li></ul></div></details>
+</section>
+<section id="appendix-b"><h2>附录B　完整人物卡表</h2>
+<p class="intro">完整人物卡表。通用规则不在每张卡上重复。</p>
+<p>本附录保留人物的具体数值与独有效果。通用部署、文官锦囊限额与太守规则见第7、10章，不要求印在每张卡上。卡表中的“无”表示没有该栏效果，能否打出依3.4判断。</p>
+<details class="rule-detail" id="section-B-1"><summary>B.1 起始通用人物（每势力各2张）</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>州府佐吏</td><td>文</td><td>初始人物</td><td>2</td><td>征税，筹措；无</td><td>无</td><td>条件：一个非冲突的己方控制地区繁荣度不低于2；收益：1金1粮</td><td>无</td></tr><tr><td>江湖游士</td><td>文</td><td>初始人物</td><td>2</td><td>招贤，贸易；无</td><td>无</td><td>条件：牌组的卡牌总数不少于11张；收益：支付1金，移除一张牌</td><td>无</td></tr><tr><td>郡国戍卫</td><td>武</td><td>初始人物</td><td>2</td><td>募兵，巡查；无</td><td>军令1；防守时获得1军令</td><td>条件：有与己方处于冲突状态的己方区域；收益：支付1金，在该区域获得1兵</td><td>无</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-2"><summary>B.2 董卓起始人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>吕布</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，掠夺；无</td><td>军令1；战力3；若军团没有其他【武】或【文】人物，战力+1；【斗将】时战力+2</td><td>条件：讨董联军时期、有与己方处于冲突状态的中立区域；收益：威望清零，转化1名中立士兵</td><td>勇</td></tr><tr><td>李儒</td><td>文</td><td>初始人物</td><td>1</td><td>招贤，征税；行动后可支付1金，抽取1张锦囊。</td><td>无</td><td>条件：己方有起义Token；收益：获得2锦囊</td><td>谋</td></tr><tr><td>徐荣</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，筹措；募兵后，可将本次招募的1名士兵部署在相邻己方地区</td><td>军令2；战力1；防守时战力+1</td><td>无</td><td>督</td></tr><tr><td>华雄</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，掠夺；掠夺行动强度+1</td><td>军令1；战力1；【斗将】时战力+2，战败后可移除该角色，迁都进度+2</td><td>无</td><td>校</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-3"><summary>B.3 袁绍起始人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>颜良文丑</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，掠夺；无</td><td>军令2；战力1；进攻胜利时获得1金1粮</td><td>无</td><td>勇</td></tr><tr><td>淳于琼</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，筹措；筹措行动强度+1。</td><td>军令2；战力0；军团不少于3兵时行军耗粮-1</td><td>条件：持有粮不少于8；收益：获得1兵</td><td>校</td></tr><tr><td>逢纪</td><td>文</td><td>初始人物</td><td>1</td><td>筹措，贸易；行动后可支付1金，抽取1张锦囊。</td><td>无</td><td>条件：群雄逐鹿时期、拥有不少于3个地区、邺中立且无冲突；收益：支付1威望，获得邺与士兵的所有权，不获得战功</td><td>谋</td></tr><tr><td>许攸</td><td>文</td><td>初始人物</td><td>1</td><td>招贤，征税；征税行动强度+1。</td><td>无</td><td>条件：持有金不少于8；收益：获得3金</td><td>商</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-4"><summary>B.4 曹操起始人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>夏侯惇</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，筹措；筹措行动强度+1。</td><td>军令1；战力2；双方伤亡+1</td><td>条件：一个非冲突的己方控制地区繁荣度不高于1；收益：提高地区2繁荣，获得2粮</td><td>屯</td></tr><tr><td>夏侯渊</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，巡查；募兵后，可将本次招募的1名士兵部署在相邻己方地区。</td><td>军令1；战力2；进攻时战力+1，无剩余军令时战力+1</td><td>无</td><td>勇</td></tr><tr><td>曹仁</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，筹措；执行内政行动时，基础繁荣视为至少2</td><td>军令2；战力1；防守时战力+1，【疑阵】成功时战力+2</td><td>条件：有与己方处于冲突状态的任意区域；收益：获得1兵</td><td>校</td></tr><tr><td>曹洪</td><td>武</td><td>初始人物</td><td>1</td><td>征税，筹措；征税行动强度+1。</td><td>军令1；战力1；战败时己方伤亡-1</td><td>无</td><td>商</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-5"><summary>B.5 孙坚起始人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>程普</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，筹措；募兵后，可将本次招募的1名士兵部署在相邻己方地区。</td><td>军令2；战力1；胜利时己方伤亡-1</td><td>条件：洛阳烧毁，玉玺未被获得，且有军团处于洛阳；收益：可支付1金，获得玉玺（选择获得2威望或获得2兵2粮）</td><td>督</td></tr><tr><td>黄盖</td><td>武</td><td>初始人物</td><td>1</td><td>筹措，巡查；筹措行动强度+1</td><td>军令2；战力1；【火攻】成功时战力+2</td><td>条件：有与己方处于冲突状态的任意区域；收益：将其中一个地区内的1名己方士兵横置，成为诈降士兵</td><td>屯</td></tr><tr><td>韩当</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，征税；执行内政行动时，基础繁荣视为至少2</td><td>军令2；战力1；军团不多于3兵时战力+1</td><td>无</td><td>校</td></tr><tr><td>祖茂</td><td>武</td><td>初始人物</td><td>1</td><td>募兵，巡查；募兵行动强度+1</td><td>军令1；战力1；【疑阵】成功时战力+2；战败后可移除该角色，战斗视为胜利</td><td>无</td><td>勇</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-6"><summary>B.6 关陇具名人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>贾诩</td><td>文</td><td>7</td><td>1</td><td>招贤，筹措，掠夺；行动后，所有其他玩家获得一枚起义Token。</td><td>军令2；战力0；若敌方军团有2名【武】人物，移除1名敌方【武】人物。【疑阵】成功时战力+2</td><td>条件：有与己方处于冲突状态的任意区域且敌方有起义Token；收益：移除冲突区域一个敌方士兵，并将1名己方士兵横置，成为诈降士兵</td><td>谋</td></tr><tr><td>张辽</td><td>武</td><td>7</td><td>1</td><td>募兵，巡查；募兵后，可将本次招募的至多2名士兵部署在相邻己方地区。</td><td>军令3；战力2；胜利时敌方伤亡+1</td><td>条件：本季战功不少于2；收益：获得1威望2金</td><td>督</td></tr><tr><td>荀攸</td><td>文</td><td>7</td><td>1</td><td>招贤，筹措，征税；行动后抽3张锦囊，再从自己全部锦囊中弃2张</td><td>军令2；战力0；可额外使用一个锦囊，每使用1锦囊战力+1</td><td>条件：持有锦囊牌数量最少；收益：获得三张锦囊</td><td>佐</td></tr><tr><td>皇甫嵩</td><td>武</td><td>6</td><td>1</td><td>募兵，招贤；募兵行动强度+1，行动开始后，可搜寻一名【关陇】角色</td><td>军令3；战力0；军团不少于3兵时战力+2，【火攻】成功时战力+2</td><td>条件：展示区有至少1名【武】角色；收益：在展示区的所有【武】角色上放2招募点</td><td>屯</td></tr><tr><td>徐晃</td><td>武</td><td>6</td><td>1</td><td>募兵，筹措；筹措行动强度+1</td><td>军令2；战力2；进攻时移除敌方2军令，【伏击】成功时战力+2</td><td>无</td><td>校</td></tr><tr><td>王允</td><td>文</td><td>5</td><td>1</td><td>招贤，巡查；行动后可支付1金，抽取1张锦囊。</td><td>无</td><td>条件：打出区有吕布；收益：将貂蝉加入弃牌区</td><td>名</td></tr><tr><td>李傕郭汜</td><td>武</td><td>5</td><td>1</td><td>募兵，掠夺；掠夺行动强度+1</td><td>军令1；战力1；进攻时战力+2，进攻获胜时获得1金1粮</td><td>无</td><td>勇</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-7"><summary>B.7 关陇通用人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>弘农杨氏</td><td>文</td><td>4</td><td>2</td><td>招贤，贸易；无</td><td>无</td><td>条件：打出区或太守区有【谋】角色；收益：每2个【谋】角色获得1威望</td><td>谋</td></tr><tr><td>武威张氏</td><td>武</td><td>4</td><td>2</td><td>募兵，征税；无</td><td>无</td><td>条件：打出区或太守区有【关陇】角色；收益：每2个【关陇】角色获得1兵</td><td>名</td></tr><tr><td>中宫常侍</td><td>文</td><td>2</td><td>3</td><td>征税，贸易；行动后抽1张角色牌，弃1张角色牌</td><td>无</td><td>条件：拥有首位玩家标记；收益：支付3金，获得一次太守任命；或移除一个太守，获得1威望</td><td>无</td></tr><tr><td>北军五校</td><td>兵</td><td>3</td><td>3</td><td>巡查；无</td><td>军令0；战力1；额外获得等于同军团角色最高牌面军令的战力</td><td>无</td><td>无</td></tr><tr><td>陇西羌骑</td><td>兵</td><td>3</td><td>3</td><td>掠夺；无</td><td>军令0；战力2；进攻时移除敌方2军令</td><td>无</td><td>无</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-8"><summary>B.8 中原具名人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>荀彧</td><td>文</td><td>7</td><td>1</td><td>招贤，筹措，巡查；行动后，从打出区拿回一张其他角色牌</td><td>军令2；战力0；防守时获得2军令</td><td>条件：汉天子位于长安、拥有不少于3个地区且未拥有汉天子；收益：支付3金3粮，将汉天子移至控制下的一个非冲突地区</td><td>佐</td></tr><tr><td>郭嘉</td><td>文</td><td>7</td><td>1</td><td>招贤，贸易，征税；行动后，可以从一名玩家手中随机获得1张锦囊</td><td>军令2；战力0；敌方先公开军令和锦囊，再由己方选择军令和锦囊，敌方未使用锦囊时战力+2</td><td>条件：持有锦囊牌数量最多；收益：获得1枚治民Token，并且使一名玩家获得1枚起义Token</td><td>谋</td></tr><tr><td>陈宫</td><td>文</td><td>6</td><td>1</td><td>招贤，募兵；所有行动强度+1；行动开始后，可搜寻一名【中原】角色</td><td>军令1；战力0；军团在【中原】战斗时战力+3</td><td>条件：威望最低；收益：获得1威望</td><td>商</td></tr><tr><td>程昱</td><td>文</td><td>6</td><td>1</td><td>筹措，募兵；行动后抽取1张锦囊</td><td>军令1；战力0；失效敌方一个锦囊，【伏击】成功时战力+2</td><td>条件：有与己方处于冲突状态的任意区域；收益：免费调动2次所选冲突区域内的1名敌方士兵</td><td>名</td></tr><tr><td>乐进</td><td>武</td><td>6</td><td>1</td><td>募兵，筹措，巡查；募兵后，可将本次招募的1名士兵部署在相邻己方地区</td><td>军令2；战力1；进攻时战力+2，双方伤亡+1</td><td>无</td><td>屯</td></tr><tr><td>于禁</td><td>武</td><td>5</td><td>1</td><td>募兵，筹措；募兵行动强度+1</td><td>军令2；战力0；若其所在军团有【兵】人物，战力+3</td><td>条件：展示区有至少1名【兵】角色；收益：在所有展示区的【兵】角色上放2招募点</td><td>校</td></tr><tr><td>典韦</td><td>武</td><td>5</td><td>1</td><td>募兵，巡查，掠夺；无</td><td>军令0；战力2；【斗将】时战力+2，己方伤亡-1</td><td>无</td><td>勇</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-9"><summary>B.9 中原通用人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>济阴李氏</td><td>武</td><td>4</td><td>2</td><td>募兵，筹措；无</td><td>无</td><td>条件：打出区或太守区有【屯】角色；收益：每2个【屯】角色获得1威望</td><td>屯</td></tr><tr><td>颍川陈氏</td><td>文</td><td>4</td><td>2</td><td>招贤，征税；无</td><td>无</td><td>条件：打出区或太守区有【中原】角色；收益：每2个【中原】角色获得3粮</td><td>佐</td></tr><tr><td>世家门客</td><td>文</td><td>2</td><td>3</td><td>招贤，巡查；招贤行动强度+1；计算太守标记时，视为任意标记</td><td>无</td><td>条件：展示区有至少1名具名角色；收益：在所有展示区的所有具名角色上放2招募点</td><td>无</td></tr><tr><td>陷阵锐卒</td><td>兵</td><td>3</td><td>3</td><td>募兵；无</td><td>军令0；战力3；</td><td>无</td><td>无</td></tr><tr><td>泰山悍勇</td><td>兵</td><td>3</td><td>3</td><td>掠夺；无</td><td>军令0；战力2；进攻胜利时获得1金1粮。</td><td>无</td><td>无</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-10"><summary>B.10 河北具名人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>沮授</td><td>文</td><td>7</td><td>1</td><td>招贤，募兵，巡查；行动后，指定1名玩家，随机弃掉其1张手牌。</td><td>军令2；战力0；己方文、武太守均提供战力+1，影响范围扩大至两步。</td><td>条件：汉天子位于长安、拥有不少于3个地区且未拥有汉天子；收益：支付2士兵，将汉天子移至控制下的一个非冲突地区</td><td>佐</td></tr><tr><td>赵云</td><td>武</td><td>7</td><td>1</td><td>募兵，筹措；执行内政行动时，基础繁荣度视为至少3</td><td>军令2；战力3；军团士兵不多于3时战力+1；【疑阵】成功时战力+2</td><td>条件：本季战功不少于2；收益：获得1威望1治民Token</td><td>勇</td></tr><tr><td>田丰</td><td>文</td><td>6</td><td>1</td><td>征税，募兵；行动后抽取1张锦囊。</td><td>军令1；战力0；失效敌方一个锦囊，防守时获得1军令</td><td>条件：己方有治民Token；收益：免费调动2次处于己方区域的1名己方士兵</td><td>名</td></tr><tr><td>审配</td><td>文</td><td>6</td><td>1</td><td>征税，招贤；所有行动强度+1；行动开始后，可搜寻一名【河北】角色</td><td>军令1；战力0；军团在【河北】战斗时战力+3</td><td>条件：威望最低；收益：获得1威望</td><td>商</td></tr><tr><td>张郃</td><td>武</td><td>6</td><td>1</td><td>募兵，巡查；募兵行动强度+1</td><td>军令2；战力2；若其所在军团有【兵】人物，战力+3</td><td>条件：展示区有至少1名【兵】角色；收益：在展示区的所有【兵】角色上放3招募点</td><td>督</td></tr><tr><td>高览</td><td>武</td><td>5</td><td>1</td><td>筹措，巡查；筹措行动强度+1</td><td>军令2；战力1；移除敌方1军令</td><td>无</td><td>屯</td></tr><tr><td>公孙瓒</td><td>武</td><td>5</td><td>1</td><td>募兵，掠夺；掠夺行动强度+1</td><td>军令1；战力1；无剩余军令时战力+2，【伏击】成功时战力+2</td><td>条件：虎牢关属于敌对势力董卓，有军团处在虎牢关；收益：将桃园三英放到自己的牌库顶</td><td>校</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-11"><summary>B.11 河北通用人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>中山甄氏</td><td>文</td><td>4</td><td>2</td><td>征税，贸易；无</td><td>无</td><td>条件：打出区或太守区有【商】角色；收益：每2个【商】角色获得1威望</td><td>商</td></tr><tr><td>范阳卢氏</td><td>武</td><td>4</td><td>2</td><td>募兵，筹措；无</td><td>无</td><td>条件：打出区或太守区有【河北】角色；收益：每2个【河北】角色获得3金</td><td>名</td></tr><tr><td>州郡治中</td><td>文</td><td>2</td><td>3</td><td>征税，巡查；行动后，可在己方领地内迁移1枚己方太守标记。</td><td>无</td><td>条件：己方太守地区本季执行过内政行动或有敌方军团；收益：触发一次太守奖励</td><td>无</td></tr><tr><td>白马义从</td><td>兵</td><td>3</td><td>3</td><td>巡查；无</td><td>军令0；战力2；进攻时战力+2。</td><td>无</td><td>无</td></tr><tr><td>先登死士</td><td>兵</td><td>3</td><td>3</td><td>募兵；无</td><td>军令0；战力2；双方伤亡+1。</td><td>无</td><td>无</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-12"><summary>B.12 楚地具名人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>周瑜</td><td>武</td><td>7</td><td>1</td><td>招贤，募兵；募兵后，可将本次招募的至多2名士兵部署在相邻己方地区</td><td>军令3；战力0；交战时自动使用不占锦囊限额的【火攻】，【火攻】成功时战力+2</td><td>条件：本季战功不少于2；收益：获得1威望1锦囊</td><td>督</td></tr><tr><td>鲁肃</td><td>文</td><td>7</td><td>1</td><td>征税，筹措，贸易；行动后，抽一张角色牌</td><td>军令2；战力0；无视所有战力减益。</td><td>条件：拥有地区最少；收益：获得3粮3金</td><td>谋</td></tr><tr><td>黄忠</td><td>武</td><td>6</td><td>1</td><td>募兵，巡查；募兵行动强度+1</td><td>军令2；战力2；进攻时战力+2，【斗将】时战力+2</td><td>无</td><td>校</td></tr><tr><td>张昭张纮</td><td>文</td><td>6</td><td>1</td><td>征税，招贤；所有行动强度+1；行动开始后，可搜寻一名【楚地】角色</td><td>军令1；战力0；军团在【楚地】战斗时战力+3</td><td>条件：威望最低；收益：获得1威望</td><td>商</td></tr><tr><td>司马徽</td><td>文</td><td>6</td><td>1</td><td>招贤，筹措；招贤行动强度+1，行动开始后，可搜寻一名指定太守效果的角色。</td><td>无</td><td>条件：展示区有至少1名【文】角色；收益：在所有展示区的【文】角色上放2招募点</td><td>佐</td></tr><tr><td>许邵</td><td>文</td><td>5</td><td>1</td><td>招贤，贸易；行动后抽2张角色牌，弃2张角色牌</td><td>无</td><td>条件：打出区至少有5名具名人物；收益：获得1威望</td><td>名</td></tr><tr><td>周泰</td><td>武</td><td>5</td><td>1</td><td>掠夺，筹措；掠夺行动强度+1</td><td>军令1；战力1；防守时战力+2，战败时己方伤亡-1</td><td>无</td><td>勇</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-13"><summary>B.13 楚地通用人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>吴郡陆氏</td><td>武</td><td>4</td><td>2</td><td>募兵，贸易；无</td><td>无</td><td>条件：打出区或太守区有【督】角色；收益：每2个【督】角色获得1威望</td><td>督</td></tr><tr><td>襄阳庞氏</td><td>文</td><td>4</td><td>2</td><td>招贤，筹措；无</td><td>无</td><td>条件：打出区或太守区有【楚地】角色；收益：每2个【楚地】角色获得1治民Token</td><td>佐</td></tr><tr><td>清流议士</td><td>文</td><td>2</td><td>3</td><td>招贤、贸易；招贤时，可在自动招募点放置后、结束招贤前刷新一次展示区；贸易时，可在行动前刷新一次展示区</td><td>无</td><td>条件：牌组的卡牌总数不少于8张；收益：移除一张牌</td><td>无</td></tr><tr><td>江夏舟师</td><td>兵</td><td>3</td><td>3</td><td>贸易；无</td><td>军令0；战力2；军团不少于3兵时行军耗粮-1</td><td>无</td><td>无</td></tr><tr><td>丹阳精兵</td><td>兵</td><td>3</td><td>3</td><td>巡查；无</td><td>军令0；战力2；胜利时己方伤亡-1</td><td>无</td><td>无</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-14"><summary>B.14 特殊人物</summary><div class="detail-body"><div class="table-wrap"><table class="wide-table"><thead><tr><th>人物</th><th>类别</th><th>费用</th><th>数量</th><th>内政效果</th><th>军事效果</th><th>朝会效果</th><th>太守效果</th></tr></thead><tbody><tr><td>桃园三英</td><td>武</td><td>特殊获取</td><td>1</td><td>；无</td><td>军令1；战力3；【斗将】时战力+2；胜利时敌方伤亡+1</td><td>无</td><td>无</td></tr><tr><td>貂蝉</td><td>文</td><td>特殊获取</td><td>1</td><td>舞乐：支付1威望，从打出区取回1张其他角色牌；指定1名玩家，随机弃掉其1张手牌。</td><td>无</td><td>条件：处于群雄逐鹿时期，威望最低，且己方打出区有吕布；收益：移除吕布，将董卓主公面板永久替换为吕布</td><td>无</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-B-15"><summary>B.15 特殊人物补充</summary><div class="detail-body"><p>桃园三英与貂蝉仅由指定人物效果取得，不进入公共人才库，不可任命太守；尚在特殊牌展示位的条件按实际位置判断。王允取得貂蝉通常放个人弃牌区，公孙瓒取得桃园三英放个人牌库顶。每张特殊牌只有1张。</p>
+<p>貂蝉【舞乐】支付1威望，从打出区指定回收1张其他人物，再指定1名玩家随机弃掉1张人物手牌；某部分没有合法对象便不执行该部分。其朝会及吕布转换按卡表结算。</p></div></details>
+</section>
+<section id="appendix-c"><h2>附录C　完整锦囊表</h2>
+<p class="intro">完整锦囊表。使用前同时确认窗口、条件与效果。</p>
+<p>共40张：4种战斗锦囊各5张，其余10种各2张。使用后放公共锦囊弃牌堆；议事时洗混剩余锦囊牌库。持有量可超过5，季末弃至5。</p>
+<p>战斗限额与三角克制见8.1、8.5；内政每次行动限1张；朝会按使用窗口插入，同一窗口不能使用两张同名朝会锦囊。终局锦囊不用于提前触发结束，每种每人最多结算1张。</p>
+<div class="table-wrap"><table class="wide-table"><thead><tr><th>类别</th><th>锦囊</th><th>使用窗口</th><th>条件</th><th>效果</th><th>克制／交互</th><th>数量</th></tr></thead><tbody><tr><td>战斗</td><td>火攻</td><td>双方选择战斗锦囊时</td><td>无</td><td>本场敌方军团每个士兵战力-1。</td><td>不参与三角克制。</td><td>5</td></tr><tr><td>战斗</td><td>伏击</td><td>双方选择战斗锦囊时</td><td>无</td><td>本场敌方战力-3；敌方无剩余军令时再-1。</td><td>克制【斗将】；被【疑阵】克制。</td><td>5</td></tr><tr><td>战斗</td><td>疑阵</td><td>双方选择战斗锦囊时</td><td>无</td><td>敌方1兵撤退；无路可退则留在原地，本场不参战、不承受战损。</td><td>克制【伏击】；被【斗将】克制。</td><td>5</td></tr><tr><td>战斗</td><td>斗将</td><td>双方选择战斗锦囊时</td><td>无</td><td>本场战力+1；双方武将按牌面战力掷骰，使用方获胜再+3。胜方2★更多才撤下败将部署标记，牌留打出区。</td><td>克制【疑阵】；被【伏击】克制。</td><td>5</td></tr><tr><td>内政</td><td>细作</td><td>自己的内政行动中</td><td>无</td><td>本次可在任意合法地区执行内政行动，免除影响费。</td><td>行动自身限制仍适用。</td><td>2</td></tr><tr><td>内政</td><td>伪报</td><td>自己的内政行动中</td><td>场上存在可移动的敌军团</td><td>选择1支敌军团，指挥其中至多1名普通士兵沿合法相邻路线免费行军一次。</td><td>不支付军令与粮；其他移动限制照常。</td><td>2</td></tr><tr><td>内政</td><td>地主</td><td>自己的内政行动中</td><td>无</td><td>获得3金或3粮。</td><td>无</td><td>2</td></tr><tr><td>内政</td><td>赈济</td><td>自己的内政行动中</td><td>支付至少1粮，有可恢复繁荣的地区</td><td>选择1个地区；每支付1粮恢复1繁荣，本次实际恢复至少3繁荣时获得1威望。</td><td>不超过繁荣上限。</td><td>2</td></tr><tr><td>内政</td><td>人脉</td><td>自己的内政行动回合中</td><td>有可搜寻人物</td><td>搜寻1名指定【地域／文武兵／太守标记】或指定费用的角色，在该角色上放置己方2招募点。</td><td>选择一种搜寻条件；搜寻牌占临时第4展示位，达到费用立即招募；不要求执行招贤行动。</td><td>2</td></tr><tr><td>终局</td><td>攘外</td><td>终局计分</td><td>牌组【武】与【兵】合计不少于10张</td><td>获得1威望；仅四人局：对应类别数量为全场最多（含并列）时再获得1威望。</td><td>牌组包含太守区；每人每种最多结算1张。只影响终局排名，不触发提前结束。</td><td>2</td></tr><tr><td>终局</td><td>安内</td><td>终局计分</td><td>牌组【文】不少于8张</td><td>获得1威望；仅四人局：对应类别数量为全场最多（含并列）时再获得1威望。</td><td>牌组包含太守区；每人每种最多结算1张。只影响终局排名，不触发提前结束。</td><td>2</td></tr><tr><td>朝会</td><td>召见</td><td>自己的个人朝会步骤中</td><td>打出区或太守区有角色牌</td><td>从自己的打出区或太守区取回1张角色牌到手牌。</td><td>回收太守牌时撤下1枚同文／武太守标记；回手后可继续打出，次数限制不重置。</td><td>2</td></tr><tr><td>朝会</td><td>表奏</td><td>自己的个人朝会步骤中</td><td>支付4金且有己方无太守地区</td><td>获得1次太守任命机会。</td><td>无</td><td>2</td></tr><tr><td>朝会</td><td>荐举</td><td>自己的个人朝会步骤中</td><td>存在公开具名人才</td><td>在1张公开具名人才上放置自己的3点招募点。</td><td>达到费用时立即招募。</td><td>2</td></tr></tbody></table></div>
+</section>
+<section id="appendix-d"><h2>附录D　双人变体</h2>
+<p class="intro">双人局只修改本附录列出的部分，其余使用标准规则。</p>
+<p>除以下差异外，均用标准规则。</p>
+<details class="rule-detail" id="section-D-1"><summary>D.1 开局与联军控制</summary><div class="detail-body"><p>固定董卓对袁绍，董卓先行动；地图所有权、驻军及汉天子位置不变。董卓规则不变。</p>
+<p>袁绍作为联军玩家，牌组为6张起始通用人物，加袁、曹、孙共12张起始具名人物洗混随机取6张，合计12张；其余6张移出游戏。联军以6金、6粮、2威望开局。</p>
+<p>联军共用手牌、牌库、资源、军令、战功、投资、太守区与机会；仍保留袁／曹／孙的地区所有权、士兵颜色和独立军团。仅使用袁绍主公技能，不兼得曹操、孙坚技能。面向“玩家”的效果只在董卓与联军两人之间选择。</p>
+<p>联军可统一调动三色军团，普通士兵可移动、撤退至友军地区，仍保留颜色；同地区不同颜色不合并。募兵按行动地区所有者决定兵色；在中立地区或使用【细作】时可选任一联军兵色。城市特色仍全体每地区每季1次。</p></div></details>
+<details class="rule-detail" id="section-D-2"><summary>D.2 讨董联军时期特权</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>项目</th><th>联军规则</th></tr></thead><tbody><tr><td>议事补牌</td><td>通常补至6张</td></tr><tr><td>内政</td><td>与标准相同，每次1张人物、1次行动，不翻倍</td></tr><tr><td>军事打出</td><td>每次至多2张文／武，须分别部署到不同军团；兵牌按标准容量，打出不限次数</td></tr><tr><td>紧急部署</td><td>与标准相同，不翻倍</td></tr><tr><td>军事前回收</td><td>联军在军事阶段开始前，可从打出区或太守区回收1张；朝会仍按通用规则回收1张</td></tr><tr><td>兜底接管</td><td>双人局不适用</td></tr></tbody></table></div>
+<p>联军三色共享每季战功上限。联盟目标由任一联军颜色取得时，联军同时得到3金与1威望，各只结算1次。</p></div></details>
+<details class="rule-detail" id="section-D-3"><summary>D.3 联军分裂</summary><div class="detail-body"><p>进入群雄逐鹿的议事阶段，先执行：</p>
+<ol><li>统计袁、曹、孙各自拥有地区数。唯一最多者成为玩家继承势力；<strong>只要最高数有并列，一律保留袁绍</strong>。</li><li>玩家继承全部共同资源、威望、金粮、治民／起义、军令、投资、任命机会及里程碑。改用继承势力主公面板，不重发开局收益。</li><li>牌组保留6张通用起始牌、所有后来取得的牌，以及继承势力起始人物；移除另两家起始人物，包括已在太守区的牌。</li><li>继承势力保留自身地区与士兵；另两家成为独特中立势力，各自地区驻军统一为3兵，在其领地外的旧军队移除。继承势力士兵数量不重置。</li><li>若太守区同类别牌不足以支持现有标记，选择多余标记撤下。失去领地上的剩余太守标记各可迁移1次，至保留势力无太守的城市；无目标或放弃迁移时，自选移除1张同类太守牌。其余保留标记归继承势力。</li><li>失去联军特权：补牌回到5张，军事每次1张文／武，取消军事前回收。</li></ol>
+<p>时期转换只按本附录处理独特中立，不因其他多军团共处而自动易主。</p></div></details>
+<details class="rule-detail" id="section-D-4"><summary>D.4 独特中立势力</summary><div class="detail-body"><p>另两家视为敌对独特中立势力，不成为玩家，不持有手牌或锦囊。</p>
+<p><strong>战斗</strong>：每支军团附带2名虚拟【武】，各战力2、军令0、无其他效果，可参与斗将；退场只影响本场，下场恢复。没有锦囊和威望收益。</p>
+<p><strong>军事阶段结束前自动攻击</strong>：依袁、曹、孙顺序检查各独特中立领地。若其中有普通士兵数不多于守军的玩家军团，选择兵最少者进攻1次；兵数相同优先进攻董卓。仍受每地区每季2场限制，玩家照常响应与紧急部署。</p>
+<p><strong>每季结束扩张</strong>：每个独特中立势力吞并1个相邻、无玩家驻军的普通中立地区，接收所有权与全部中立士兵；优先同地域，其次招贤特色地区，仍有多个则随机。不能吞并其他独特中立。无合法目标时，其全部地区各增1兵，仍限6。议事时中立地区照常恢复1繁荣。</p></div></details>
+</section>
+<section id="appendix-e"><h2>附录E　快速查阅</h2>
+<p class="intro">熟悉游戏后，在桌边查流程、数值与牌区去向。</p>
+
+<details class="rule-detail" id="section-E-1" open><summary>E.1 一季流程</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>时点</th><th>依序处理</th></tr></thead><tbody><tr><td>议事</td><td>时期转换／双人分裂 → 季度重置与中立恢复 → 四人兜底 → 全体太守收入 → 标记与补牌 → 袁绍目标</td></tr><tr><td>内政</td><td>检查资格与费用 → 付影响费 → 自动点数／行动前效果 → 行动 → 地区与人物后续效果</td></tr><tr><td>军事</td><td>清除己方到期渡河标记 → 打牌／部署与积累军令 → 行军或进攻 → 确认结束；或PASS退出</td></tr><tr><td>个人朝会</td><td>全体先回收 → 个人逐张打牌 → 战功转威望 → 任命 → 弃手牌／主公结算 → 朝贡出价</td></tr><tr><td>季末</td><td>朝贡与天子 → 锦囊限额 → 检查终局 → 清场、保留手牌与太守 → 下一季</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-E-2" open><summary>E.2 高频数值</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>项目</th><th>数值</th></tr></thead><tbody><tr><td>胜利／时限</td><td>16威望、群雄逐鹿7地区，或192年冬</td></tr><tr><td>太守里程碑</td><td>4、8、12威望，各1次</td></tr><tr><td>军团容量</td><td>普通士兵6；文武合计2；兵牌不超过普通士兵数</td></tr><tr><td>募兵</td><td>强度÷2向上取整，每兵1金</td></tr><tr><td>行军</td><td>每步1军令＋按兵数付粮；敌地到敌地2军令</td></tr><tr><td>渡河／断粮</td><td>各-5战力；渡河不付金，并停止当次行动</td></tr><tr><td>战力差与伤亡</td><td>0—1：0/0；2—5：1/1；6—9：1/2；10以上：0/2（胜/败）</td></tr><tr><td>战功</td><td>胜方按敌方实际阵亡；每季联军时期2、群雄时期3；夺城不加</td></tr><tr><td>展示区／投资奖励</td><td>常规3＋搜寻临时1；至少3点投资可领离场奖励</td></tr><tr><td>朝贡</td><td>每人1次，0或高于现价的1—9；最高至少6另加1威望</td></tr><tr><td>锦囊手牌</td><td>季末弃至5，平时可超过</td></tr></tbody></table></div></div></details>
+<details class="rule-detail" id="section-E-3" open><summary>E.3 卡牌来源与去向</summary><div class="detail-body"><div class="table-wrap"><table><thead><tr><th>操作</th><th>可选来源／结果</th></tr></thead><tbody><tr><td>正常打出</td><td>手牌 → 打出区；只触发当前阶段一栏</td></tr><tr><td>任命太守</td><td>手牌／打出区／弃牌区 → 太守区</td></tr><tr><td>自由移除己方人物</td><td>手牌／打出区／弃牌区 → 公共移出游戏区</td></tr><tr><td>通用朝会回收／召见</td><td>打出区／太守区 → 手牌；回收太守撤同类地区标记</td></tr><tr><td>战斗退场</td><td>只清除部署标记，牌留打出区</td></tr><tr><td>强制召回</td><td>清除标记，打出区 → 弃牌区</td></tr><tr><td>通常招募</td><td>联军时期 → 弃牌区；群雄时期 → 牌库顶</td></tr><tr><td>未打出手牌</td><td>默认保留；个人朝会结算可自愿弃置</td></tr></tbody></table></div>
+<p>争议先定位对应模块，再读卡牌例外：进入地区看5.1；招募投资看6.2；部署看7.2；伤亡看8.3；朝会时点看9；太守牌与标记看10；双人差异看附录D。</p></div></details>
+</section><section id="glossary"><h2>概念百科</h2>
+<p class="intro">保留游戏卡牌的词条链接。精确流程请结合上方对应模块查阅。</p>
+<input class="term-search" id="term-search" type="search" placeholder="搜索：断粮、诈降士兵、太守…" aria-label="搜索规则词条">
+<div class="term-index">
+<a href="#term-prestige">威望</a>
+<a href="#term-merit">战功</a>
+<a href="#term-coalition">讨董联军时期</a>
+<a href="#term-warlords">群雄逐鹿时期</a>
+<a href="#term-ownership">所有权</a>
+<a href="#term-conflict">冲突地区</a>
+<a href="#term-prosperity">繁荣</a>
+<a href="#term-recruit-points">招募点</a>
+<a href="#term-search-talent">搜寻</a>
+<a href="#term-resistance">起义Token</a>
+<a href="#term-civic">治民Token</a>
+<a href="#term-spy">细作</a>
+<a href="#term-command">军令</a>
+<a href="#term-army">军团</a>
+<a href="#term-elite">精锐</a>
+<a href="#term-strategy">文官部署</a>
+<a href="#term-emergency">紧急部署</a>
+<a href="#term-river">渡河</a>
+<a href="#term-cut-supply">断粮</a>
+<a href="#term-casualties">伤亡</a>
+<a href="#term-feign">诈降士兵</a>
+<a href="#term-duel">斗将</a>
+<a href="#term-governor">太守</a>
+<a href="#term-remove">移除卡牌</a>
+<a href="#term-tactic-limit">锦囊上限</a>
+<a href="#term-triangle">三角克制</a>
+</div>
+<h3>目标与进度</h3>
+<details class="term-entry" id="term-prestige" data-search="威望 决定胜负的分数；所有人完成朝会后才检查16威望胜利。 战功在个人朝会按1:1转成威望；卡牌写“获得威望”则在牌面指定时点结算。威望减少即时发生，不能支付的部分变为起义标记。"><summary>威望<small>决定胜负的分数；所有人完成朝会后才检查16威望胜利。</small></summary><p>战功在个人朝会按1:1转成威望；卡牌写“获得威望”则在牌面指定时点结算。威望减少即时发生，不能支付的部分变为起义标记。</p></details>
+<details class="term-entry" id="term-merit" data-search="战功 本季暂存的战斗成果，个人朝会时按1:1转为威望。 胜方按败方实际阵亡获得战功；每名玩家每季上限：讨董联军时期2、群雄逐鹿时期3。讨董时期与普通中立交战不获得，逐鹿时期可以。夺城本身不提供战功。双人联军共享上限。非董卓玩家在个人朝会每转化1战功为威望，迁都进度+1，上限10。"><summary>战功<small>本季暂存的战斗成果，个人朝会时按1:1转为威望。</small></summary><p>胜方按败方实际阵亡获得战功；每名玩家每季上限：讨董联军时期2、群雄逐鹿时期3。讨董时期与普通中立交战不获得，逐鹿时期可以。夺城本身不提供战功。双人联军共享上限。非董卓玩家在个人朝会每转化1战功为威望，迁都进度+1，上限10。</p></details>
+<details class="term-entry" id="term-coalition" data-search="讨董联军时期 开局时期：袁绍、曹操、孙坚与中立友好，主要对抗董卓。 战功来自战斗败方的实际阵亡，夺城不另加战功。洛阳失守或焚毁的当季仍按讨董联军时期完成。"><summary>讨董联军时期<small>开局时期：袁绍、曹操、孙坚与中立友好，主要对抗董卓。</small></summary><p>战功来自战斗败方的实际阵亡，夺城不另加战功。洛阳失守或焚毁的当季仍按讨董联军时期完成。</p></details>
+<details class="term-entry" id="term-warlords" data-search="群雄逐鹿时期 洛阳失守或焚毁后的下季度议事阶段进入；诸侯互相敌对。 诸侯彼此敌对。胜方按败方实际阵亡获得战功，包含中立士兵。夺取城市获得1枚起义标记，不另加战功。"><summary>群雄逐鹿时期<small>洛阳失守或焚毁后的下季度议事阶段进入；诸侯互相敌对。</small></summary><p>诸侯彼此敌对。胜方按败方实际阵亡获得战功，包含中立士兵。夺取城市获得1枚起义标记，不另加战功。</p></details>
+<h3>地图与内政</h3>
+<details class="term-entry" id="term-ownership" data-search="所有权 地区归属独立于驻军记录；进入空城不会自动取得。 通常要在军事阶段战胜守军并满足夺城条件，或花1军令明确攻取无人防守的敌方地区。友军共处及时期转换不自动改所有权。"><summary>所有权<small>地区归属独立于驻军记录；进入空城不会自动取得。</small></summary><p>通常要在军事阶段战胜守军并满足夺城条件，或花1军令明确攻取无人防守的敌方地区。友军共处及时期转换不自动改所有权。</p></details>
+<details class="term-entry" id="term-conflict" data-search="冲突地区 同一地区存在互相敌对的军团；不限制内政或兵力部署。 讨董联军时期袁、曹、孙及中立共处不构成冲突。内政与部署仍须满足费用、所有权、容量和牌面条件。太守在冲突地区正常生效。"><summary>冲突地区<small>同一地区存在互相敌对的军团；不限制内政或兵力部署。</small></summary><p>讨董联军时期袁、曹、孙及中立共处不构成冲突。内政与部署仍须满足费用、所有权、容量和牌面条件。太守在冲突地区正常生效。</p></details>
+<details class="term-entry" id="term-prosperity" data-search="繁荣 地区的开发能力，用于计算多数内政行动强度。 内政通常降低繁荣，巡查和贸易可恢复。"><summary>繁荣<small>地区的开发能力，用于计算多数内政行动强度。</small></summary><p>内政通常降低繁荣，巡查和贸易可恢复。</p></details>
+<details class="term-entry" id="term-recruit-points" data-search="招募点 招贤得到的点数，可投入公开人才或每2点访贤获得1锦囊。 招贤点数可自由拆分投入任意公开人物，或每2点访贤抽1锦囊。同来源人物自动+1点，曹操还向所有公开人物各放1点。常规位3张，唯一搜寻位不补牌。"><summary>招募点<small>招贤得到的点数，可投入公开人才或每2点访贤获得1锦囊。</small></summary><p>招贤点数可自由拆分投入任意公开人物，或每2点访贤抽1锦囊。同来源人物自动+1点，曹操还向所有公开人物各放1点。常规位3张，唯一搜寻位不补牌。</p></details>
+<details class="term-entry" id="term-search-talent" data-search="搜寻 连续翻公共人才库，直到找到指定标记或费用的人物，放到临时第4展示位。 未命中的人物进公共人物弃牌区；新的搜寻会先弃置旧搜寻牌。搜寻位人物招募后不补位。库空时洗回人物弃牌区；没有符合条件的人物则无结果。人物附带搜寻在支付影响费并启动行动后触发，保留牌面行动范围。【人脉】可在自己的内政回合独立使用，不要求招贤；可指定地域、文武兵、太守标记或费用，搜寻后仅在找到的角色上放2点；荐举在公开具名人才上放3点。"><summary>搜寻<small>连续翻公共人才库，直到找到指定标记或费用的人物，放到临时第4展示位。</small></summary><p>未命中的人物进公共人物弃牌区；新的搜寻会先弃置旧搜寻牌。搜寻位人物招募后不补位。库空时洗回人物弃牌区；没有符合条件的人物则无结果。人物附带搜寻在支付影响费并启动行动后触发，保留牌面行动范围。【人脉】可在自己的内政回合独立使用，不要求招贤；可指定地域、文武兵、太守标记或费用，搜寻后仅在找到的角色上放2点；荐举在公开具名人才上放3点。</p></details>
+<details class="term-entry" id="term-resistance" data-search="起义token 掠夺或未能扣足威望等产生；通常令下季少抽1张人物。 与治民标记互相抵消。议事阶段每季最多结算1枚；若本季原本就没有补牌额度，起义标记保留。"><summary>起义Token<small>掠夺或未能扣足威望等产生；通常令下季少抽1张人物。</small></summary><p>与治民标记互相抵消。议事阶段每季最多结算1枚；若本季原本就没有补牌额度，起义标记保留。</p></details>
+<details class="term-entry" id="term-civic" data-search="治民token 巡查等治理效果产生；议事阶段结算后通常多抽1张人物。 与起义标记互相抵消。每季最多结算1枚，即使手牌已达到通常补牌目标也可多抽1张。"><summary>治民Token<small>巡查等治理效果产生；议事阶段结算后通常多抽1张人物。</small></summary><p>与起义标记互相抵消。每季最多结算1枚，即使手牌已达到通常补牌目标也可多抽1张。</p></details>
+<details class="term-entry" id="term-spy" data-search="细作 允许在其他玩家控制地区或敌对中立地区进行普通内政的锦囊。 所有内政行动（含招贤）在其他玩家控制地区或敌对中立地区均需细作，使用后免影响费。己方地区免费，友好中立地区支付2金。冲突本身不限制内政。"><summary>细作<small>允许在其他玩家控制地区或敌对中立地区进行普通内政的锦囊。</small></summary><p>所有内政行动（含招贤）在其他玩家控制地区或敌对中立地区均需细作，使用后免影响费。己方地区免费，友好中立地区支付2金。冲突本身不限制内政。</p></details>
+<h3>军团与战斗</h3>
+<details class="term-entry" id="term-command" data-search="军令 军事阶段的临时资源；1点可移动、进攻或在战斗中转为1战力。 本季取得的军令可跨行动累积；自己军事阶段pass时弃掉余令。已pass仍可紧急部署，使用由此获得的军令防守，但不重新主动行动。确认战斗锦囊时可按规则消耗军令。"><summary>军令<small>军事阶段的临时资源；1点可移动、进攻或在战斗中转为1战力。</small></summary><p>本季取得的军令可跨行动累积；自己军事阶段PASS时弃掉余令。已PASS仍可紧急部署，使用由此获得的军令防守，但不重新主动行动。确认战斗锦囊时可按规则消耗军令。</p></details>
+<details class="term-entry" id="term-army" data-search="军团 同一玩家在同一地区的全部普通士兵，视为一支军团。 同一势力同地区的普通士兵为一个军团，最多部署2张文／武，兵牌另计且不超过普通士兵数。军团没有普通士兵时清除全部部署标记；战斗导致无兵时，人物牌留在打出区。"><summary>军团<small>同一玩家在同一地区的全部普通士兵，视为一支军团。</small></summary><p>同一势力同地区的普通士兵为一个军团，最多部署2张文／武，兵牌另计且不超过普通士兵数。军团没有普通士兵时清除全部部署标记；战斗导致无兵时，人物牌留在打出区。</p></details>
+<details class="term-entry" id="term-elite" data-search="精锐 【兵】人物牌；军事阶段可单独打出并部署，不占文／武人物打牌次数。 兵牌不占文／武打出次数和军团2张文／武上限；数量不超过军团普通士兵数。超额时选择清除兵牌标记，来源牌留在打出区。"><summary>精锐<small>【兵】人物牌；军事阶段可单独打出并部署，不占文／武人物打牌次数。</small></summary><p>兵牌不占文／武打出次数和军团2张文／武上限；数量不超过军团普通士兵数。超额时选择清除兵牌标记，来源牌留在打出区。</p></details>
+<details class="term-entry" id="term-strategy" data-search="文官部署 文官的军事效果部署到军团生效。 文官与武共用每军团2张上限，兵牌另计；每名部署文官使本军团可额外使用1张战斗锦囊。"><summary>文官部署<small>文官的军事效果部署到军团生效。</small></summary><p>文官与武共用每军团2张上限，兵牌另计；每名部署文官使本军团可额外使用1张战斗锦囊。</p></details>
+<details class="term-entry" id="term-emergency" data-search="紧急部署 没有部署人物的防守军团受进攻时，可临时从手牌部署。 可部署至多1张合法文／武，以及不超过本军团普通士兵数的兵牌，也可只部署兵牌。即使已在军事阶段pass也可响应，不重新获得主动行动机会。"><summary>紧急部署<small>没有部署人物的防守军团受进攻时，可临时从手牌部署。</small></summary><p>可部署至多1张合法文／武，以及不超过本军团普通士兵数的兵牌，也可只部署兵牌。即使已在军事阶段PASS也可响应，不重新获得主动行动机会。</p></details>
+<details class="term-entry" id="term-river" data-search="渡河 跨黄河不额外支付金，但会停止行动并获得渡河标记。 有渡河标记的军团战力-5。标记在所属玩家下一次正常军事行动开始时清除；防守响应不会清除。"><summary>渡河<small>跨黄河不额外支付金，但会停止行动并获得渡河标记。</small></summary><p>有渡河标记的军团战力-5。标记在所属玩家下一次正常军事行动开始时清除；防守响应不会清除。</p></details>
+<details class="term-entry" id="term-cut-supply" data-search="断粮 战场不与可供粮城市相邻，战力-5。 己方城市、友军城市与友好中立城市均可供粮，即使处于冲突状态仍有效；只有己方驻军但所有权敌对不能供粮。断粮与渡河可叠加。"><summary>断粮<small>战场不与可供粮城市相邻，战力-5。</small></summary><p>己方城市、友军城市与友好中立城市均可供粮，即使处于冲突状态仍有效；只有己方驻军但所有权敌对不能供粮。断粮与渡河可叠加。</p></details>
+<details class="term-entry" id="term-casualties" data-search="伤亡 战斗中需退出战场的普通士兵。 战力差0—1为0／0，2—5为1／1，6—9为1／2，10及以上为0／2（胜／败）。先叠加伤亡增加，再把伤亡减少对应的士兵转为撤退，两者不先相减。撤到相邻己方或友军控制、非冲突且有容量的地区，不能跨河，保留士兵颜色；无处可退仍阵亡。战功按败方实际阵亡计算并受每季上限约束。"><summary>伤亡<small>战斗中需退出战场的普通士兵。</small></summary><p>战力差0—1为0／0，2—5为1／1，6—9为1／2，10及以上为0／2（胜／败）。先叠加伤亡增加，再把伤亡减少对应的士兵转为撤退，两者不先相减。撤到相邻己方或友军控制、非冲突且有容量的地区，不能跨河，保留士兵颜色；无处可退仍阵亡。战功按败方实际阵亡计算并受每季上限约束。</p></details>
+<details class="term-entry" id="term-feign" data-search="诈降士兵 横置的己方普通士兵；其军团开战时可强化本场战斗锦囊。 开战、选锦囊前恢复为普通士兵。本场己方战斗锦囊不会被三角克制取消，且其最终战力修正数值翻倍；多名不叠加。离开地区或地区不再冲突也会恢复。"><summary>诈降士兵<small>横置的己方普通士兵；其军团开战时可强化本场战斗锦囊。</small></summary><p>开战、选锦囊前恢复为普通士兵。本场己方战斗锦囊不会被三角克制取消，且其最终战力修正数值翻倍；多名不叠加。离开地区或地区不再冲突也会恢复。</p></details>
+<details class="term-entry" id="term-duel" data-search="斗将 落败武将清除标记，人物牌留在打出区；其军团本场战力减去该牌军令。 有效斗将使使用方战力+1。双方选武将，按牌面战力掷等量0／0／1／1／2／2★骰，由当前行动玩家点击掷骰。总点高者胜；使用方获胜再+3，胜方2★更多才撤下败将部署标记，不移除卡牌。"><summary>斗将<small>落败武将清除标记，人物牌留在打出区；其军团本场战力减去该牌军令。</small></summary><p>有效斗将使使用方战力+1。双方选武将，按牌面战力掷等量0／0／1／1／2／2★骰，由当前行动玩家点击掷骰。总点高者胜；使用方获胜再+3，胜方2★更多才撤下败将部署标记，不移除卡牌。</p></details>
+<h3>朝会与卡牌</h3>
+<details class="term-entry" id="term-governor" data-search="太守 用威望里程碑的任命机会设置的跨季度人物。 太守卡牌独立放在太守区；地图只放文／武标记。失地时选择移除相同类别的太守牌。文太守强化城市效果，武太守提供本地及相邻地区战斗+1。朝会回收及【召见】可拿回太守牌，并撤下1枚同类别标记；沮授使己方文、武太守均提供战力+1，范围扩大至两步。"><summary>太守<small>用威望里程碑的任命机会设置的跨季度人物。</small></summary><p>太守卡牌独立放在太守区；地图只放文／武标记。失地时选择移除相同类别的太守牌。文太守强化城市效果，武太守提供本地及相邻地区战斗+1。朝会回收及【召见】可拿回太守牌，并撤下1枚同类别标记；沮授使己方文、武太守均提供战力+1，范围扩大至两步。</p></details>
+<details class="term-entry" id="term-remove" data-search="移除卡牌 将人物正面放入公共移出游戏区，不再进入牌库循环。 与弃置不同：弃置进拥有者弃牌区，可在牌库抽空时洗回。来源牌移除时，对应部署标记也清除。"><summary>移除卡牌<small>将人物正面放入公共移出游戏区，不再进入牌库循环。</small></summary><p>与弃置不同：弃置进拥有者弃牌区，可在牌库抽空时洗回。来源牌移除时，对应部署标记也清除。</p></details>
+<details class="term-entry" id="term-tactic-limit" data-search="锦囊上限 可暂时超过5张；全员朝会结束后弃置到5张。 获得锦囊时不会因为已有5张而禁止抽取。季末先处理超额锦囊，再检查终局。"><summary>锦囊上限<small>可暂时超过5张；全员朝会结束后弃置到5张。</small></summary><p>获得锦囊时不会因为已有5张而禁止抽取。季末先处理超额锦囊，再检查终局。</p></details>
+<details class="term-entry" id="term-triangle" data-search="三角克制 伏击、疑阵、斗将互相克制；被克制的一方效果无效。 双方战斗锦囊同时公开后判定。伏击克斗将，斗将克疑阵，疑阵克伏击；其他锦囊不参与这组三角克制。"><summary>三角克制<small>伏击、疑阵、斗将互相克制；被克制的一方效果无效。</small></summary><p>双方战斗锦囊同时公开后判定。伏击克斗将，斗将克疑阵，疑阵克伏击；其他锦囊不参与这组三角克制。</p></details>
+</section><p class="foot">正文、卡表与下载文件同源生成。v3.41 修订：双人军事前回收与季度末迁都推进。</p></main></div>
+<script>
+const details = [...document.querySelectorAll('details.rule-detail')];
+document.getElementById('expand-all').onclick = () => details.forEach(d => d.open = true);
+document.getElementById('collapse-all').onclick = () => details.forEach(d => d.open = false);
+document.getElementById('expand-core').onclick = () => details.forEach(d => d.open = d.closest('section').id.startsWith('rule-'));
+document.getElementById('term-search').addEventListener('input', e => {
+  const query = e.target.value.trim().toLocaleLowerCase();
+  document.querySelectorAll('.term-entry').forEach(d => d.hidden = !d.dataset.search.includes(query));
+});
+function revealHash() {
+  let key;
+  try { key = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+  const target = document.getElementById(key);
+  if (!target) return;
+  target.hidden = false;
+  if (target.tagName === 'DETAILS') target.open = true;
+  let ancestor = target.parentElement;
+  while (ancestor) { if (ancestor.tagName === 'DETAILS') ancestor.open = true; ancestor = ancestor.parentElement; }
+  requestAnimationFrame(() => target.scrollIntoView({block:'start'}));
+}
+addEventListener('hashchange', revealHash);
+revealHash();
+</script></body></html>
