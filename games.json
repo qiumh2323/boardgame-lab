@@ -23,29 +23,8 @@
     ]
   },
   {
-    "id": "hejiubifen",
-    "number": "002",
-    "title": "合久必分",
-    "subtitle": "经营州郡、招募人物，在讨董与逐鹿之间争取胜利。",
-    "status": "live",
-    "type": "区域控制 · 牌组构筑",
-    "players": "双人／四人单机",
-    "tags": ["规则 AI", "同屏热坐"],
-    "href": "hejiubifen/",
-    "theme": "hejiubifen",
-    "artLabel": "三国策略",
-    "cover": "hejiubifen/guandong-campaign-map-v3.png",
-    "version": "V3.41",
-    "description": "扮演董卓、袁绍、曹操或孙坚，通过经营地区、招募人才和战斗取得威望。",
-    "notes": [
-      "支持双人或四人单机对局。每个席位可由同一设备上的玩家操作，或交给规则 AI。",
-      "包含骰子斗将与群雄逐鹿时期的七地区胜利条件。",
-      "无需登录；不支持远程联机。"
-    ]
-  },
-  {
     "id": "reserved-table",
-    "number": "003",
+    "number": "002",
     "title": "敬请期待",
     "subtitle": "",
     "status": "upcoming",
