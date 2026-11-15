@@ -1,0 +1,41 @@
+/* Color-only Castle identity. Layout and control geometry come from lobby.css. */
+body:not(.playing){background:#f6f3f8;color:#493756}
+:is(#lobby,#setup-dialog,#leave-dialog,.game-header,.game-footer){--lab-ink:#493756;--lab-muted:#7b7085;--lab-border:#ded6e6;--lab-accent:#654979;--lab-soft:#f0eaf6}
+.site-header.game-header,body:not(.playing) .site-header.game-header{background:#f6f3f8;border-bottom-color:#e1d9e8}
+body.playing .site-header.game-header{background:#fcfaff;border-bottom-color:#e1d9e8}
+.game-header .lab-home-link,.game-header-right{color:#63506f}
+.game-header .lab-home-link small,.game-header-right #version{color:#94819e;border-color:#ded6e6}
+#lobby .lobby-breadcrumb,#lobby .lobby-breadcrumb a{color:#8c7d98}
+#lobby .lobby-story>h1{color:#493756}
+#lobby .lobby-kicker,.setup-eyebrow{color:#887096}
+#lobby .lobby-intro,#lobby .lobby-tags>span{color:#7b7085;border-color:#ded6e6}
+#lobby .lobby-art{background:#ece6f1;border-color:#ded6e6}
+#lobby .lobby-art:before{background-image:radial-gradient(#87739724 .6px,transparent .6px)}
+#lobby .lobby-art-note{color:#94819e}
+#lobby .quick-guide{border-color:#ded6e6}
+#lobby .quick-guide summary,#lobby .quick-guide strong{color:#655074}
+#lobby .quick-guide ol,#lobby .lobby-bottom-note{color:#8d7e98}
+#lobby-settings>.settings,#setup-dialog{background:#fffdf9;border-color:#ded6e6;box-shadow:0 8px 28px #4937560b}
+:is(#lobby,#setup-dialog) #setup-title{color:#493756}
+:is(#lobby,#setup-dialog) .setup-intro,:is(#lobby,#setup-dialog) .settings label{color:#7b7085}
+:is(#lobby,#setup-dialog) .difficulty-choice{background:#fffdf9;border-color:#ded6e6;color:#655074}
+:is(#lobby,#setup-dialog) .difficulty-choice:hover:not(:disabled){background:#f5eff9;border-color:#b5a0c4}
+:is(#lobby,#setup-dialog) .difficulty-choice[aria-checked=true]{background:#f0eaf6;border-color:#9b82ae;box-shadow:0 0 0 1px #9b82ae22}
+:is(#lobby,#setup-dialog) .difficulty-choice strong{color:#493756}
+:is(#lobby,#setup-dialog) .difficulty-choice small{color:#8c7b98}
+:is(#lobby,#setup-dialog) .difficulty-choice em{background:#f0ecf4;color:#94819e}
+:is(#lobby,#setup-dialog) .difficulty-choice[aria-checked=true] em{background:#e7ddef;color:#81618f}
+:is(#lobby,#setup-dialog) .setting-help:not(.public-information-notice){color:#8d7e98}
+:is(#lobby,#setup-dialog) .settings select{background:#fffdf9;border-color:#ded6e6;color:#655074}
+:is(#lobby,#setup-dialog) .settings #start,#leave-dialog>.primary{background:#654979;border-color:#654979;color:white}
+:is(#lobby,#setup-dialog) .settings #start:hover:not(:disabled),#leave-dialog>.primary:hover{background:#523660;border-color:#523660}
+:is(#lobby,#setup-dialog) .settings #start:disabled{background:#b0a1bb}
+:is(#lobby,#setup-dialog) .replay-import-link,:is(#lobby,#setup-dialog) .text-button{color:#80698e}
+:is(#lobby,#setup-dialog) .engine-state,:is(#lobby,#setup-dialog) #runtime{color:#9b8aa7}
+.engine-indicator.ready{background:#9270a4}
+#lobby .difficulty-choice:focus-visible,#lobby summary:focus-visible,#lobby select:focus-visible{outline-color:#9b82ae}
+#setup-dialog #close-setup{color:#8c7b98}
+#leave-dialog{background:#fffdf9;border-color:#ded6e6;color:#493756}
+#leave-dialog p{color:#8c7b98}
+#leave-dialog .leave-actions a{color:#80698e}
+.game-footer,.game-footer a,body:not(.playing) .game-footer a{color:#9b8aa7;border-color:#ded6e6}
