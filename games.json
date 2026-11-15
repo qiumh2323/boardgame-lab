@@ -23,8 +23,38 @@
     ]
   },
   {
-    "id": "reserved-table",
+    "id": "castle-combo",
     "number": "002",
+    "title": "城堡嘉年华",
+    "subtitle": "九张角色，拼出你的小城。",
+    "status": "live",
+    "type": "阵列构筑 · 卡牌组合",
+    "players": "你 vs AI",
+    "version": "V1.5",
+    "tags": [
+      "AI 对战",
+      "九宫格",
+      "三个难度"
+    ],
+    "href": "castle-combo/",
+    "theme": "castle",
+    "artLabel": "招募与组合",
+    "artCards": [
+      "back-1.jpg",
+      "card-121.jpg",
+      "card-20.jpg"
+    ],
+    "description": "在城堡和村庄之间招募角色，把九张牌拼成3×3阵列。利用徽章、折扣、位置和钱袋，找到属于你的得分组合。",
+    "notes": [
+      "仅人机对战；双方各完成九次招募后结算，角色与剩余钥匙计分。",
+      "提供简单、中等难度和令人发狂三种电脑；前两种遵循正常信息，令人发狂为公开牌库顺序。",
+      "AI 模型和搜索引擎在浏览器本地运行，较高难度可能需要更长思考时间。",
+      "完整结束后可下载对局文件，再读取文件逐步回放。无需登录。"
+    ]
+  },
+  {
+    "id": "reserved-table",
+    "number": "003",
     "title": "敬请期待",
     "subtitle": "",
     "status": "upcoming",

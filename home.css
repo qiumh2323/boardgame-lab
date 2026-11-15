@@ -35,3 +35,4 @@ body{background:var(--paper);color:var(--ink)}.wrap{width:min(1200px,calc(100% -
 .castle-fan img:first-child { transform: translateY(12%) rotate(-6deg); }
 .castle-fan img:nth-child(2) { transform: translateY(-4%); }
 .castle-fan img:last-child { transform: translateY(-18%) rotate(6deg); }
+.castle .castle-fan img{aspect-ratio:429/600;width:27%;border-radius:5px}

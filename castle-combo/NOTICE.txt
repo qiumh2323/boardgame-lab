@@ -1,0 +1,25 @@
+Castle Combo / Chateau Combo game and artwork: Catch Up Games and respective creators.
+Game design: Gregory Grard and Mathieu Roussel. Illustrations: Stephane Escapa.
+Rules adaptation: Romain Fromi / Game Park; package declares ISC license.
+Source: https://github.com/gamepark/chateau-combo
+Pinned commit: c903ecc19f2d5eeeada8228cf98bb1eb37e01ffd
+Vendor rules are preserved from that source. Local-only adaptation, not an official product.
+Local rules patch (2026-11-02): DealCardsHelper now completes both markets before
+emitting one continuation, and resumes refill sequentially after a shuffle.
+This prevents duplicate turn/endgame settlement. Not an upstream-certified fix.
+
+ISC License
+
+Permission to use, copy, modify, and/or distribute this software for any purpose
+with or without fee is hereby granted, provided that the above copyright notice
+and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+
+This software license does not grant rights to redistribute game artwork.
