@@ -11,8 +11,6 @@ const fortressAnchors={Lindon:[6.9,26.6],Arnor:[34.2,19.2],Rhovanion:[70.9,27],E
 let g, data, board, picked=null, artwork=null, aiSide=null, timer=null;
 let busy=false;
 const skillKeys=['Ruse','Strength','Courage','Knowledge','Leadership'];
-const skillGlyph={Ruse:'✦',Strength:'⚒',Courage:'♥',Knowledge:'▣',Leadership:'♛'};
-const chainGlyph={HARP:'♬',ANVIL:'⚒',POT:'♜',HORSESHOE:'∩',FISH:'♓',BACKPACK:'▣',HORSE:'♞',ARROW:'➶',HELMET:'♟',KNIFE:'†',ACORN:'♠',SCROLL:'▤',FIRE:'♨',BEDROLL:'▰',TREASURE_CASKET:'▧',ARMOR:'♜',AXE:'⚒'};
 function notify(text){const box=$('#action-notice');box.textContent=text;box.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>box.hidden=true,2700);}
 async function transition(action,source,kind='play'){
  if(busy||!g||g.s.victory)return;busy=true;document.body.classList.add('action-busy');hideTip();hideOwnedZoom();
@@ -203,7 +201,7 @@ function drawCards(){
   const n=btn(undefined,()=>execute('play',x.ID),'card '+(vis?(open?'open':'blocked'):'back'));n.dataset.slot=x.ID;n.disabled=!open||!!s.choice||!!s.victory||aiTurn();
   n.addEventListener('contextmenu',e=>{e.preventDefault();if(!n.disabled)execute('discard',x.ID);});
   n.style.gridColumnStart=s.chapter===3&&x.Row===4?2+i*4:max-row+1+i*2;n.style.gridColumnEnd='span 2';n.style.gridRow=x.Row;
-  if(vis){n.style.setProperty('--c',colors[c.color][1]);n.append(el('b',colors[c.color][0]),el('span',c.effects.map(description).join('；')));if(open&&g.price(c).chain)n.classList.add('chain-ready');if(open)n.append(el('small',g.price(c).coins+' 金币'));}
+  if(vis){n.style.setProperty('--c',colors[c.color][1]);n.append(el('b',colors[c.color][0]),el('span',c.effects.map(description).join('；')));if(g.price(c).chain)n.classList.add('chain-ready');if(open)n.append(el('small',g.price(c).coins+' 金币'));}
   else n.textContent='未揭示';
   if(artwork){const img=art(vis?artwork[c.id]:'./original-art/chapter-'+s.chapter+'-back.png',vis?cardText(c):'未揭示');img.onerror=()=>{n.classList.remove('with-art');img.remove();};n.prepend(img);n.classList.add('with-art');if(open)n.dataset.price=g.price(c).coins+' 金币';}
   if(vis)largePreview(n,()=>art(artwork?.[c.id],cardText(c)),colors[c.color][0]+'章节牌',()=>details(c,{blocked:!open}));
@@ -320,15 +318,15 @@ function render(){
    else for(const [key,value] of Object.entries(e.SkillSet))if(key!=='IsOptional')fixed[key]=(fixed[key]??0)+value;
   }
   if(p.tokens.some(t=>t.Attribute==='BENEFIT_FROM_ANY_SKILL'))flex.push(Object.fromEntries(skillKeys.map(k=>[k,1])));
-  skillBox.append(el('h4','技能 · 括号内为可选数量'));
+  skillBox.append(el('h4','能力'));
   const skillRow=el('div',undefined,'skill-counts');for(const key of skillKeys){
-   const optional=flex.filter(f=>f[key]>0).length,amount=fixed[key]??0,item=el('span'),icons=el('div',undefined,'skill-stack');
-   for(let j=0;j<amount;j++)icons.append(el('i',skillGlyph[key],'skill-token skill-'+key));
-   item.append(el('small',tr(key)),icons,el('strong',amount+(optional?'+('+optional+')':'')));skillRow.append(item);
+   const item=el('span');item.append(el('small',tr(key)),el('strong',String(fixed[key]??0)));skillRow.append(item);
   }skillBox.append(skillRow);
-  if(flex.length){const row=el('div',undefined,'optional-skills');for(const f of flex){const pair=el('span',undefined,'skill-choice');pair.title='每次支付时任选其中一种技能，不是同时拥有';for(const key of skillKeys.filter(k=>f[k]>0)){const icon=el('i',skillGlyph[key],'skill-token skill-'+key);icon.setAttribute('aria-label',tr(key));pair.append(icon);}row.append(pair);}skillBox.append(row);}
+  const optional=el('span',undefined,'multi-skill-column');optional.append(el('small','多选能力'));
+  const choices=new Map();for(const f of flex){const keys=skillKeys.filter(k=>f[k]>0),label=keys.length===5?'任意能力':keys.map(tr).join('／');choices.set(label,(choices.get(label)??0)+1);}
+  if(!choices.size)optional.append(el('strong','0'));else for(const [label,count] of choices){const value=el('span',undefined,'multi-skill-value');value.append(el('span',label),el('strong','×'+count));value.title='每次支付时可任选其中一种，不计入左侧固定能力';optional.append(value);}skillRow.append(optional);
   const chains=[...new Set(p.played.flatMap(c=>c.chain.grants?[c.chain.grants]:[]))];
-  if(chains.length){const chainRow=el('div',undefined,'resource-chains');chainRow.append(el('small','连锁'));for(const key of chains){const chip=el('span',undefined,'chain-chip');chip.append(el('i',chainGlyph[key]??'◇'),el('span',glyph(key)));chainRow.append(chip);}skillBox.append(chainRow);}
+  if(chains.length){const chainRow=el('div',undefined,'resource-chains');chainRow.append(el('small','连锁'));for(const key of chains)chainRow.append(el('span',glyph(key),'chain-chip'));skillBox.append(chainRow);}
   n.append(header,stats,skillBox,tags,btn('查看联盟奖励',showAlliances,'alliance-open'));return n;
  }));
  drawOwned();
