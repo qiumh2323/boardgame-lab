@@ -212,7 +212,21 @@ function render(){
  hideTip();
  const s=g.s;$('#chapter').textContent='第 '+s.chapter+' 章';$('#turn').textContent=s.victory?(s.victory.winner===null?'双方平局':names[s.victory.winner]+'获胜'):names[s.turn]+(aiTurn()?'（电脑）':'')+'行动';
  drawMap();drawCards();drawActions();
- $('#players').replaceChildren(...s.players.map((p,i)=>{const n=el('div',undefined,'panel '+(!s.victory&&i===s.turn?'active':''));n.append(el('h2',names[i]),el('p',p.coins+' 金币 · '+g.count(i)+'/7 地区 · '+g.raceCount(i)+'/6 支持'),el('small',Object.keys(p.races).map(tr).join('、')||'尚无族群支持'));return n;}));
+ $('#players').replaceChildren(...s.players.map((p,i)=>{
+  const active=!s.victory&&i===s.turn,n=el('section',undefined,'panel resource-panel resource-'+i+(active?' active':''));
+  const header=el('div',undefined,'resource-head'),title=el('h2',names[i]);header.append(title);
+  if(active)header.append(el('span','行动中','resource-turn'));
+  const stats=el('dl',undefined,'resource-stats');
+  for(const [label,value,max] of [['金币',p.coins],['地区',g.count(i),7],['族群',g.raceCount(i),6]]){
+   const group=el('div',undefined,'resource-stat'),valueNode=el('dd');valueNode.append(el('strong',String(value)));
+   if(max)valueNode.append(el('span','/'+max,'resource-target'));
+   group.append(el('dt',label),valueNode);stats.append(group);
+  }
+  const races=Object.keys(p.races),tags=el('div',undefined,'resource-races');
+  if(races.length)for(const race of races)tags.append(el('span',tr(race),'resource-race'));
+  else tags.append(el('small','尚无族群支持'));
+  n.append(header,stats,tags);return n;
+ }));
  $('#played').replaceChildren(...s.players.map((p,i)=>{const d=el('div');d.append(el('h3',names[i]));for(const c of p.played)d.append(el('p',cardText(c)+(c.chain.grants?' · '+glyph(c.chain.grants):'')));for(const t of p.tokens)d.append(el('p',token(t)));return d;}));
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
 }
