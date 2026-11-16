@@ -10,3 +10,4 @@
 - 数据出处：[社区规则实现的基础配置](https://github.com/Vermihunter/lotr-duel-for-middle-earth/blob/783649d5d55cbffd7f2dfa342707e4c2965b7a09/src/main/resources/DefaultConfig.json)、[第二来源的章节牌卡图与 CSV](https://github.com/szuperszilard/LotR_Game/tree/8dfea9569fe4dce430a4dfc8c2e7857940ae3413/LotRpics/Done)。第二章地图议事灰牌的费用与技能已按卡面修正；全套牌效和连锁仍待逐张复核。
 - 规则电脑只按公开信息估值，兼顾胜利威胁、技能、金币和区域，不使用训练模型。
 - 本地和独立试玩站均可加载 `original-art/` 下的 69 张原版章节牌、卡背、封面、地图和轨道；无素材时回退为文字牌面和示意地图。独立试玩站的链接无登录限制。游戏与作品权利归各权利人所有。
+- 七块原版地标取自 [GeekDad 评测](https://geekdad.com/2025/01/the-lord-of-the-rings-duel-duel-for-middle-earth-tom-bombadil-not-included/)中 Paul Benson 拍摄的地标合照；网页仅按区域裁切展示。

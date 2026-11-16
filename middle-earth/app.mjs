@@ -43,7 +43,17 @@ function scheduleAI(){
 function execute(type,i){if(!aiTurn()&&g.action(type,i)){picked=null;render();if(g.s.choice||g.s.victory)$('#actions h2')?.focus();scheduleAI();}}
 function art(src,alt){const n=el('img',undefined,'component-art');n.src=src;n.alt=alt;n.decoding='async';return n;}
 const svgNS='http://www.w3.org/2000/svg';
-function landmarkImage(l){return landmarkIcon(l.FortressToPlaceTo);}
+// Unobstructed physical tiles, read from the same cached photograph. The
+// coordinates are interior insets so neighbouring tiles and the table stay out.
+const landmarkFrames={Arnor:[53,95,251,249],Mordor:[332,95,249,250],Enedwaith:[607,91,249,248],Lindon:[886,86,250,249],Rohan:[185,380,254,256],Rhovanion:[485,378,251,257],Gondor:[776,377,253,258]};
+function landmarkImage(l){
+ const frame=landmarkFrames[l.FortressToPlaceTo];if(!artwork||!frame)return landmarkIcon(l.FortressToPlaceTo);
+ const svg=document.createElementNS(svgNS,'svg'),img=document.createElementNS(svgNS,'image');
+ svg.setAttribute('class','landmark-photo');svg.setAttribute('viewBox',frame.join(' '));svg.setAttribute('role','img');svg.setAttribute('aria-label',landmarkName(l)+'原版地标板块');
+ img.setAttribute('width','1200');img.setAttribute('height','720');img.setAttribute('href','./original-art/landmark-tiles.jpg');
+ img.addEventListener('error',()=>{const fallback=landmarkIcon(l.FortressToPlaceTo);if(svg.classList.contains('landmark-preview'))fallback.classList.add('landmark-preview');svg.replaceWith(fallback);},{once:true});
+ svg.append(img);return svg;
+}
 function landmarkName(l){return tr(board.regions.find(r=>r.Name===l.FortressToPlaceTo).Fortress);}
 function details(c,{blocked=false,landmark=false}={}){
  const price=g.price(c),coins=g.s.players[g.s.turn].coins;

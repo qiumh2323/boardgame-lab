@@ -10,6 +10,7 @@
 .landmarks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 .landmark-tile{border:1px solid #d6cbaf;padding:5px;background:#fffdf5;border-radius:8px}
 .landmark-tile svg,.landmark-preview{aspect-ratio:64/38}
+.landmark-tile .landmark-photo,.landmark-preview.landmark-photo{aspect-ratio:1;overflow:hidden}
 .landmark-tile strong,.landmark-tile small{padding-inline:1px}.landmark-tile small{font-variant-numeric:tabular-nums}
 #inspect{position:fixed;z-index:50;width:min(300px,calc(100vw - 16px));max-height:calc(100dvh - 16px);overflow:auto;pointer-events:none;padding:12px 13px;background:#fffdf5;color:#283c31;border:1px solid #bdad89;border-radius:8px;box-shadow:0 8px 20px #302a2330;font-size:.84rem}
 .detail-title{display:block;padding-bottom:5px;color:#28493c}
