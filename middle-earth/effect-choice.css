@@ -1,0 +1,9 @@
+#effect-choice{box-sizing:border-box;width:max-content;min-width:min(270px,calc(100vw - 24px));max-width:min(450px,calc(100vw - 24px));max-height:85dvh;overflow:auto;padding:14px;border:1px solid #bcae8e;border-radius:9px;background:#fffdf5;color:#293b33}
+#effect-choice::backdrop{background:#18231d70}
+#effect-choice-title{margin:0 0 10px;font-size:1rem}
+#effect-options{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:8px}
+.effect-option{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;max-width:130px;padding:6px;font-size:.75rem;line-height:1.4;text-align:center}
+.effect-option:hover{background:#f4ead0}.effect-option:focus-visible{outline:2px solid #8d611a;outline-offset:2px}
+.effect-card{display:block;width:72px;height:106px;object-fit:contain}.effect-token{display:block;width:50px;height:50px;object-fit:contain}
+#effect-footer{display:flex;justify-content:flex-end;border-top:1px solid #ded5c1;margin-top:10px;padding-top:8px}
+@media(max-width:480px){#effect-choice{padding:11px}.effect-option{max-width:92px}.effect-card{width:58px;height:86px}}
