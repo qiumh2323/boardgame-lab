@@ -1,6 +1,6 @@
 import {createGame} from './engine.mjs';
 import {stepAI} from './ai.mjs';
-import {landmarkIcon,pawnIcon,originalPawn} from './board-icons.mjs?v=7';
+import {landmarkIcon,pawnIcon,originalPawn} from './board-icons.mjs?v=9';
 const $=s=>document.querySelector(s), names=['护戒同盟','索伦'];
 const words={Lindon:'林顿',Arnor:'亚尔诺',Rhovanion:'罗瓦尼安',Enedwaith:'埃奈德',Rohan:'洛汗',Gondor:'刚铎',Mordor:'魔多',BaradDur:'巴拉督尔',Bree:'布理',Erebor:'孤山',GreyHavens:'灰港',HelmsDeep:'圣盔谷',Isengard:'艾森加德',MinasTirith:'米那斯提力斯',Elves:'精灵',Dwarves:'矮人',Hobbits:'霍比特人',Humans:'人类',Ents:'树人',Wizards:'巫师',Eagles:'巨鹰',Ruse:'诡计',Strength:'力量',Courage:'勇气',Knowledge:'知识',Leadership:'领导力'};
 const colors={gray:['技能','#5a6869'],yellow:['金币','#bb8c25'],blue:['魔戒','#356d99'],green:['族群','#3a7752'],red:['部队','#a34839'],purple:['谋略','#78528a']};
@@ -165,7 +165,7 @@ function drawMap(){
    const faction=el('span',undefined,'region-faction f'+j);
    const piece=artwork?originalPawn:pawnIcon;
    if(g.s.forts[i]===j){const fort=el('span',undefined,'fort-piece');fort.setAttribute('aria-label',names[j]+'要塞');fort.append(piece(j,true));faction.append(fort);}
-   if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('role','img');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.style.setProperty('--unit-step',Math.min(9,57/Math.max(1,q-1))+'px');for(let k=0;k<q;k++)unit.append(piece(j,false));faction.append(unit);}
+   if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('role','img');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.style.setProperty('--unit-step',Math.min(9,57/Math.max(1,q-1))+'px');unit.style.setProperty('--map-unit-step',Math.min(2.05,4.7/Math.max(1,q-1))+'cqw');for(let k=0;k<q;k++)unit.append(piece(j,false));faction.append(unit);}
    if(faction.childElementCount)pieces.append(faction);
   });
   n.append(pieces);n.tabIndex=0;tooltip(n,tr(r),()=>[

@@ -5,12 +5,15 @@
 .original-art #map{background:none;container-type:inline-size}
 .original-art #map::before{content:'';position:absolute;inset:0;z-index:-1;background:url('./original-art/map.png') center/100% 100% no-repeat;filter:brightness(1.17) contrast(.95) saturate(.96)}
 .original-art #map .region-name{display:block;transform:translateY(calc(-1.1em - 4cqw));text-shadow:0 0 3px #fff7de,0 0 5px #fff7de,0 1px 2px #fff7de}
-.original-art #map .region-pieces{top:50%;transform:translate(-50%,-10%)}.region-faction{white-space:nowrap}
+.original-art #map .region-pieces{top:50%;transform:translate(-50%,-50%)}.region-faction{white-space:nowrap}
 #map .piece-sprite{width:clamp(16px,2.15vw,28px);height:clamp(18px,2.4vw,32px)}
 #map .pawn-photo{width:auto;height:clamp(23px,3.25vw,39px);max-width:27px}
 #map .unit-piece{gap:0;isolation:isolate;flex:none}
 #map .unit-piece .piece-sprite{flex:none}
 #map .unit-piece .piece-sprite+.piece-sprite{margin-left:calc(var(--unit-step) - clamp(13px,1.82vw,22px))}
+.original-art #map .unit-piece{--map-unit-width:3.5cqw}
+.original-art #map .unit-piece .piece-sprite{width:var(--map-unit-width);height:6.1cqw;max-width:none;filter:none}
+.original-art #map .unit-piece .piece-sprite+.piece-sprite{margin-left:calc(var(--map-unit-step) - var(--map-unit-width))}
 .quest-open{display:block;width:100%;flex:0 0 100%;padding:0;border:0;border-radius:4px;background:none;cursor:zoom-in}
 .quest-open .quest-track,.quest-zoom .quest-track{display:block}
 .quest-zoom{position:fixed;z-index:45;width:min(840px,calc(100vw - 16px));padding:9px 10px 10px;background:#fffdf5;color:#283c31;border:1px solid #bdad89;border-radius:9px;box-shadow:0 8px 24px #302a233e}
