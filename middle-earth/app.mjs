@@ -331,11 +331,11 @@ function render(){
   if(p.tokens.some(t=>t.Attribute==='BENEFIT_FROM_ANY_SKILL'))flex.push(Object.fromEntries(skillKeys.map(k=>[k,1])));
   skillBox.append(el('h4','能力'));
   const skillRow=el('div',undefined,'skill-counts');for(const key of skillKeys){
-   const item=el('span');item.append(el('small',tr(key)),skillIcon(key),el('strong',String(fixed[key]??0)));skillRow.append(item);
+   const item=el('span'),hasOptional=flex.some(f=>f[key]>0);item.append(el('small',tr(key)),skillIcon(key),el('strong',String(fixed[key]??0)+(hasOptional?'+':'')));if(hasOptional)item.title=tr(key)+'固定 '+(fixed[key]??0)+'；另有多选来源，+不代表额外固定能力';skillRow.append(item);
   }skillBox.append(skillRow);
   const optional=el('span',undefined,'multi-skill-column');optional.append(el('small','多选能力'));
   const choices=new Map();for(const f of flex){const keys=skillKeys.filter(k=>f[k]>0),signature=keys.join(',');choices.set(signature,(choices.get(signature)??0)+1);}
-  if(!choices.size)optional.append(el('span','—','multi-skill-empty'));else for(const [signature,count] of choices)for(let copy=0;copy<count;copy++){const keys=signature.split(','),label=keys.length===5?'任意能力':keys.map(tr).join('／'),value=el('span',undefined,'multi-skill-value'),icons=el('span',undefined,'multi-choice-icons'+(keys.length>3?' many-options':''));keys.forEach((key,index)=>{if(index)icons.append(el('span','/','choice-divider'));icons.append(skillIcon(key));});value.append(icons);value.title=label+'：每次支付时任选其中一种，不计入左侧固定能力';value.setAttribute('aria-label',value.title);optional.append(value);}skillRow.append(optional);
+  if(!choices.size)optional.append(el('span','—','multi-skill-empty'));else for(const [signature,count] of choices)for(let copy=0;copy<count;copy++){const keys=signature.split(','),label=keys.length===5?'任意能力':keys.map(tr).join('／'),value=el('span',undefined,'multi-skill-value'),icons=el('span',undefined,'multi-choice-icons'+(keys.length>3?' many-options':''));keys.forEach(key=>icons.append(skillIcon(key)));value.append(icons);value.title=label+'：每次支付时任选其中一种，不计入左侧固定能力';value.setAttribute('aria-label',value.title);optional.append(value);}skillRow.append(optional);
   const chains=[...new Set(p.played.flatMap(c=>c.chain.grants?[c.chain.grants]:[]))];
   if(chains.length){const chainRow=el('div',undefined,'resource-chains');chainRow.append(el('small','连锁'));for(const key of chains)chainRow.append(el('span',glyph(key),'chain-chip'));skillBox.append(chainRow);}
   n.append(header,stats,ringProgress,skillBox,tags);return n;
