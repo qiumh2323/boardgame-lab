@@ -23,3 +23,16 @@ export function pawnIcon(side,fort){
  svg.append(shape('path',{d,fill,stroke:rim,'stroke-width':1.5,'stroke-linejoin':'round'}),shape('path',{d:fort?'M12 27v-7a2 2 0 0 1 4 0v7M8 13h12':'M9 16h10m-5-4v13',fill:'none',stroke:rim,'stroke-width':1.5,'stroke-linecap':'round'}));
  return svg;
 }
+const pawnFrames=[
+ [[725,121,184,329],'8% 91%,3% 59%,8% 5%,13% 1%,24% 0,33% 7%,38% 33%,53% 30%,67% 32%,80% 41%,97% 48%,100% 60%,94% 83%,88% 97%,72% 100%,16% 99%'],
+ [[291,48,212,400],'11% 53%,14% 33%,9% 22%,13% 3%,18% 0,30% 0,33% 4%,44% 4%,46% 0,58% 0,63% 4%,72% 4%,75% 0,85% 0,90% 3%,98% 13%,97% 26%,89% 39%,77% 39%,77% 90%,86% 95%,83% 100%,13% 99%,2% 94%,0 86%'],
+ [[1021,121,188,329],'2% 68%,6% 55%,19% 45%,27% 35%,42% 28%,57% 32%,58% 14%,63% 4%,69% 1%,80% 0,89% 7%,93% 35%,97% 58%,100% 84%,90% 98%,72% 100%,12% 98%,4% 92%'],
+ [[1623,46,245,404],'7% 21%,5% 12%,12% 2%,26% 1%,29% 5%,38% 5%,42% 1%,53% 1%,58% 5%,67% 5%,72% 0,78% 1%,82% 5%,85% 16%,85% 25%,77% 32%,87% 59%,99% 87%,91% 97%,79% 100%,24% 99%,17% 95%,15% 85%,13% 46%,7% 38%']
+];
+export function originalPawn(side,fort){
+ const [box,outline]=pawnFrames[side*2+Number(fort)];
+ const svg=shape('svg',{class:'piece-sprite pawn-photo',viewBox:box.join(' '),'aria-hidden':'true'});
+ const img=shape('image',{href:'./original-art/pawn-tiles.jpg',width:1920,height:495});
+ svg.style.clipPath='polygon('+outline+')';svg.style.aspectRatio=box[2]+'/'+box[3];img.addEventListener('error',()=>svg.replaceWith(pawnIcon(side,fort)),{once:true});
+ svg.append(img);return svg;
+}

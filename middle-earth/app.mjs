@@ -1,6 +1,6 @@
 import {createGame} from './engine.mjs';
 import {stepAI} from './ai.mjs';
-import {landmarkIcon,pawnIcon} from './board-icons.mjs';
+import {landmarkIcon,pawnIcon,originalPawn} from './board-icons.mjs?v=7';
 const $=s=>document.querySelector(s), names=['护戒同盟','索伦'];
 const words={Lindon:'林顿',Arnor:'亚尔诺',Rhovanion:'罗瓦尼安',Enedwaith:'埃奈德',Rohan:'洛汗',Gondor:'刚铎',Mordor:'魔多',BaradDur:'巴拉督尔',Bree:'布理',Erebor:'孤山',GreyHavens:'灰港',HelmsDeep:'圣盔谷',Isengard:'艾森加德',MinasTirith:'米那斯提力斯',Elves:'精灵',Dwarves:'矮人',Hobbits:'霍比特人',Humans:'人类',Ents:'树人',Wizards:'巫师',Eagles:'巨鹰',Ruse:'诡计',Strength:'力量',Courage:'勇气',Knowledge:'知识',Leadership:'领导力'};
 const colors={gray:['技能','#5a6869'],yellow:['金币','#bb8c25'],blue:['魔戒','#356d99'],green:['族群','#3a7752'],red:['部队','#a34839'],purple:['谋略','#78528a']};
@@ -78,6 +78,7 @@ function tooltip(node,title,lines){
  const show=()=>{if(!node.isConnected)return;hideTip();appendDetails(t,title,lines());t.hidden=false;node.setAttribute('aria-describedby','inspect');positionTip(node);};
  node.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')show();});
  node.addEventListener('pointerleave',hideTip);node.addEventListener('focus',show);node.addEventListener('blur',hideTip);
+ return show;
 }
 const followTip=()=>{const node=document.querySelector('[aria-describedby="inspect"]');if(node)positionTip(node);};
 window.addEventListener('scroll',followTip,{capture:true,passive:true});
@@ -94,6 +95,16 @@ function drawRing(){
    const fellowship=art('./original-art/FotR.png','持戒者滑板'),nazgul=art('./original-art/Sauron.png','戒灵滑板');
    fixed.classList.add('quest-layer');fellowship.classList.add('quest-layer','quest-fellowship');nazgul.classList.add('quest-layer','quest-nazgul');
    track.append(base,fixed,fellowship,nazgul);ring.append(track);
+   for(const side of [0,1])for(const reward of board.ring.BonusActions){
+    const name=side?'戒灵':'持戒者',text=reward.BonusActions.map(description).join('；');
+    const hint=el('button',undefined,'quest-reward quest-reward-'+side);hint.type='button';
+    hint.dataset.side=side;hint.dataset.step=reward.Position;
+    hint.setAttribute('aria-label',name+'第 '+reward.Position+' 格：'+text);
+    const show=tooltip(hint,name+' · 第 '+reward.Position+' 格',()=>[
+     ['奖励',text],['触发','到达或经过这格时结算一次'],['进度',g.s.players[side].ring>=reward.Position?'已通过':'尚未通过']
+    ]);
+    hint.addEventListener('click',show);track.append(hint);
+   }
   }
   ring.append(status);
  }
@@ -103,6 +114,11 @@ function drawRing(){
  if(track){
   track.querySelector('.quest-fellowship').style.setProperty('--shift',f*3.33+'%');
   track.querySelector('.quest-nazgul').style.setProperty('--shift',(f+s)*3.33+'%');
+  for(const hint of track.querySelectorAll('.quest-reward')){
+   const side=Number(hint.dataset.side),step=Number(hint.dataset.step);
+   hint.style.setProperty('--pos',(4.93+3.33*(step+(side?f:14)))+'%');
+   hint.toggleAttribute('data-overlap',side===1&&board.ring.BonusActions.some(reward=>Math.abs(reward.Position+14-step-f)<=1));
+  }
  }
 }
 function drawMap(){
@@ -115,8 +131,9 @@ function drawMap(){
   n.dataset.region=r;n.style.left=point[0]+'%';n.style.top=point[1]+'%';n.append(el('b',tr(r),'region-name'));
   g.s.units[i].forEach((q,j)=>{
    const faction=el('span',undefined,'region-faction f'+j);
-   if(g.s.forts[i]===j){const fort=el('span',undefined,'fort-piece');fort.setAttribute('aria-label',names[j]+'要塞');fort.append(pawnIcon(j,true));faction.append(fort);}
-   if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.append(pawnIcon(j,false),el('strong',String(q)));faction.append(unit);}
+   const piece=artwork?originalPawn:pawnIcon;
+   if(g.s.forts[i]===j){const fort=el('span',undefined,'fort-piece');fort.setAttribute('aria-label',names[j]+'要塞');fort.append(piece(j,true));faction.append(fort);}
+   if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.append(piece(j,false),el('strong',String(q)));faction.append(unit);}
    if(faction.childElementCount)pieces.append(faction);
   });
   n.append(pieces);n.tabIndex=0;tooltip(n,tr(r),()=>[

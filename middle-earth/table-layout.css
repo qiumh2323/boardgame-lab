@@ -4,9 +4,14 @@
 @media(max-width:800px){.board{gap:0}.table-play{grid-row:3}.world-column{grid-row:4;display:flex;flex-direction:column-reverse}#players .panel{margin-bottom:7px}.board #actions{margin-bottom:8px}}
 .original-art #map{background:none}
 .original-art #map::before{content:'';position:absolute;inset:0;z-index:-1;background:url('./original-art/map.png') center/100% 100% no-repeat;filter:brightness(1.17) contrast(.95) saturate(.96)}
-.original-art #map .region-name{display:block;transform:translateY(-.85em);text-shadow:0 0 3px #fff7de,0 0 5px #fff7de,0 1px 2px #fff7de}
+.original-art #map .region-name{display:block;transform:translateY(-1.27em);text-shadow:0 0 3px #fff7de,0 0 5px #fff7de,0 1px 2px #fff7de}
 .original-art #map .region-pieces{top:50%;transform:translate(-50%,-10%)}.region-faction{white-space:nowrap}
 #map .piece-sprite{width:clamp(16px,2.15vw,28px);height:clamp(18px,2.4vw,32px)}
+#map .pawn-photo{width:auto;height:clamp(23px,3.25vw,39px);max-width:27px}
+.quest-reward{position:absolute;left:var(--pos);transform:translateX(-50%);z-index:3;background:transparent;border:1px solid transparent;border-radius:5px;width:clamp(16px,6%,31px);height:41%;padding:0;transition:left 340ms ease}
+.quest-reward{bottom:0;height:32%}.quest-reward-1[data-overlap]{bottom:33%}
+.quest-reward:hover,.quest-reward:focus-visible,.quest-reward[aria-describedby]{background:#fff1be44;border-color:#fff0bb;box-shadow:0 0 0 1px #63401b}
+@media(prefers-reduced-motion:reduce){.quest-reward{transition:none}}
 .landmarks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 .landmark-tile{border:1px solid #d6cbaf;padding:5px;background:#fffdf5;border-radius:8px}
 .landmark-tile svg,.landmark-preview{aspect-ratio:64/38}
