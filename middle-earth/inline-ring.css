@@ -1,4 +1,8 @@
 .quest-inline{display:block;width:100%;flex:0 0 100%;cursor:default}
-.quest-inline .quest-reward{width:clamp(13px,3.5%,22px);height:45%;min-height:14px;bottom:0;cursor:help}
-.quest-inline .quest-reward-1[data-overlap]{bottom:45%}
+.quest-inline .quest-reward{width:3.1%;height:27%;min-height:0;top:70%;bottom:auto;cursor:help}
+.quest-inline .quest-reward-1[data-overlap]{bottom:auto}
 .original-art #map .unit-piece .pawn-front{width:var(--map-unit-width);height:6.1cqw;aspect-ratio:auto;align-self:flex-end}
+#inspect.ring-tip{overflow:visible}#inspect.ring-tip::after{content:'';position:absolute;left:var(--tip-arrow-x);transform:translateX(-50%);border:7px solid transparent;pointer-events:none}#inspect.ring-tip[data-placement="above"]::after{top:100%;border-top-color:#bdad89}#inspect.ring-tip[data-placement="below"]::after{bottom:100%;border-bottom-color:#bdad89}
+.soldier-token{display:block;flex:none;width:clamp(16px,2.15vw,28px);height:clamp(18px,2.4vw,32px);filter:drop-shadow(.6px 0 0 #111) drop-shadow(-.6px 0 0 #111) drop-shadow(0 .6px 0 #111) drop-shadow(0 -.6px 0 #111)}
+.soldier-token+.soldier-token{margin-left:calc(var(--unit-step) - clamp(16px,2.15vw,28px))}
+.original-art #map .unit-piece .soldier-token{width:var(--map-unit-width);height:6.1cqw}.original-art #map .unit-piece .soldier-token+.soldier-token{margin-left:calc(var(--map-unit-step) - var(--map-unit-width))}

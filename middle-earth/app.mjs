@@ -91,16 +91,17 @@ function details(c,{blocked=false,landmark=false}={}){
  return lines;
 }
 function appendDetails(target,title,lines){target.replaceChildren(el('strong',title,'detail-title'));const list=el('dl');for(const [name,value] of lines)list.append(el('dt',name),el('dd',value));target.append(list);}
-function hideTip(){const t=$('#inspect');t.hidden=true;document.querySelector('[aria-describedby="inspect"]')?.removeAttribute('aria-describedby');}
+function hideTip(){const t=$('#inspect');t.hidden=true;t.classList.remove('ring-tip');document.querySelector('[aria-describedby="inspect"]')?.removeAttribute('aria-describedby');}
 function positionTip(node){
  const t=$('#inspect'),a=node.getBoundingClientRect(),w=t.offsetWidth,h=t.offsetHeight;
  if(a.bottom<0||a.top>innerHeight||a.right<0||a.left>innerWidth){hideTip();return;}
+ if(node.classList.contains('quest-reward')){const x=Math.max(8,Math.min(innerWidth-w-8,a.left+a.width/2-w/2)),above=a.top>=h+12;t.style.left=x+'px';t.style.top=Math.max(8,Math.min(innerHeight-h-8,above?a.top-h-10:a.bottom+10))+'px';t.style.setProperty('--tip-arrow-x',Math.max(10,Math.min(w-10,a.left+a.width/2-x))+'px');t.dataset.placement=above?'above':'below';return;}
  t.style.left=Math.max(8,Math.min(innerWidth-w-8,a.right+9+w<=innerWidth?a.right+9:a.left-w-9))+'px';
  t.style.top=Math.max(8,Math.min(innerHeight-h-8,a.top))+'px';
 }
 function tooltip(node,title,lines,{precise=false}={}){
  const t=$('#inspect');
- const show=()=>{if(!node.isConnected)return;hideTip();appendDetails(t,title,lines());t.hidden=false;node.setAttribute('aria-describedby','inspect');positionTip(node);};
+ const show=()=>{if(!node.isConnected)return;hideTip();appendDetails(t,typeof title==='function'?title():title,lines());t.classList.toggle('ring-tip',node.classList.contains('quest-reward'));t.hidden=false;node.setAttribute('aria-describedby','inspect');positionTip(node);};
  node.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch'&&(!precise||matchMedia('(hover:hover)').matches))show();});
  node.addEventListener('pointerleave',hideTip);node.addEventListener('focus',()=>{if(!precise||node.matches(':focus-visible'))show();});node.addEventListener('blur',hideTip);
  return show;
@@ -130,9 +131,11 @@ function drawRing(){
     const hint=el('button',undefined,'quest-reward quest-reward-'+side);hint.type='button';
     hint.dataset.side=side;hint.dataset.step=reward.Position;
     hint.setAttribute('aria-label',name+'第 '+reward.Position+' 格：'+text);
-    const show=tooltip(hint,name+' · 第 '+reward.Position+' 格',()=>[
-     ['奖励',text],['触发','到达或经过这格时结算一次'],['进度',g.s.players[side].ring>=reward.Position?'已通过':'尚未通过']
-    ],{precise:true});
+    const show=tooltip(hint,()=>hint.dataset.sharedStep?'魔戒轨道 · 重叠奖励':name+' · 第 '+reward.Position+' 格',()=>{
+     const rows=[['奖励',text],['触发','到达或经过这格时结算一次'],['进度',g.s.players[side].ring>=reward.Position?'已通过':'尚未通过']];
+     if(hint.dataset.sharedStep){const otherSide=1-side,otherStep=Number(hint.dataset.sharedStep),otherReward=board.ring.BonusActions.find(r=>r.Position===otherStep);rows[0]=[name+' · 第 '+reward.Position+' 格',text+'（'+(g.s.players[side].ring>=reward.Position?'已通过':'尚未通过')+'）'];rows.splice(1,0,[(otherSide?'戒灵':'持戒者')+' · 第 '+otherStep+' 格',otherReward.BonusActions.map(description).join('；')+'（'+(g.s.players[otherSide].ring>=otherStep?'已通过':'尚未通过')+'）']);rows[2]=['触发','双方各自到达对应进度时结算，并非同时获得两项奖励'];rows.pop();}
+     return rows;
+    },{precise:true});
     hint.addEventListener('click',show);track.append(hint);
    }
   }
@@ -149,7 +152,8 @@ function drawRing(){
   for(const hint of track.querySelectorAll('.quest-reward')){
    const side=Number(hint.dataset.side),step=Number(hint.dataset.step);
    hint.style.setProperty('--pos',(4.93+3.33*(step+(side?f:14)))+'%');
-   hint.toggleAttribute('data-overlap',side===1&&board.ring.BonusActions.some(reward=>Math.abs(reward.Position+14-step-f)<=1));
+   const shared=board.ring.BonusActions.find(r=>side===0?f+r.Position===14+step:14+r.Position===f+step);
+   hint.hidden=side===1&&!!shared;if(side===0&&shared)hint.dataset.sharedStep=shared.Position;else delete hint.dataset.sharedStep;
   }
  }
 }
@@ -166,7 +170,7 @@ function drawMap(){
    const faction=el('span',undefined,'region-faction f'+j);
    const piece=artwork?originalPawn:pawnIcon;
    if(g.s.forts[i]===j){const fort=el('span',undefined,'fort-piece'+(artwork?' map-fortress':''));fort.setAttribute('aria-label',names[j]+'要塞 · '+tr(r));fort.dataset.region=r;fort.append(piece(j,true));if(artwork){const a=fortressAnchors[r];fort.style.left=a[0]+'%';fort.style.top=a[1]+'%';box.append(fort);}else faction.append(fort);}
-   if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('role','img');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.style.setProperty('--unit-step',Math.min(9,57/Math.max(1,q-1))+'px');unit.style.setProperty('--map-unit-step',Math.min(2.05,4.7/Math.max(1,q-1))+'cqw');for(let k=0;k<q;k++)unit.append(piece(j,false));faction.append(unit);}
+   if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('role','img');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.style.setProperty('--unit-step',Math.min(9,57/Math.max(1,q-1))+'px');unit.style.setProperty('--map-unit-step',Math.min(2.05,4.7/Math.max(1,q-1))+'cqw');for(let k=0;k<q;k++){const outline=el('span',undefined,'soldier-token');outline.append(piece(j,false));unit.append(outline);}faction.append(unit);}
    if(faction.childElementCount)pieces.append(faction);
   });
   n.append(pieces);n.tabIndex=0;tooltip(n,tr(r),()=>[
