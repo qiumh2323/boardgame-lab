@@ -47,7 +47,7 @@ function drawCards(){
  const counts={};for(const x of s.slots){const i=counts[x.Row]??0;counts[x.Row]=i+1;if(x.taken)continue;
   const row=s.slots.filter(y=>y.Row===x.Row).length, open=g.available(x), vis=g.visible(x), c=x.card;
   const n=btn(undefined,()=>pick('card',x.ID),'card '+(vis?(open?'open':'blocked'):'back'));n.disabled=!open||!!s.choice||!!s.victory;
-  n.style.gridColumnStart=s.chapter===3&&x.Row===4?1+i*4:max-row+1+i*2;n.style.gridColumnEnd='span 2';n.style.gridRow=x.Row;
+  n.style.gridColumnStart=s.chapter===3&&x.Row===4?2+i*4:max-row+1+i*2;n.style.gridColumnEnd='span 2';n.style.gridRow=x.Row;
   if(vis){n.style.setProperty('--c',colors[c.color][1]);n.append(el('b',colors[c.color][0]),el('span',c.effects.map(description).join('；')));n.title='费用：'+costText(c)+(c.chain.requiresForFree?' · '+glyph(c.chain.requiresForFree)+'可免费':'');if(open)n.append(el('small',g.price(c).coins+' 金币'));}
   else n.textContent='ᚠ · 未揭示';
   if(picked?.type==='card'&&picked.i===x.ID)n.classList.add('picked');box.append(n);
