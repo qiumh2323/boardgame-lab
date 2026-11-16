@@ -1,0 +1,4 @@
+.quest-inline{display:block;width:100%;flex:0 0 100%;cursor:default}
+.quest-inline .quest-reward{width:clamp(13px,3.5%,22px);height:45%;min-height:14px;bottom:0;cursor:help}
+.quest-inline .quest-reward-1[data-overlap]{bottom:45%}
+.original-art #map .unit-piece .pawn-front{width:var(--map-unit-width);height:6.1cqw;aspect-ratio:auto;align-self:flex-end}

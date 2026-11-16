@@ -1,6 +1,6 @@
 import {createGame} from './engine.mjs';
 import {decide,observe} from './ai.mjs';
-import {landmarkIcon,pawnIcon,originalPawn} from './board-icons.mjs?v=10';
+import {landmarkIcon,pawnIcon,originalPawn} from './board-icons.mjs?v=11';
 const $=s=>document.querySelector(s), names=['护戒同盟','索伦'];
 const words={Lindon:'林顿',Arnor:'亚尔诺',Rhovanion:'罗瓦尼安',Enedwaith:'埃奈德',Rohan:'洛汗',Gondor:'刚铎',Mordor:'魔多',BaradDur:'巴拉督尔',Bree:'布理',Erebor:'孤山',GreyHavens:'灰港',HelmsDeep:'圣盔谷',Isengard:'艾森加德',MinasTirith:'米那斯提力斯',Elves:'精灵',Dwarves:'矮人',Hobbits:'霍比特人',Humans:'人类',Ents:'树人',Wizards:'巫师',Eagles:'巨鹰',Ruse:'诡计',Strength:'力量',Courage:'勇气',Knowledge:'知识',Leadership:'领导力'};
 const colors={gray:['技能','#5a6869'],yellow:['金币','#bb8c25'],blue:['魔戒','#356d99'],green:['族群','#3a7752'],red:['部队','#a34839'],purple:['谋略','#78528a']};
@@ -121,36 +121,10 @@ function drawRing(){
     fixed.classList.add('quest-layer');fellowship.classList.add('quest-layer','quest-fellowship');nazgul.classList.add('quest-layer','quest-nazgul');
     track.append(base,fixed,fellowship,nazgul);return track;
    };
-   const opener=el('button',undefined,'quest-open');opener.type='button';opener.setAttribute('aria-label','放大魔戒轨道查看奖励');
-   opener.setAttribute('aria-controls','quest-zoom');opener.setAttribute('aria-expanded','false');opener.append(createTrack());
-   const zoom=el('section',undefined,'quest-zoom');zoom.id='quest-zoom';zoom.hidden=true;zoom.setAttribute('aria-label','放大的魔戒轨道');
-   const track=createTrack(),head=el('div',undefined,'quest-zoom-head');
-   const rail=el('div',undefined,'quest-zoom-rail');rail.append(track);
-   head.append(el('strong','魔戒轨道'),el('small','可左右滑动','quest-scroll-hint'));zoom.append(head,rail);ring.append(opener,zoom);
-   let hideTimer,pinned=false;
-   function positionZoom(){
-    if(zoom.hidden)return;
-    const a=opener.getBoundingClientRect(),w=zoom.offsetWidth,h=zoom.offsetHeight;
-    if(a.bottom<=0||a.top>=innerHeight){hideZoom();return;}
-    const y=a.top>=h+10?a.top-h-5:a.bottom+5;
-    zoom.style.top=Math.max(6,Math.min(innerHeight-h-6,y))+'px';
-    zoom.style.left=Math.max(6,Math.min(innerWidth-w-6,a.left+(a.width-w)/2))+'px';
-   }
-   function showZoom(){clearTimeout(hideTimer);if(zoom.hidden)hideTip();zoom.hidden=false;opener.setAttribute('aria-expanded','true');positionZoom();}
-   function hideZoom(){clearTimeout(hideTimer);pinned=false;zoom.hidden=true;opener.setAttribute('aria-expanded','false');hideTip();}
-   const leave=()=>{clearTimeout(hideTimer);hideTimer=setTimeout(()=>{if(!pinned&&!zoom.matches(':hover')&&!zoom.querySelector(':focus-visible')&&!opener.matches(':hover,:focus-visible'))hideZoom();},240);};
-   opener.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')showZoom();});
-   opener.addEventListener('pointerleave',leave);zoom.addEventListener('pointerenter',()=>clearTimeout(hideTimer));zoom.addEventListener('pointerleave',leave);
-   opener.addEventListener('focus',()=>{if(opener.matches(':focus-visible'))showZoom();});
-   opener.addEventListener('click',e=>{if(e.pointerType==='touch'||matchMedia('(hover:none)').matches){if(pinned)hideZoom();else{pinned=true;showZoom();}}else showZoom();});
-   // Events live on the ring's contents; abort window listeners when a new game resets the ring.
-   ringVisibility?.abort();ringVisibility=new AbortController();const signal=ringVisibility.signal;
-   ring.addEventListener('focusout',leave,{signal});
-   ring.addEventListener('keydown',e=>{if(e.key==='Escape'&&!zoom.hidden){opener.focus();hideZoom();}},{signal});
-   window.addEventListener('scroll',positionZoom,{capture:true,passive:true,signal});
-   window.addEventListener('resize',positionZoom,{signal});
-   document.addEventListener('pointerdown',e=>{if(!zoom.hidden&&!ring.contains(e.target))hideZoom();},{signal});
-   ringDismiss=hideZoom;
+   const track=createTrack();track.classList.add('quest-inline');track.setAttribute('role','group');track.setAttribute('aria-label','魔戒轨道，悬浮奖励位置查看效果');ring.append(track);
+   ringVisibility?.abort();ringVisibility=new AbortController();
+   document.addEventListener('pointerdown',e=>{if(!ring.contains(e.target)&&document.querySelector('.quest-reward[aria-describedby]'))hideTip();},{signal:ringVisibility.signal});
+   ringDismiss=hideTip;
    for(const side of [0,1])for(const reward of board.ring.BonusActions){
     const name=side?'戒灵':'持戒者',text=reward.BonusActions.map(description).join('；');
     const hint=el('button',undefined,'quest-reward quest-reward-'+side);hint.type='button';

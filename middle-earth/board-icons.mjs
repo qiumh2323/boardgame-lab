@@ -43,6 +43,7 @@ export function originalPawn(side,fort){
  }
  const [box,outline]=fort?pawnFrames[side*2+1]:soldierFaces[side];
  const svg=shape('svg',{class:'piece-sprite pawn-photo'+(fort?'':' pawn-front'),viewBox:box.join(' '),'aria-hidden':'true'});
+ svg.setAttribute('preserveAspectRatio','none');svg.dataset.side=side;
  const img=shape('image',fort?{href:'./original-art/pawn-tiles.jpg',width:1920,height:495}:{href:'./original-art/soldier-fronts.jpg',width:1200,height:635});
  svg.style.clipPath='polygon('+outline+')';svg.style.aspectRatio=box[2]+'/'+box[3];img.addEventListener('error',()=>svg.replaceWith(pawnIcon(side,fort)),{once:true});
  svg.append(img);return svg;
