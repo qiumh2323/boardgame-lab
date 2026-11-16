@@ -231,7 +231,7 @@ function drawActions(){
 }
 function inspectOwned(c){
  $('#owned-detail h2').textContent='已建造章节牌';
- const dialog=$('#owned-detail'),content=$('#owned-content');content.replaceChildren();
+ const dialog=$('#owned-detail'),content=$('#owned-content');content.classList.remove('alliance-catalog');content.replaceChildren();
  if(artwork)content.append(art(artwork[c.id],cardText(c)));
  const info=el('section');appendDetails(info,colors[c.color][0]+'章节牌',[
   ['效果',c.effects.map(description).join('；')],['印刷费用',costText(c)],
@@ -255,11 +255,13 @@ function largePreview(node,image,title,lines){
 function ownedPreview(node,c){largePreview(node,()=>art(artwork[c.id],cardText(c)),colors[c.color][0]+'章节牌',()=>[
  ['效果',c.effects.map(description).join('；')],...(c.chain.grants?[['提供连锁',glyph(c.chain.grants)]]:[]),...(c.chain.requiresForFree?[['免费连锁',glyph(c.chain.requiresForFree)]]:[])
 ]);}
-function showAlliances(){
- const dialog=$('#owned-detail'),content=$('#owned-content');content.replaceChildren();$('#owned-detail h2').textContent='联盟奖励';content.classList.add('alliance-catalog');
+function showAlliances(raceName=null){
+ if(typeof raceName!=='string')raceName=null;
+ const dialog=$('#owned-detail'),content=$('#owned-content');content.replaceChildren();$('#owned-detail h2').textContent=raceName?tr(raceName)+' · 潜在结盟效果':'联盟奖励';content.classList.add('alliance-catalog');
  content.append(el('p','同族第二张牌：翻两枚选一枚。首次集齐三种族群：各翻一枚，再选一枚。这里展示奖励种类，不显示本局未翻开的顺序。'));
- for(const race of board.races){const section=el('section');section.append(el('h3',tr(race.Name)));for(const t of race.AllianceTokens)section.append(el('p',token({...t,race:race.Name})));content.append(section);}
- hideTip();hideOwnedZoom();dialog.showModal();
+ for(const race of board.races.filter(r=>!raceName||r.Name===raceName)){const section=el('section');section.append(el('h3',tr(race.Name)));race.AllianceTokens.forEach((t,i)=>{const row=el('p',token({...t,race:race.Name})),owner=g.s.players.findIndex(p=>p.tokens.some(x=>x.id===race.Name+'-'+i));if(owner>=0)row.append(el('small',names[owner]+'已获得','alliance-claimed'));section.append(row);});content.append(section);}
+ if(raceName)content.append(btn('查看全部族群',()=>showAlliances()));
+ hideTip();hideOwnedZoom();if(!dialog.open)dialog.showModal();
 }
 window.addEventListener('scroll',hideOwnedZoom,{capture:true,passive:true});window.addEventListener('resize',hideOwnedZoom);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')hideOwnedZoom();});
@@ -269,10 +271,10 @@ function drawOwned(){
   const section=el('section',undefined,'owned-player resource-'+i),head=el('div',undefined,'owned-head');
   head.append(el('h3',names[i]),el('small',p.played.length+' 张牌 · '+p.tokens.length+' 枚标记'));section.append(head);
   const tokens=el('div',undefined,'owned-tokens');
-  tokens.append(el('h4','结盟标记'));
+  const tokenHead=el('div',undefined,'owned-token-head');tokenHead.append(el('h4','结盟标记'),btn('查看可选效果',()=>showAlliances(),'alliance-link'));tokens.append(tokenHead);
   if(!p.tokens.length)tokens.append(el('p','尚未获得标记','owned-empty'));
   for(const t of p.tokens){
-   const item=el('div',undefined,'owned-token'),text=token(t).split(' · ');
+   const item=btn(undefined,()=>showAlliances(t.race),'owned-token'),text=token(t).split(' · ');item.setAttribute('aria-label',tr(t.race)+'结盟标记，查看该族潜在可选效果');
    item.append(el('strong',tr(t.race)),el('span',text.slice(1).join(' · ')));tokens.append(item);
   }
   const piles=el('div',undefined,'owned-piles');
@@ -282,6 +284,7 @@ function drawOwned(){
    group.append(el('h4',name+' '+cards.length));const grid=el('div',undefined,'owned-cards');grid.style.setProperty('--count',Math.max(1,cards.length));
    for(const c of cards){
     const item=btn(undefined,()=>inspectOwned(c),'owned-card');item.setAttribute('aria-label',cardText(c)+'，查看详情');
+    item.style.setProperty('--stack-index',grid.childElementCount);
     if(artwork)item.append(art(artwork[c.id],cardText(c)));
     item.append(el('span',c.effects.map(description).join('；'),'owned-caption'));
     if(c.chain.grants)item.append(el('small','连锁 · '+glyph(c.chain.grants)));
@@ -310,7 +313,7 @@ function render(){
    group.append(el('dt',label),valueNode);stats.append(group);
   }
   const races=Object.keys(p.races),tags=el('div',undefined,'resource-races');
-  if(races.length)for(const race of races)tags.append(el('span',tr(race),'resource-race'));
+  if(races.length)for(const race of races){const tag=btn(tr(race),()=>showAlliances(race),'resource-race');tag.title='查看'+tr(race)+'的潜在结盟效果';tags.append(tag);}
   else tags.append(el('small','尚无族群支持'));
   const skillBox=el('section',undefined,'resource-skills'),fixed={},flex=[];
   for(const c of p.played)for(const e of c.effects)if(e.Type==='GainSkill'){
