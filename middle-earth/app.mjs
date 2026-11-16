@@ -73,11 +73,11 @@ function positionTip(node){
  t.style.left=Math.max(8,Math.min(innerWidth-w-8,a.right+9+w<=innerWidth?a.right+9:a.left-w-9))+'px';
  t.style.top=Math.max(8,Math.min(innerHeight-h-8,a.top))+'px';
 }
-function tooltip(node,title,lines){
+function tooltip(node,title,lines,{precise=false}={}){
  const t=$('#inspect');
  const show=()=>{if(!node.isConnected)return;hideTip();appendDetails(t,title,lines());t.hidden=false;node.setAttribute('aria-describedby','inspect');positionTip(node);};
- node.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')show();});
- node.addEventListener('pointerleave',hideTip);node.addEventListener('focus',show);node.addEventListener('blur',hideTip);
+ node.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch'&&(!precise||matchMedia('(hover:hover)').matches))show();});
+ node.addEventListener('pointerleave',hideTip);node.addEventListener('focus',()=>{if(!precise||node.matches(':focus-visible'))show();});node.addEventListener('blur',hideTip);
  return show;
 }
 const followTip=()=>{const node=document.querySelector('[aria-describedby="inspect"]');if(node)positionTip(node);};
@@ -85,16 +85,47 @@ window.addEventListener('scroll',followTip,{capture:true,passive:true});
 window.addEventListener('resize',followTip);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')hideTip();});
 function drawRing(){
- const ring=$('#ring');let track=ring.querySelector('.quest-track');
+ const ring=$('#ring');
  if(!ring.querySelector('.quest-status')){
   const status=el('div',undefined,'quest-status');status.append(el('span',undefined,'f0'),el('span',undefined,'f1'));
   if(artwork){
-   track=el('div',undefined,'quest-track');
-   const base=art('./original-art/ring-track.png','魔戒任务轨道');
-   const fixed=art('./original-art/sauronWay.png','');
-   const fellowship=art('./original-art/FotR.png','持戒者滑板'),nazgul=art('./original-art/Sauron.png','戒灵滑板');
-   fixed.classList.add('quest-layer');fellowship.classList.add('quest-layer','quest-fellowship');nazgul.classList.add('quest-layer','quest-nazgul');
-   track.append(base,fixed,fellowship,nazgul);ring.append(track);
+   const createTrack=()=>{const track=el('span',undefined,'quest-track');
+    const base=art('./original-art/ring-track.png','');
+    const fixed=art('./original-art/sauronWay.png','');
+    const fellowship=art('./original-art/FotR.png',''),nazgul=art('./original-art/Sauron.png','');
+    fixed.classList.add('quest-layer');fellowship.classList.add('quest-layer','quest-fellowship');nazgul.classList.add('quest-layer','quest-nazgul');
+    track.append(base,fixed,fellowship,nazgul);return track;
+   };
+   const opener=el('button',undefined,'quest-open');opener.type='button';opener.setAttribute('aria-label','放大魔戒轨道查看奖励');
+   opener.setAttribute('aria-controls','quest-zoom');opener.setAttribute('aria-expanded','false');opener.append(createTrack());
+   const zoom=el('section',undefined,'quest-zoom');zoom.id='quest-zoom';zoom.hidden=true;zoom.setAttribute('aria-label','放大的魔戒轨道');
+   const track=createTrack(),head=el('div',undefined,'quest-zoom-head'),close=btn('关闭',()=>{opener.focus();hideZoom();});
+   const rail=el('div',undefined,'quest-zoom-rail');rail.append(track);
+   head.append(el('strong','魔戒轨道'),el('small','可左右滑动','quest-scroll-hint'),close);zoom.append(head,rail);ring.append(opener,zoom);
+   let hideTimer,pinned=false;
+   function positionZoom(){
+    if(zoom.hidden)return;
+    const a=opener.getBoundingClientRect(),w=zoom.offsetWidth,h=zoom.offsetHeight;
+    if(a.bottom<=0||a.top>=innerHeight){hideZoom();return;}
+    const y=a.top>=h+10?a.top-h-5:a.bottom+5;
+    zoom.style.top=Math.max(6,Math.min(innerHeight-h-6,y))+'px';
+    zoom.style.left=Math.max(6,Math.min(innerWidth-w-6,a.left+(a.width-w)/2))+'px';
+   }
+   function showZoom(){clearTimeout(hideTimer);if(zoom.hidden)hideTip();zoom.hidden=false;opener.setAttribute('aria-expanded','true');positionZoom();}
+   function hideZoom(){clearTimeout(hideTimer);pinned=false;zoom.hidden=true;opener.setAttribute('aria-expanded','false');hideTip();}
+   const leave=()=>{clearTimeout(hideTimer);hideTimer=setTimeout(()=>{if(!pinned&&!zoom.matches(':hover,:focus-within')&&!opener.matches(':hover,:focus-visible'))hideZoom();},240);};
+   opener.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')showZoom();});
+   opener.addEventListener('pointerleave',leave);zoom.addEventListener('pointerenter',()=>clearTimeout(hideTimer));zoom.addEventListener('pointerleave',leave);
+   opener.addEventListener('focus',()=>{if(opener.matches(':focus-visible'))showZoom();});
+   opener.addEventListener('click',()=>{if(pinned)hideZoom();else{pinned=true;showZoom();}});
+   // Events live on the ring's contents; abort window listeners when a new game resets the ring.
+   ringVisibility?.abort();ringVisibility=new AbortController();const signal=ringVisibility.signal;
+   ring.addEventListener('focusout',leave,{signal});
+   ring.addEventListener('keydown',e=>{if(e.key==='Escape'&&!zoom.hidden){opener.focus();hideZoom();}},{signal});
+   window.addEventListener('scroll',positionZoom,{capture:true,passive:true,signal});
+   window.addEventListener('resize',positionZoom,{signal});
+   document.addEventListener('pointerdown',e=>{if(!zoom.hidden&&!ring.contains(e.target))hideZoom();},{signal});
+   ringDismiss=hideZoom;
    for(const side of [0,1])for(const reward of board.ring.BonusActions){
     const name=side?'戒灵':'持戒者',text=reward.BonusActions.map(description).join('；');
     const hint=el('button',undefined,'quest-reward quest-reward-'+side);hint.type='button';
@@ -102,7 +133,7 @@ function drawRing(){
     hint.setAttribute('aria-label',name+'第 '+reward.Position+' 格：'+text);
     const show=tooltip(hint,name+' · 第 '+reward.Position+' 格',()=>[
      ['奖励',text],['触发','到达或经过这格时结算一次'],['进度',g.s.players[side].ring>=reward.Position?'已通过':'尚未通过']
-    ]);
+    ],{precise:true});
     hint.addEventListener('click',show);track.append(hint);
    }
   }
@@ -111,7 +142,7 @@ function drawRing(){
  const [f,s]=g.s.players.map(p=>p.ring);
  ring.querySelector('.quest-status .f0').textContent='持戒者距末日火山 '+(14-f)+' 格';
  ring.querySelector('.quest-status .f1').textContent='戒灵距持戒者 '+(14-s)+' 格';
- if(track){
+ for(const track of ring.querySelectorAll('.quest-track')){
   track.querySelector('.quest-fellowship').style.setProperty('--shift',f*3.33+'%');
   track.querySelector('.quest-nazgul').style.setProperty('--shift',(f+s)*3.33+'%');
   for(const hint of track.querySelectorAll('.quest-reward')){
@@ -121,6 +152,7 @@ function drawRing(){
   }
  }
 }
+let ringVisibility,ringDismiss;
 function drawMap(){
  const box=$('#map');box.replaceChildren();
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
@@ -133,7 +165,7 @@ function drawMap(){
    const faction=el('span',undefined,'region-faction f'+j);
    const piece=artwork?originalPawn:pawnIcon;
    if(g.s.forts[i]===j){const fort=el('span',undefined,'fort-piece');fort.setAttribute('aria-label',names[j]+'要塞');fort.append(piece(j,true));faction.append(fort);}
-   if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.append(piece(j,false),el('strong',String(q)));faction.append(unit);}
+   if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('role','img');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.style.setProperty('--unit-step',Math.min(9,57/Math.max(1,q-1))+'px');for(let k=0;k<q;k++)unit.append(piece(j,false));faction.append(unit);}
    if(faction.childElementCount)pieces.append(faction);
   });
   n.append(pieces);n.tabIndex=0;tooltip(n,tr(r),()=>[
@@ -185,7 +217,7 @@ function render(){
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
 }
 $('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);picked=null;$('#ring').replaceChildren();$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};
-$('#return').onclick=()=>{if(!g.s.victory&&!confirm('返回准备界面将结束本局。确定返回？'))return;hideTip();clearTimeout(timer);timer=null;g=null;picked=null;$('#game').hidden=true;$('#lobby').hidden=false;$('#start').focus();window.scrollTo(0,0);};
+$('#return').onclick=()=>{if(!g.s.victory&&!confirm('返回准备界面将结束本局。确定返回？'))return;ringDismiss?.();ringVisibility?.abort();hideTip();clearTimeout(timer);timer=null;g=null;picked=null;$('#game').hidden=true;$('#lobby').hidden=false;$('#start').focus();window.scrollTo(0,0);};
 $('#mode').onchange=()=>{$('#seat-field').hidden=$('#mode').value==='pvp';};
 const read=async f=>{const r=await fetch(f);if(!r.ok)throw Error(f);return r.json();};
 try{[data,board,artwork]=await Promise.all([read('./chapter-cards.json?v=2'),read('./board.json'),read('./original-art/manifest.json?v=3').catch(()=>null)]);if(data.length!==69||board.layouts.length!==3)throw Error('数据不完整');if(artwork&&data.every(c=>artwork[c.id]))document.body.classList.add('original-art');else artwork=null;$('#start').disabled=false;$('#start').textContent='开始对战';}catch(e){$('#status').textContent='无法载入游戏资料，请刷新页面重试。';console.error(e);}
