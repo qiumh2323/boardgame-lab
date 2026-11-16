@@ -1,5 +1,7 @@
 # 魔戒：中洲对决｜规则试玩
 
+[打开 GitHub Pages 试玩](https://qiumh2323.github.io/middle-earth-duel-playtest/)
+
 双人同屏热座；无需账号、服务器或构建工具。通过静态 HTTP 服务打开，不能直接以 file:// 打开。支持基础版三章，未包含扩展、电脑对手、跨设备联机或断点存档。
 
 - 运行：在当前目录执行 `python -m http.server 8895 --bind 127.0.0.1`，打开 `http://127.0.0.1:8895/`。
