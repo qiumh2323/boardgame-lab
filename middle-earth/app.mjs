@@ -29,6 +29,8 @@ async function transition(action,source,kind='play'){
   if(!action()){notify('无法执行：请检查金币、可拿取状态或当前待结算效果。');return;}
   if(matchStats){const stats=matchStats.players[side];if(kind==='choice')stats.choices++;else{stats.turns++;if(kind==='play')stats.build++;if(kind==='discard')stats.discard++;if(kind==='landmark')stats.landmark++;}}
   picked=null;render();
+  const next=({map:'#map .map-target',move:'#map .map-target',tactics:'#map-choice button',token:'#alliance-pool .alliance-selectable',race:'#alliance-pool .race-target',gray:'#played .owned-card.choice-outline'})[choiceKind()];
+  if(next){const target=$(next);target?.scrollIntoView({block:'nearest'});target?.focus({preventScroll:true});}
   const panel=document.querySelector('.resource-'+side);if(panel)await panel.animate([{background:'#f2df9a'},{background:'#fffdf5'}],{duration:400}).finished;
  }finally{busy=false;document.body.classList.remove('action-busy');scheduleAI();}
 }
@@ -160,7 +162,30 @@ function drawRing(){
  }
 }
 let ringVisibility,ringDismiss;
+let moveChoice,moveFrom=null;
+function choiceKind(c=g.s.choice){
+ if(!c||aiTurn()||g.s.victory)return null;
+ return [['选择部署','map'],['移动 1 支','move'],['移除敌方','map'],['选择一枚结盟','token'],['选择结盟标记所属族群','race'],['从弃牌堆','discard'],['弃掉对手','gray'],['选择谋略','tactics']].find(([prefix])=>c.label.startsWith(prefix))?.[1];
+}
+function selectHere(c,i,node){if(!busy&&!aiTurn()&&g.s.choice===c&&c.options[i]){if(choiceKind(c)==='discard'&&$('#discard-detail').open)$('#discard-detail').close();transition(()=>g.select(i),node?.isConnected&&node.getClientRects().length?node:null,'choice');}}
+function localGuide(selector,kinds,message){
+ const box=$(selector),c=g.s.choice,kind=choiceKind(c);box.replaceChildren();box.hidden=!kinds.includes(kind);if(box.hidden)return;
+ box.append(el('span',message??c.label));
+ const skip=c.options.findIndex(o=>o.value===null);if(skip>=0){const button=btn('跳过',()=>selectHere(c,skip,button));box.append(button);}
+}
+function mapTarget(n,i){
+ const c=g.s.choice,kind=choiceKind(c);if(kind!=='map'&&kind!=='move')return;
+ const index=c.options.findIndex(o=>kind==='map'?o.value===i:Array.isArray(o.value)&&(moveFrom===null?o.value[0]===i:o.value[0]===moveFrom&&o.value[1]===i));
+ const selected=kind==='move'&&i===moveFrom;
+ if(index<0&&!selected)return;
+ const label=kind==='map'?c.label:moveFrom===null?'选择出发地区':selected?'重选出发地区':'移动到';
+ const button=btn(undefined,()=>{if(busy||g.s.choice!==c)return;if(kind==='move'&&(moveFrom===null||selected)){moveFrom=selected?null:i;drawMap();$('#map .map-target')?.focus({preventScroll:true});}else selectHere(c,index,button);},'map-target'+(selected?' origin-selected':''));
+ n.removeAttribute('tabindex');button.setAttribute('aria-label',label+'：'+tr(g.regions[i]));n.append(button);
+}
 function drawMap(){
+ const c=g.s.choice,kind=choiceKind(c);if(moveChoice!==c){moveChoice=c;moveFrom=null;}
+ localGuide('#map-choice',['map','move','tactics'],kind==='move'?(moveFrom===null?'移动部队：点选出发地区':'移动部队：点选目的地，再点出发地区可重选'):null);
+ if(kind==='tactics')c.options.forEach((o,i)=>{if(o.value!==null){const button=btn(o.label,()=>selectHere(c,i,button));$('#map-choice').append(button);}});
  const box=$('#map');box.replaceChildren();
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
  for(const r of board.regions)for(const other of r.ConnectedWith)if(r.Name<other){const l=document.createElementNS(ns,'line'),a=flags[r.Name],b=flags[other];for(const [k,v] of Object.entries({x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:'#927d53','stroke-width':'.6'}))l.setAttribute(k,v);svg.append(l);}
@@ -178,7 +203,7 @@ function drawMap(){
   n.append(pieces);n.tabIndex=0;tooltip(n,tr(r),()=>[
    ['相邻地区',board.regions[i].ConnectedWith.map(tr).join('、')],
    ...names.map((f,j)=>[f,g.s.units[i][j]+' 支士兵'+(g.s.forts[i]===j?' · 有要塞':'')])
-  ]);box.append(n);
+  ]);mapTarget(n,i);box.append(n);
  });drawRing();
 }
 function drawCards(){
@@ -205,10 +230,10 @@ function drawCards(){
  if(!s.market.length)ls.textContent='本章没有可选地标。';
 }
 function drawActions(){
- const s=g.s, a=$('#actions');a.replaceChildren();const heading=el('h2',s.choice?.label??'本回合');heading.tabIndex=-1;a.append(heading);
+ const s=g.s, a=$('#actions');a.hidden=false;a.replaceChildren();const heading=el('h2',s.choice?.label??'本回合');heading.tabIndex=-1;a.append(heading);
  if(s.victory){a.append(el('p',s.victory.reason),btn('查看本局统计',showVictoryStats));return;}
  if(aiTurn()){heading.textContent='规则电脑正在行动';return;}
- if(s.choice){const choices=el('div',undefined,'choices');s.choice.options.forEach((o,i)=>{const label=o.value?.race&&o.value?.id?token(o.value):o.label.split(' → ').map(tr).join(' → ');const card=data.find(c=>c.id===label);choices.append(btn(card?cardText(card):label,()=>{if(aiTurn()||busy)return;transition(()=>g.select(i),choices.children[i],'choice');}));});a.append(choices);return;}
+ if(s.choice){const kind=choiceKind();if(kind){a.hidden=true;return;}s.choice.options.forEach((o,i)=>{const button=btn(o.label,()=>selectHere(s.choice,i,button));a.append(button);});return;}
  if(!picked){a.append(el('p','左键建造章节牌或地标；右键弃掉可拿取的章节牌换金币。悬浮查看大图与效果。','hint'));const mobile=el('details',undefined,'touch-discard');mobile.append(el('summary','触屏弃牌'));for(const x of s.slots.filter(x=>g.available(x)))mobile.append(btn('弃掉'+colors[x.card.color][0]+'牌（+'+s.chapter+'金币）',()=>execute('discard',x.ID)));a.append(mobile);return;}
  const {type,i}=picked,c=type==='card'?s.slots[i].card:s.market[i],price=g.price(c);
  if(type==='card'&&artwork)a.append(art(artwork[c.id],cardText(c)));
@@ -257,8 +282,10 @@ function allianceArt(t){const race=board.races.find(r=>r.Name===t.race);let inde
 function inspectAlliance(t){const d=$('#owned-detail'),content=$('#owned-content');content.classList.remove('alliance-catalog');content.replaceChildren(art(allianceArt(t),token(t)));$('#owned-detail h2').textContent=tr(t.race)+'结盟标记';const info=el('section');appendDetails(info,'标记效果',[['效果',token(t).split(' · ').slice(1).join(' · ')],['选择规则','每枚标记全局唯一；必须触发结盟，从本次翻出的标记中选择。']]);content.append(info);hideTip();hideOwnedZoom();d.showModal();}
 function ownedAlliances(p){const section=el('section',undefined,'owned-tokens');section.append(el('h4','结盟效果'));for(const t of p.tokens){const text=token(t).split(' · '),item=btn(undefined,()=>showAlliances(t.race),'owned-token');item.setAttribute('aria-label',tr(t.race)+'结盟标记，查看该族潜在可选效果');item.append(el('strong',text[0]),el('span',text.slice(1).join(' · ')));section.append(item);}return section;}
 function drawAlliancePool(){const host=$('#alliance-pool');host.replaceChildren();const taken=new Set(g.s.players.flatMap(p=>p.tokens.map(t=>t.id))),choice=g.s.choice;let total=0;
+ const kind=choiceKind(choice);localGuide('#alliance-choice',['race','token'],kind==='race'?'点虚框族群，翻出该族奖励':'点虚框标记，领取这枚奖励');
  for(const race of board.races){const remaining=race.AllianceTokens.map((t,i)=>({...t,race:race.Name,id:race.Name+'-'+i})).filter(t=>!taken.has(t.id));total+=remaining.length;const group=el('section',undefined,'alliance-race-group');group.append(el('h3',tr(race.Name)+' · '+remaining.length));const row=el('div',undefined,'alliance-token-row');for(const t of remaining){const choiceIndex=choice?.label==='选择一枚结盟标记'?choice.options.findIndex(o=>o.value?.id===t.id):-1,selectable=choiceIndex>=0&&!aiTurn()&&!g.s.victory,item=btn(undefined,()=>{if(busy)return;if(selectable)transition(()=>g.select(choiceIndex),item,'choice');else inspectAlliance(t);},'alliance-tile'+(selectable?' alliance-selectable':''));item.dataset.token=t.id;item.setAttribute('aria-label',token(t)+(selectable?'，点击选择':'，查看效果'));const img=art(allianceArt(t),token(t));img.loading='lazy';item.append(img);largePreview(item,()=>art(allianceArt(t),token(t)),tr(t.race)+'结盟标记',()=>[['效果',token(t).split(' · ').slice(1).join(' · ')],['状态',selectable?'本次已翻出，点击可选择':'奖励图鉴；触发结盟后才能从翻出的标记中选择']]);row.append(item);}if(!remaining.length)row.append(el('small','已全部取走'));group.append(row);host.append(group);}
  $('#alliance-remaining').textContent='剩余 '+total+' 枚';
+ if(kind==='race')Array.from(host.children).forEach((group,j)=>{const race=board.races[j].Name,i=choice.options.findIndex(o=>o.value===race);if(i<0)return;const button=btn('选择'+tr(race),()=>selectHere(choice,i,button),'race-target');group.classList.add('choice-outline');group.querySelector('h3').replaceWith(button);group.querySelector('.alliance-token-row').addEventListener('click',e=>{e.stopPropagation();selectHere(choice,i,e.target.closest('button')??button);},{capture:true});});
 }
 function resultContent(){const box=el('div'),winner=g.s.victory.winner;box.append(el('h3',winner===null?'双方平局':names[winner]+(aiSide===winner?'（电脑）':'')+'获胜'),el('p',g.s.victory.reason,'result-reason'));const duration=Math.max(0,Math.round(((matchStats?.endedAt??Date.now())-(matchStats?.startedAt??Date.now()))/1000));box.append(el('p','本局耗时 '+Math.floor(duration/60)+'分'+duration%60+'秒 · 第'+g.s.chapter+'章结束','hint'));const table=el('table',undefined,'result-table'),head=el('tr');head.append(el('th','统计'),...names.map((name,i)=>el('th',name+(aiSide===i?'（电脑）':''))));table.append(head);const values=[['主要行动次数',i=>matchStats?.players[i].turns??0],['建造章节牌',i=>matchStats?.players[i].build??0],['弃牌换金币',i=>matchStats?.players[i].discard??0],['建造地标',i=>matchStats?.players[i].landmark??0],['终局章节牌数',i=>g.s.players[i].played.length],['终局金币',i=>g.s.players[i].coins],['族群支持',i=>g.raceCount(i)+'/6'],['结盟标记',i=>g.s.players[i].tokens.length],['势力地区',i=>g.count(i)+'/7'],['魔戒进度',i=>g.s.players[i].ring+'/14'],['地图士兵',i=>g.s.units.reduce((n,u)=>n+u[i],0)],['地图要塞',i=>g.s.forts.filter(x=>x===i).length]];for(const [label,get] of values){const row=el('tr');row.append(el('th',label),el('td',String(get(0))),el('td',String(get(1))));table.append(row);}box.append(table);return box;}
 function showVictoryStats(){if(!g?.s.victory)return;for(const id of ['#owned-detail','#discard-detail'])if($(id).open)$(id).close();hideTip();hideOwnedZoom();$('#victory-content').replaceChildren(resultContent());if(!$('#victory-detail').open)$('#victory-detail').showModal();}
@@ -266,10 +293,13 @@ function updateVictory(){if(!g.s.victory)return;if(matchStats&&!matchStats.ended
 $('#alliance-catalog-open').onclick=()=>showAlliances();
 $('#victory-close').onclick=()=>$('#victory-detail').close();$('#victory-return').onclick=()=>{$('#victory-detail').close();$('#return').click();};
 function drawDiscard(){
+ const choice=g.s.choice,choosing=choiceKind(choice)==='discard';
+ localGuide('#discard-choice',['discard'],'点虚框牌面，免费建造');
  const box=$('#discard-list');box.replaceChildren();let unknown=0;
  for(const c of [...g.s.discard].reverse()){
   const known=publicCardKnowledge.has(c.id)||discardKnowledge[viewerSide()].has(c.id);
-  const item=known?btn(undefined,()=>inspectOwned(c,'弃牌详情'),'discard-card'):el('div',undefined,'discard-card discard-unknown');
+  const index=choosing?choice.options.findIndex(o=>o.value!==null&&g.s.discard[o.value]===c):-1;
+  const item=known?btn(undefined,()=>{if(index>=0)selectHere(choice,index);else inspectOwned(c,'弃牌详情');},'discard-card'+(index>=0?' choice-outline':'')):el('div',undefined,'discard-card discard-unknown');
   if(artwork)item.append(art(known?artwork[c.id]:'./original-art/chapter-'+c.chapter+'-back.png',known?cardText(c):'未公开章节牌'));
   item.append(el('small',known?colors[c.color][0]+' · 第'+c.chapter+'章':'未公开 · 第'+c.chapter+'章'));
   if(known){item.title=cardText(c);item.append(el('span',c.effects.map(description).join('；'),'discard-effect'));}else unknown++;
@@ -284,6 +314,7 @@ window.addEventListener('scroll',hideOwnedZoom,{capture:true,passive:true});wind
 document.addEventListener('keydown',e=>{if(e.key==='Escape')hideOwnedZoom();});
 function drawOwned(){
  const host=$('#played');host.replaceChildren();
+ localGuide('#gray-choice',['gray'],'点虚框灰牌，将它弃置');
  g.s.players.forEach((p,i)=>{
   const section=el('section',undefined,'owned-player resource-'+i),head=el('div',undefined,'owned-head');
   head.append(el('h3',names[i]),el('small',p.played.length+' 张牌 · '+p.tokens.length+' 枚标记'));section.append(head);
@@ -293,7 +324,8 @@ function drawOwned(){
    const group=el('section',undefined,'owned-group');group.style.setProperty('--card-color',accent);
    group.append(el('h4',name+' '+cards.length));const grid=el('div',undefined,'owned-cards');grid.style.setProperty('--count',Math.max(1,cards.length));
    for(const c of cards){
-    const item=btn(undefined,()=>inspectOwned(c),'owned-card');item.setAttribute('aria-label',cardText(c)+'，查看详情');
+    const choice=g.s.choice,index=choiceKind(choice)==='gray'&&i!==g.s.turn?choice.options.findIndex(o=>o.value!==null&&p.played[o.value]===c):-1;
+    const item=btn(undefined,()=>index>=0?selectHere(choice,index,item):inspectOwned(c),'owned-card'+(index>=0?' choice-outline':''));item.setAttribute('aria-label',cardText(c)+(index>=0?'，点击弃置':'，查看详情'));
     item.style.setProperty('--stack-index',grid.childElementCount);
     if(artwork)item.append(art(artwork[c.id],cardText(c)));
     item.append(el('span',c.effects.map(description).join('；'),'owned-caption'));
@@ -346,6 +378,9 @@ function render(){
  }));
  drawOwned();
  drawAlliancePool();updateVictory();
+ if(choiceKind()==='gray')$('#collection-panel').open=true;
+ $('#discard-open').classList.toggle('choice-outline',choiceKind()==='discard');
+ if(choiceKind()==='discard'&&!$('#discard-detail').open)$('#discard-detail').showModal();
  if($('#discard-detail').open)drawDiscard();
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
 }

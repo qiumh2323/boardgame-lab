@@ -1,0 +1,7 @@
+.local-choice{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 0 9px;padding:6px 8px;border-left:2px solid #ae853d;background:#f5edda;color:#5d471f;font-size:.79rem}
+.local-choice button,.race-target{padding:3px 7px;font-size:.75rem}
+.choice-outline,#alliance-pool .alliance-selectable{outline:2px dashed #8d611a;outline-offset:2px}
+.alliance-race-group.choice-outline{border-radius:5px}.race-target{margin-bottom:5px}
+#map .map-target{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:max(38px,14cqw);height:max(29px,9cqw);padding:0;border:2px dashed #7d561a;border-radius:7px;background:#ffdb7024;box-shadow:0 0 0 1px #fff3cd;cursor:pointer}
+#map .map-target:hover,#map .map-target:focus-visible,#map .origin-selected{border-color:#694419;background:#ffd86465}
+.owned-card.choice-outline{outline-offset:-3px}.owned-card.choice-outline:focus-visible{z-index:1}
