@@ -16,22 +16,23 @@ const skillKeys=['Ruse','Strength','Courage','Knowledge','Leadership'];
 const skillArt={Ruse:['1-03.png',113,16,67],Strength:['1-05.png',113,16,67],Courage:['1-06.png',113,16,67],Knowledge:['1-22.png',115,13,68],Leadership:['1-20.png',114,13,68]};
 function skillIcon(key){const [file,x,y,size]=skillArt[key],svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),img=document.createElementNS('http://www.w3.org/2000/svg','image');svg.setAttribute('viewBox',[x,y,size,size].join(' '));svg.setAttribute('class','ability-icon');svg.setAttribute('role','img');svg.setAttribute('aria-label',tr(key));img.setAttribute('width','292');img.setAttribute('height','432');img.setAttribute('href','./original-art/cards/'+file);svg.append(img);return svg;}
 function notify(text){const box=$('#action-notice');box.textContent=text;box.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>box.hidden=true,2700);}
-async function transition(action,source,kind='play'){
+async function transition(action,source,kind='play',landmark=null){
  if(busy||!g||g.s.victory)return;busy=true;document.body.classList.add('action-busy');hideTip();hideOwnedZoom();
  const side=g.s.turn,game=g,rect=source?.getBoundingClientRect(),target=(kind==='discard'?$('#actions'):document.querySelector('.resource-'+side))?.getBoundingClientRect();
+ const onMap=kind==='choice'&&['map','move'].includes(choiceKind(game.s.choice,true));
  try{
-  if(source&&rect&&target){
+  if(!onMap&&source&&rect&&target){
    const ghost=source.cloneNode(true);ghost.removeAttribute('id');ghost.className='action-flight';ghost.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px`;ghost.append(el('em',kind==='discard'?'弃牌换金币':kind==='landmark'?'建造地标':kind==='choice'?'结算效果':'建造章节牌','flight-label'));document.body.append(ghost);
    const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
    await ghost.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${target.left+target.width/2-rect.left-rect.width/2}px,${target.top+target.height/2-rect.top-rect.height/2}px) scale(.25)`,opacity:.15}],{duration:reduced?100:650,easing:'ease-in-out',fill:'forwards'}).finished;ghost.remove();
-  }else await new Promise(r=>setTimeout(r,matchMedia('(prefers-reduced-motion:reduce)').matches?60:350));
+  }else if(!onMap)await new Promise(r=>setTimeout(r,matchMedia('(prefers-reduced-motion:reduce)').matches?60:350));
   if(g!==game)return;
   if(!action()){notify('无法执行：请检查金币、可拿取状态或当前待结算效果。');return;}
-  if(matchStats){const stats=matchStats.players[side];if(kind==='choice')stats.choices++;else{stats.turns++;if(kind==='play')stats.build++;if(kind==='discard')stats.discard++;if(kind==='landmark')stats.landmark++;}}
+  if(matchStats){const stats=matchStats.players[side];if(kind==='choice')stats.choices++;else{stats.turns++;if(kind==='play')stats.build++;if(kind==='discard')stats.discard++;if(kind==='landmark'){stats.landmark++;if(landmark)stats.landmarks.push(landmark);}}}
   picked=null;render();
   const next=({map:'#map .map-target',move:'#map .map-target'})[choiceKind()];
   if(next){const target=$(next);target?.scrollIntoView({block:'nearest'});target?.focus({preventScroll:true});}
-  const panel=document.querySelector('.resource-'+side);if(panel)await panel.animate([{background:'#f2df9a'},{background:'#fffdf5'}],{duration:400}).finished;
+  const panel=document.querySelector('.resource-panel.resource-'+side);if(panel&&!onMap)await panel.animate([{background:'#f2df9a'},{background:'#fffdf5'}],{duration:400}).finished;
  }finally{busy=false;document.body.classList.remove('action-busy');scheduleAI();}
 }
 const aiTurn=()=>g&&aiSide===g.s.turn&&!g.s.victory;
@@ -67,9 +68,9 @@ function cardText(c){return (colors[c.color]?.[0]??'')+' · '+c.effects.map(desc
 function pick(type,i){picked={type,i};render();if(matchMedia('(max-width:800px)').matches)$('#actions').scrollIntoView({block:'nearest'});$('#actions h2')?.focus({preventScroll:true});}
 function scheduleAI(){
  if(!aiTurn()||timer!==null||busy)return;
- timer=setTimeout(()=>{timer=null;if(!aiTurn())return;try{const a=decide(observe(g));if(!a)throw Error('no legal plan');const source=a[0]==='landmark'?$('#landmarks').children[a[1]]:a[0]==='choice'?$('#actions'):$(`[data-slot="${a[1]}"]`);transition(()=>a[0]==='choice'?g.select(a[1]):g.action(...a),source,a[0]);}catch(e){console.error(e);$('#actions').append(el('p','电脑未能继续行动，请返回准备界面重开。'));}},450);
+ timer=setTimeout(()=>{timer=null;if(!aiTurn())return;try{const a=decide(observe(g));if(!a)throw Error('no legal plan');const source=a[0]==='landmark'?$('#landmarks').children[a[1]]:a[0]==='choice'?$('#actions'):$(`[data-slot="${a[1]}"]`);transition(()=>a[0]==='choice'?g.select(a[1]):g.action(...a),source,a[0],a[0]==='landmark'?g.s.market[a[1]]:null);}catch(e){console.error(e);$('#actions').append(el('p','电脑未能继续行动，请返回准备界面重开。'));}},450);
 }
-function execute(type,i){if(aiTurn()||busy)return;const c=type==='landmark'?g.s.market[i]:g.s.slots[i]?.card;if(!c)return;if(type!=='discard'&&g.price(c).coins>g.s.players[g.s.turn].coins){notify('金币不足：还缺 '+(g.price(c).coins-g.s.players[g.s.turn].coins)+' 金币');return;}transition(()=>g.action(type,i),type==='landmark'?$('#landmarks').children[i]:$(`[data-slot="${i}"]`),type);}
+function execute(type,i){if(aiTurn()||busy)return;const c=type==='landmark'?g.s.market[i]:g.s.slots[i]?.card;if(!c)return;if(type!=='discard'&&g.price(c).coins>g.s.players[g.s.turn].coins){notify('金币不足：还缺 '+(g.price(c).coins-g.s.players[g.s.turn].coins)+' 金币');return;}transition(()=>g.action(type,i),type==='landmark'?$('#landmarks').children[i]:$(`[data-slot="${i}"]`),type,type==='landmark'?c:null);}
 function art(src,alt){const n=el('img',undefined,'component-art');n.src=src;n.alt=alt;n.decoding='async';return n;}
 const svgNS='http://www.w3.org/2000/svg';
 // Unobstructed physical tiles, read from the same cached photograph. The
@@ -163,8 +164,8 @@ function drawRing(){
 }
 let ringVisibility,ringDismiss;
 let moveChoice,moveFrom=null;
-function choiceKind(c=g.s.choice){
- if(!c||aiTurn()||g.s.victory)return null;
+function choiceKind(c=g.s.choice,includeAI=false){
+ if(!c||(!includeAI&&aiTurn())||g.s.victory)return null;
  return [['选择部署','map'],['移动 1 支','move'],['移除敌方','map'],['选择一枚结盟','token'],['选择结盟标记所属族群','race'],['从弃牌堆','discard'],['弃掉对手','gray'],['选择谋略','tactics']].find(([prefix])=>c.label.startsWith(prefix))?.[1];
 }
 function selectHere(c,i,node){if(!busy&&!aiTurn()&&g.s.choice===c&&c.options[i]){if($('#effect-choice').open)$('#effect-choice').close();transition(()=>g.select(i),node?.isConnected&&node.getClientRects().length?node:null,'choice');}}
@@ -185,6 +186,7 @@ function mapTarget(n,i){
 function drawMap(){
  const c=g.s.choice,kind=choiceKind(c);if(moveChoice!==c){moveChoice=c;moveFrom=null;}
  localGuide('#map-choice',['map','move'],kind==='move'?(moveFrom===null?'移动部队：点选出发地区':'移动部队：点选目的地，再点出发地区可重选'):null);
+ drawTurnPrompt();
  const box=$('#map');box.replaceChildren();
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
  for(const r of board.regions)for(const other of r.ConnectedWith)if(r.Name<other){const l=document.createElementNS(ns,'line'),a=flags[r.Name],b=flags[other];for(const [k,v] of Object.entries({x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:'#927d53','stroke-width':'.6'}))l.setAttribute(k,v);svg.append(l);}
@@ -346,8 +348,27 @@ function drawOwned(){
    }if(!cards.length)grid.append(el('span','—','owned-vacant'));group.append(grid);piles.append(group);
   }
   section.append(piles);
+  const landmarks=matchStats.players[i].landmarks,landmarkShelf=el('section',undefined,'owned-landmarks');
+  landmarkShelf.append(el('h4','已建造地标 · '+landmarks.length));
+  const tiles=el('div',undefined,'owned-landmark-tiles');
+  for(const l of landmarks){const item=btn(undefined,()=>inspectOwnedLandmark(l),'landmark-tile');item.append(landmarkImage(l),el('strong',landmarkName(l)));largePreview(item,()=>landmarkImage(l),landmarkName(l),()=>ownedLandmarkDetails(l));tiles.append(item);}
+  if(!landmarks.length)tiles.append(el('small','尚未建造地标'));
+  landmarkShelf.append(tiles);section.append(landmarkShelf);
   host.append(section);
  });
+}
+function ownedLandmarkDetails(l){return [['建造位置',tr(l.FortressToPlaceTo)],['效果',l.Effects.map(description).join('；')||'建造要塞'],['印刷费用',costText(l)]];}
+function inspectOwnedLandmark(l){const dialog=$('#owned-detail'),content=$('#owned-content');content.classList.remove('alliance-catalog');$('#owned-detail h2').textContent='已建造地标';const info=el('section');appendDetails(info,landmarkName(l),ownedLandmarkDetails(l));content.replaceChildren(landmarkImage(l),info);hideTip();hideOwnedZoom();dialog.showModal();}
+function drawTurnPrompt(){
+ const s=g.s,kind=choiceKind(),prompt=$('#turn-prompt');
+ const instruction=s.victory?'':aiTurn()?'电脑正在行动':kind==='move'?(moveFrom===null?'移动部队：请选择出发地':'移动部队：请选择虚框目的地'):kind==='map'?s.choice.label+'：点选地图上的虚框':s.choice?s.choice.label:'请选择章节牌或地标';
+ prompt.hidden=!instruction;if(prompt.textContent!==instruction)prompt.textContent=instruction;
+}
+function preloadArt(){
+ const sprites=['map.png','ring-track.png','sauronWay.png','FotR.png','Sauron.png','landmark-tiles.jpg','soldier-fronts.jpg','pawn-tiles.jpg','chapter-1-back.png','chapter-2-back.png','chapter-3-back.png'];
+ const queue=[...new Set([...sprites.map(f=>'./original-art/'+f),...Object.values(skillArt).map(([f])=>'./original-art/cards/'+f),...data.filter(c=>c.chapter===1).map(c=>artwork[c.id]),...Object.values(allianceFiles).flat().map(i=>'./original-art/alliance/'+String(i).padStart(2,'0')+'.webp'),...data.filter(c=>c.chapter!==1).map(c=>artwork[c.id])])];
+ const next=()=>{const url=queue.shift();if(!url)return;const img=new Image();img.fetchPriority='low';img.onload=img.onerror=()=>setTimeout(next,0);img.src=url;};
+ next();next();next();
 }
 $('#owned-close').onclick=()=>{$('#owned-detail').close();$('#owned-content').classList.remove('alliance-catalog');};
 function render(){
@@ -393,8 +414,8 @@ function render(){
  if($('#discard-detail').open)drawDiscard();
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
 }
-$('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);matchStats={startedAt:Date.now(),endedAt:null,players:[0,1].map(()=>({turns:0,build:0,discard:0,landmark:0,choices:0}))};resultShown=false;$('#match-summary').hidden=true;publicCardKnowledge=new Set();discardKnowledge=[new Set(),new Set()];picked=null;$('#ring').replaceChildren();$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};
+$('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);matchStats={startedAt:Date.now(),endedAt:null,players:[0,1].map(()=>({turns:0,build:0,discard:0,landmark:0,landmarks:[],choices:0}))};resultShown=false;$('#match-summary').hidden=true;publicCardKnowledge=new Set();discardKnowledge=[new Set(),new Set()];picked=null;$('#ring').replaceChildren();$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};
 $('#return').onclick=()=>{if(!g.s.victory&&!confirm('返回准备界面将结束本局。确定返回？'))return;ringDismiss?.();ringVisibility?.abort();hideTip();clearTimeout(timer);timer=null;g=null;picked=null;$('#game').hidden=true;$('#lobby').hidden=false;$('#start').focus();window.scrollTo(0,0);};
 $('#mode').onchange=()=>{$('#seat-field').hidden=$('#mode').value==='pvp';};
 const read=async f=>{const r=await fetch(f);if(!r.ok)throw Error(f);return r.json();};
-try{[data,board,artwork]=await Promise.all([read('./chapter-cards.json?v=2'),read('./board.json'),read('./original-art/manifest.json?v=3').catch(()=>null)]);if(data.length!==69||board.layouts.length!==3)throw Error('数据不完整');if(artwork&&data.every(c=>artwork[c.id]))document.body.classList.add('original-art');else artwork=null;$('#start').disabled=false;$('#start').textContent='开始对战';}catch(e){$('#status').textContent='无法载入游戏资料，请刷新页面重试。';console.error(e);}
+try{[data,board,artwork]=await Promise.all([read('./chapter-cards.json?v=2'),read('./board.json'),read('./original-art/manifest.json?v=3').catch(()=>null)]);if(data.length!==69||board.layouts.length!==3)throw Error('数据不完整');if(artwork&&data.every(c=>artwork[c.id]))document.body.classList.add('original-art');else artwork=null;$('#start').disabled=false;$('#start').textContent='开始对战';if(artwork)preloadArt();}catch(e){$('#status').textContent='无法载入游戏资料，请刷新页面重试。';console.error(e);}

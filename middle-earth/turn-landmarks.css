@@ -1,0 +1,13 @@
+#turn-prompt {
+ position:fixed; top:10px; left:50%; transform:translateX(-50%); z-index:40;
+ width:max-content; max-width:calc(100% - 24px); box-sizing:border-box;
+ padding:7px 14px; border:1px solid #b9a674; border-radius:8px;
+ background:#283b32; color:#fff6df; box-shadow:0 3px 12px #18191232;
+ font-size:.85rem; font-weight:650; line-height:1.35; text-align:center;
+ pointer-events:none;
+}
+.owned-landmarks {margin-top:12px; padding-top:9px; border-top:1px solid #dacfad}
+.owned-landmarks h4 {margin:0 0 7px; font-size:.83rem}
+.owned-landmark-tiles {display:flex; flex-wrap:wrap; gap:7px}
+.owned-landmark-tiles .landmark-tile {width:86px; padding:4px; font-size:.72rem}
+.owned-landmark-tiles .landmark-tile strong {white-space:normal}
