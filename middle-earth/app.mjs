@@ -11,6 +11,8 @@ const fortressAnchors={Lindon:[6.9,26.6],Arnor:[34.2,19.2],Rhovanion:[70.9,27],E
 let g, data, board, picked=null, artwork=null, aiSide=null, timer=null;
 let busy=false;
 const skillKeys=['Ruse','Strength','Courage','Knowledge','Leadership'];
+const skillArt={Ruse:['1-03.png',113,16,67],Strength:['1-05.png',113,16,67],Courage:['1-06.png',113,16,67],Knowledge:['1-22.png',115,13,68],Leadership:['1-20.png',114,13,68]};
+function skillIcon(key){const [file,x,y,size]=skillArt[key],svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),img=document.createElementNS('http://www.w3.org/2000/svg','image');svg.setAttribute('viewBox',[x,y,size,size].join(' '));svg.setAttribute('class','ability-icon');svg.setAttribute('role','img');svg.setAttribute('aria-label',tr(key));img.setAttribute('width','292');img.setAttribute('height','432');img.setAttribute('href','./original-art/cards/'+file);svg.append(img);return svg;}
 function notify(text){const box=$('#action-notice');box.textContent=text;box.hidden=false;clearTimeout(notify.timer);notify.timer=setTimeout(()=>box.hidden=true,2700);}
 async function transition(action,source,kind='play'){
  if(busy||!g||g.s.victory)return;busy=true;document.body.classList.add('action-busy');hideTip();hideOwnedZoom();
@@ -329,11 +331,11 @@ function render(){
   if(p.tokens.some(t=>t.Attribute==='BENEFIT_FROM_ANY_SKILL'))flex.push(Object.fromEntries(skillKeys.map(k=>[k,1])));
   skillBox.append(el('h4','能力'));
   const skillRow=el('div',undefined,'skill-counts');for(const key of skillKeys){
-   const item=el('span');item.append(el('small',tr(key)),el('strong',String(fixed[key]??0)));skillRow.append(item);
+   const item=el('span');item.append(el('small',tr(key)),skillIcon(key),el('strong',String(fixed[key]??0)));skillRow.append(item);
   }skillBox.append(skillRow);
   const optional=el('span',undefined,'multi-skill-column');optional.append(el('small','多选能力'));
-  const choices=new Map();for(const f of flex){const keys=skillKeys.filter(k=>f[k]>0),label=keys.length===5?'任意能力':keys.map(tr).join('／');choices.set(label,(choices.get(label)??0)+1);}
-  if(!choices.size)optional.append(el('strong','0'));else for(const [label,count] of choices){const value=el('span',undefined,'multi-skill-value');value.append(el('span',label),el('strong','×'+count));value.title='每次支付时可任选其中一种，不计入左侧固定能力';optional.append(value);}skillRow.append(optional);
+  const choices=new Map();for(const f of flex){const keys=skillKeys.filter(k=>f[k]>0),signature=keys.join(',');choices.set(signature,(choices.get(signature)??0)+1);}
+  if(!choices.size)optional.append(el('strong','0'));else for(const [signature,count] of choices){const keys=signature.split(','),label=keys.length===5?'任意能力':keys.map(tr).join('／'),value=el('span',undefined,'multi-skill-value'),icons=el('span',undefined,'multi-choice-icons'+(keys.length>3?' many-options':''));keys.forEach((key,index)=>{if(index)icons.append(el('span','/','choice-divider'));icons.append(skillIcon(key));});value.append(icons,el('strong','×'+count));value.title=label+' ×'+count+'：每次支付时任选其中一种，不计入左侧固定能力';value.setAttribute('aria-label',value.title);optional.append(value);}skillRow.append(optional);
   const chains=[...new Set(p.played.flatMap(c=>c.chain.grants?[c.chain.grants]:[]))];
   if(chains.length){const chainRow=el('div',undefined,'resource-chains');chainRow.append(el('small','连锁'));for(const key of chains)chainRow.append(el('span',glyph(key),'chain-chip'));skillBox.append(chainRow);}
   n.append(header,stats,ringProgress,skillBox,tags);return n;
