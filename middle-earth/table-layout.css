@@ -1,0 +1,20 @@
+.board{grid-template-columns:minmax(0,1fr);gap:12px;align-items:start}.table-play{min-width:0}.board aside{min-width:0}.territory{background:#f3eddb}
+@media(min-width:1100px){.board{grid-template-columns:minmax(0,1.04fr) minmax(0,1fr) minmax(220px,.59fr);gap:14px}.board aside{position:sticky;top:12px;max-height:calc(100dvh - 24px);overflow:auto;scrollbar-gutter:stable}.table-play .panel,.territory{padding:13px}#game .top h1{font-size:clamp(1.6rem,2.7vw,2.3rem)}}
+@media(min-width:801px) and (max-width:1099px){.board{grid-template-columns:minmax(0,1fr) minmax(230px,32%)}.board aside{grid-column:2;grid-row:1 / span 2;position:sticky;top:12px}.world-column{grid-column:1}}
+@media(max-width:800px){.board{gap:0}.table-play{grid-row:3}.world-column{grid-row:4;display:flex;flex-direction:column-reverse}#players .panel{margin-bottom:7px}.board #actions{margin-bottom:8px}}
+.original-art #map{background:none}
+.original-art #map::before{content:'';position:absolute;inset:0;z-index:-1;background:url('./original-art/map.png') center/100% 100% no-repeat;filter:brightness(1.17) contrast(.95) saturate(.96)}
+.original-art #map .region-name{display:block;transform:translateY(-.85em);text-shadow:0 0 3px #fff7de,0 0 5px #fff7de,0 1px 2px #fff7de}
+.original-art #map .region-pieces{top:50%;transform:translate(-50%,-10%)}.region-faction{white-space:nowrap}
+#map .piece-sprite{width:clamp(16px,2.15vw,28px);height:clamp(18px,2.4vw,32px)}
+.landmarks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.landmark-tile{border:1px solid #d6cbaf;padding:5px;background:#fffdf5;border-radius:8px}
+.landmark-tile svg,.landmark-preview{aspect-ratio:64/38}
+.landmark-tile strong,.landmark-tile small{padding-inline:1px}.landmark-tile small{font-variant-numeric:tabular-nums}
+#inspect{position:fixed;z-index:50;width:min(300px,calc(100vw - 16px));max-height:calc(100dvh - 16px);overflow:auto;pointer-events:none;padding:12px 13px;background:#fffdf5;color:#283c31;border:1px solid #bdad89;border-radius:8px;box-shadow:0 8px 20px #302a2330;font-size:.84rem}
+.detail-title{display:block;padding-bottom:5px;color:#28493c}
+.action-details{margin-bottom:8px}
+#inspect dl,.action-details dl{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:3px 10px;line-height:1.4}
+#inspect dt,.action-details dt{color:#647064;font-size:.81rem}
+#inspect dd,.action-details dd{margin:0;overflow-wrap:anywhere}
+.action-details dl{font-size:.85rem}
