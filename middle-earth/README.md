@@ -1,5 +1,7 @@
 # 魔戒：中洲对决｜规则试玩
 
+十八枚结盟标记正面来自 [社区原版扫描素材](https://github.com/szuperszilard/LotR_Game/tree/8dfea9569fe4dce430a4dfc8c2e7857940ae3413/LotRpics/Done/allianceTokens)，依据同目录 tokens.csv 与官方玩家辅助表逐枚对应。牌阵下方为剩余奖励图鉴，不展示随机堆叠顺序；实际选择受本次翻出选项限制。标记被任一方选走后不再回公共池。
+
 [打开 GitHub Pages 试玩](https://qiumh2323.github.io/middle-earth-duel-playtest/)
 
 支持双人同屏热座或挑战规则电脑；无需账号或构建工具。通过静态 HTTP 服务打开，不能直接以 file:// 打开。不含扩展、跨设备联机或断点存档。
