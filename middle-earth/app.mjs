@@ -244,9 +244,13 @@ function drawActions(){
  if(type==='card')a.append(btn('弃牌换金币',()=>execute('discard',i)));
  a.append(btn('取消选择',()=>{picked=null;render();}));
 }
+let minimizedEffect=null;
 function drawEffectChoice(){
  const dialog=$('#effect-choice'),c=g.s.choice,kind=choiceKind(c);
- if(!c||aiTurn()||g.s.victory||kind==='map'||kind==='move'){if(dialog.open)dialog.close();return;}
+ const restore=$('#effect-restore');
+ if(!c||aiTurn()||g.s.victory||kind==='map'||kind==='move'){minimizedEffect=null;restore.hidden=true;if(dialog.open)dialog.close();return;}
+ restore.hidden=minimizedEffect!==c;
+ if(!restore.hidden)return;
  const heading=$('#effect-choice-title'),options=$('#effect-options'),footer=$('#effect-footer');
  heading.textContent=c.label;options.replaceChildren();footer.replaceChildren();
  for(const [i,o] of c.options.entries()){
@@ -260,9 +264,16 @@ function drawEffectChoice(){
   button.append(el('span',label));options.append(button);
  }
  footer.hidden=!footer.childElementCount;
- if(!dialog.open){if($('#discard-detail').open)$('#discard-detail').close();dialog.showModal();}
+ if(!dialog.open){for(const id of ['#discard-detail','#owned-detail'])if($(id).open)$(id).close();hideTip();hideOwnedZoom();dialog.showModal();}
 }
-$('#effect-choice').addEventListener('cancel',e=>e.preventDefault());
+function minimizeEffect(){
+ const dialog=$('#effect-choice');if(!dialog.open||!g?.s.choice)return;
+ minimizedEffect=g.s.choice;dialog.close();
+ const restore=$('#effect-restore');restore.hidden=false;restore.focus({preventScroll:true});
+}
+$('#effect-minimize').onclick=minimizeEffect;
+$('#effect-restore').onclick=()=>{if(!g)return;minimizedEffect=null;drawEffectChoice();};
+$('#effect-choice').addEventListener('cancel',e=>{e.preventDefault();minimizeEffect();});
 function inspectOwned(c,title='已建造章节牌'){
  $('#owned-detail h2').textContent=title;
  const dialog=$('#owned-detail'),content=$('#owned-content');content.classList.remove('alliance-catalog');content.replaceChildren();
