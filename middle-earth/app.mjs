@@ -330,7 +330,7 @@ function render(){
   if(!choices.size)optional.append(el('strong','0'));else for(const [label,count] of choices){const value=el('span',undefined,'multi-skill-value');value.append(el('span',label),el('strong','×'+count));value.title='每次支付时可任选其中一种，不计入左侧固定能力';optional.append(value);}skillRow.append(optional);
   const chains=[...new Set(p.played.flatMap(c=>c.chain.grants?[c.chain.grants]:[]))];
   if(chains.length){const chainRow=el('div',undefined,'resource-chains');chainRow.append(el('small','连锁'));for(const key of chains)chainRow.append(el('span',glyph(key),'chain-chip'));skillBox.append(chainRow);}
-  n.append(header,stats,skillBox,tags,btn('查看联盟奖励',showAlliances,'alliance-open'));return n;
+  n.append(header,stats,skillBox,tags);return n;
  }));
  drawOwned();
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
