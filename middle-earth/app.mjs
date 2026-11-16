@@ -208,6 +208,46 @@ function drawActions(){
  if(type==='card')a.append(btn('弃牌换金币',()=>execute('discard',i)));
  a.append(btn('取消选择',()=>{picked=null;render();}));
 }
+function inspectOwned(c){
+ const dialog=$('#owned-detail'),content=$('#owned-content');content.replaceChildren();
+ if(artwork)content.append(art(artwork[c.id],cardText(c)));
+ const info=el('section');appendDetails(info,colors[c.color][0]+'章节牌',[
+  ['效果',c.effects.map(description).join('；')],['印刷费用',costText(c)],
+  ...(c.chain.grants?[['提供连锁',glyph(c.chain.grants)]]:[]),
+  ...(c.chain.requiresForFree?[['免费连锁',glyph(c.chain.requiresForFree)]]:[])
+ ]);content.append(info);hideTip();dialog.showModal();
+}
+function drawOwned(){
+ const host=$('#played');host.replaceChildren();
+ g.s.players.forEach((p,i)=>{
+  const section=el('section',undefined,'owned-player resource-'+i),head=el('div',undefined,'owned-head');
+  head.append(el('h3',names[i]),el('small',p.played.length+' 张牌 · '+p.tokens.length+' 枚标记'));section.append(head);
+  const tokens=el('div',undefined,'owned-tokens');
+  tokens.append(el('h4','结盟标记'));
+  if(!p.tokens.length)tokens.append(el('p','尚未获得标记','owned-empty'));
+  for(const t of p.tokens){
+   const item=el('div',undefined,'owned-token'),text=token(t).split(' · ');
+   item.append(el('strong',tr(t.race)),el('span',text.slice(1).join(' · ')));tokens.append(item);
+  }
+  section.append(tokens);
+  for(const [color,[name,accent]] of Object.entries(colors)){
+   const cards=p.played.filter(c=>c.color===color);if(!cards.length)continue;
+   const group=el('section',undefined,'owned-group');group.style.setProperty('--card-color',accent);
+   group.append(el('h4',name+' · '+cards.length));const grid=el('div',undefined,'owned-cards');
+   for(const c of cards){
+    const item=btn(undefined,()=>inspectOwned(c),'owned-card');item.setAttribute('aria-label',cardText(c)+'，查看详情');
+    if(artwork)item.append(art(artwork[c.id],cardText(c)));
+    item.append(el('span',c.effects.map(description).join('；'),'owned-caption'));
+    if(c.chain.grants)item.append(el('small','连锁 · '+glyph(c.chain.grants)));
+    tooltip(item,name+'章节牌',()=>[['效果',c.effects.map(description).join('；')],...(c.chain.grants?[['提供连锁',glyph(c.chain.grants)]]:[])]);
+    grid.append(item);
+   }group.append(grid);section.append(group);
+  }
+  if(!p.played.length)section.append(el('p','尚未建造章节牌','owned-empty'));
+  host.append(section);
+ });
+}
+$('#owned-close').onclick=()=>$('#owned-detail').close();
 function render(){
  hideTip();
  const s=g.s;$('#chapter').textContent='第 '+s.chapter+' 章';$('#turn').textContent=s.victory?(s.victory.winner===null?'双方平局':names[s.victory.winner]+'获胜'):names[s.turn]+(aiTurn()?'（电脑）':'')+'行动';
@@ -227,7 +267,7 @@ function render(){
   else tags.append(el('small','尚无族群支持'));
   n.append(header,stats,tags);return n;
  }));
- $('#played').replaceChildren(...s.players.map((p,i)=>{const d=el('div');d.append(el('h3',names[i]));for(const c of p.played)d.append(el('p',cardText(c)+(c.chain.grants?' · '+glyph(c.chain.grants):'')));for(const t of p.tokens)d.append(el('p',token(t)));return d;}));
+ drawOwned();
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
 }
 $('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);picked=null;$('#ring').replaceChildren();$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};

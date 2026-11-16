@@ -1,0 +1,25 @@
+#played{max-height:none;overflow:visible;font-size:.85rem}
+.owned-player+.owned-player{border-top:2px solid #ddd2b8;margin-top:18px;padding-top:15px}
+.owned-head{display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 10px;margin:12px 0}
+.owned-head h3{margin:0;font-size:1rem;color:#245577}
+.owned-player.resource-1 h3{color:#79372e}
+.owned-head small{font-size:.7rem}
+.owned-tokens h4,.owned-group h4{font-size:.78rem;margin:10px 0 6px}
+.owned-token{display:grid;gap:3px;padding:8px 9px;margin-bottom:5px;border:1px solid #d6c7a5;border-left:3px solid #ad8b48;border-radius:5px;background:#faf4e5;line-height:1.45}
+.owned-token strong{font-size:.78rem;color:#6d4d23}.owned-token span{font-size:.81rem}
+.owned-empty{font-size:.78rem;color:#697167;margin:4px 0}
+.owned-group h4{border-left:4px solid var(--card-color);padding-left:6px}
+.owned-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(69px,1fr));gap:6px}
+.owned-card{padding:0;overflow:hidden;display:flex;flex-direction:column;text-align:left;border:1px solid #dbd1bc;border-radius:5px;background:#fffdf6}
+.owned-card .component-art{display:block;width:100%;aspect-ratio:292/432;object-fit:cover}
+.owned-card .owned-caption{padding:5px 5px 3px;line-height:1.4;font-size:.72rem;overflow-wrap:anywhere}
+.owned-card small{font-size:.68rem;padding:0 5px 5px;color:#665a36}
+#owned-detail{width:min(540px,calc(100vw - 24px));padding:16px;border:1px solid #bcae8e;border-radius:10px;background:#fffdf5;color:#293b33}
+#owned-detail::backdrop{background:#18231d80}
+.owned-dialog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.owned-dialog-head h2{margin:0;font-size:1.05rem}
+#owned-content{display:grid;grid-template-columns:minmax(110px,.85fr) 1fr;gap:15px;align-items:start}
+#owned-content>.component-art{width:100%;max-height:58dvh;object-fit:contain}
+#owned-content dl{display:grid;gap:5px;margin:7px 0}
+#owned-content dt{font-size:.75rem;color:#637064}#owned-content dd{margin:0 0 8px;font-size:.86rem}
+@media(max-width:800px){.owned-cards{grid-template-columns:repeat(auto-fill,minmax(86px,1fr))}}
