@@ -1,12 +1,13 @@
 import {createGame} from './engine.mjs';
 import {decide,observe} from './ai.mjs';
-import {landmarkIcon,pawnIcon,originalPawn} from './board-icons.mjs?v=9';
+import {landmarkIcon,pawnIcon,originalPawn} from './board-icons.mjs?v=10';
 const $=s=>document.querySelector(s), names=['护戒同盟','索伦'];
 const words={Lindon:'林顿',Arnor:'亚尔诺',Rhovanion:'罗瓦尼安',Enedwaith:'埃奈德',Rohan:'洛汗',Gondor:'刚铎',Mordor:'魔多',BaradDur:'巴拉督尔',Bree:'布理',Erebor:'孤山',GreyHavens:'灰港',HelmsDeep:'圣盔谷',Isengard:'艾森加德',MinasTirith:'米那斯提力斯',Elves:'精灵',Dwarves:'矮人',Hobbits:'霍比特人',Humans:'人类',Ents:'树人',Wizards:'巫师',Eagles:'巨鹰',Ruse:'诡计',Strength:'力量',Courage:'勇气',Knowledge:'知识',Leadership:'领导力'};
 const colors={gray:['技能','#5a6869'],yellow:['金币','#bb8c25'],blue:['魔戒','#356d99'],green:['族群','#3a7752'],red:['部队','#a34839'],purple:['谋略','#78528a']};
 const flags={Lindon:[10,35],Arnor:[30,20],Rhovanion:[69,20],Enedwaith:[36,55],Rohan:[61,53],Gondor:[55,84],Mordor:[88,76]};
 const sym={HARP:'竖琴',ANVIL:'铁砧',POT:'锅',HORSESHOE:'马蹄铁',FISH:'鱼',BACKPACK:'背包',HORSE:'马',ARROW:'箭',HELMET:'头盔',KNIFE:'短刀',ACORN:'橡果',SCROLL:'卷轴',FIRE:'火焰',BEDROLL:'铺盖',TREASURE_CASKET:'宝匣',ARMOR:'盔甲',AXE:'斧'};
 const originalFlags={Lindon:[16,32],Arnor:[43,25],Rhovanion:[81,33],Enedwaith:[39,58],Rohan:[67,61],Gondor:[55,83],Mordor:[88,81]};
+const fortressAnchors={Lindon:[6.9,26.6],Arnor:[34.2,19.2],Rhovanion:[70.9,27],Enedwaith:[29.5,52.5],Rohan:[57.1,55.8],Gondor:[45.4,78],Mordor:[78.5,75.5]};
 let g, data, board, picked=null, artwork=null, aiSide=null, timer=null;
 let busy=false;
 const skillKeys=['Ruse','Strength','Courage','Knowledge','Leadership'];
@@ -184,7 +185,7 @@ function drawMap(){
   g.s.units[i].forEach((q,j)=>{
    const faction=el('span',undefined,'region-faction f'+j);
    const piece=artwork?originalPawn:pawnIcon;
-   if(g.s.forts[i]===j){const fort=el('span',undefined,'fort-piece');fort.setAttribute('aria-label',names[j]+'要塞');fort.append(piece(j,true));faction.append(fort);}
+   if(g.s.forts[i]===j){const fort=el('span',undefined,'fort-piece'+(artwork?' map-fortress':''));fort.setAttribute('aria-label',names[j]+'要塞 · '+tr(r));fort.dataset.region=r;fort.append(piece(j,true));if(artwork){const a=fortressAnchors[r];fort.style.left=a[0]+'%';fort.style.top=a[1]+'%';box.append(fort);}else faction.append(fort);}
    if(q){const unit=el('span',undefined,'unit-piece');unit.setAttribute('role','img');unit.setAttribute('aria-label',names[j]+'士兵 ×'+q);unit.style.setProperty('--unit-step',Math.min(9,57/Math.max(1,q-1))+'px');unit.style.setProperty('--map-unit-step',Math.min(2.05,4.7/Math.max(1,q-1))+'cqw');for(let k=0;k<q;k++)unit.append(piece(j,false));faction.append(unit);}
    if(faction.childElementCount)pieces.append(faction);
   });

@@ -34,6 +34,13 @@ const soldierFaces=[
  [[370,140,158,291],'0% 65%,2% 58%,10% 55%,26% 49%,36% 38%,42% 34%,53% 34%,66% 40%,71% 7%,75% 2%,83% 0,92% 2%,98% 7%,100% 15%,96% 91%,91% 98%,81% 100%,11% 99%,4% 96%,8% 90%,2% 74%']
 ];
 export function originalPawn(side,fort){
+ if(fort){
+  // Keep only the printed front face; affine rectification removes the lean.
+  const svg=shape('svg',{class:'piece-sprite pawn-photo fort-front',viewBox:side?'0 0 192 356':'0 0 174 350','aria-hidden':'true'});
+  const img=shape('image',{href:'./original-art/pawn-tiles.jpg',width:1920,height:495,transform:side?'matrix(1 0 -.11 1 -1405 -50)':'matrix(1 0 .08 1 -95 -50)'});
+  svg.style.clipPath=side?'polygon(13% 0,28% 0,33% 6%,43% 6%,49% 0,62% 0,68% 6%,79% 6%,85% 0,96% 0,100% 25%,87% 37%,100% 100%,0 100%,14% 37%,4% 27%)':'polygon(8% 0,24% 0,29% 6%,39% 6%,44% 0,59% 0,64% 6%,76% 6%,80% 0,97% 0,99% 24%,88% 35%,97% 100%,0 100%,14% 35%,3% 25%)';
+  img.addEventListener('error',()=>svg.replaceWith(pawnIcon(side,true)),{once:true});svg.append(img);return svg;
+ }
  const [box,outline]=fort?pawnFrames[side*2+1]:soldierFaces[side];
  const svg=shape('svg',{class:'piece-sprite pawn-photo'+(fort?'':' pawn-front'),viewBox:box.join(' '),'aria-hidden':'true'});
  const img=shape('image',fort?{href:'./original-art/pawn-tiles.jpg',width:1920,height:495}:{href:'./original-art/soldier-fronts.jpg',width:1200,height:635});
