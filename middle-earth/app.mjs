@@ -28,6 +28,9 @@ async function transition(action,source,kind='play'){
  }finally{busy=false;document.body.classList.remove('action-busy');scheduleAI();}
 }
 const aiTurn=()=>g&&aiSide===g.s.turn&&!g.s.victory;
+const viewerSide=()=>aiSide===null?g.s.turn:1-aiSide;
+const dangerFor=side=>!g.s.victory&&side!==viewerSide();
+function warning(node,text){node.classList.add('victory-warning');node.title=text;node.setAttribute('aria-label',text);}
 function el(tag,text,klass){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(klass)e.className=klass;return e;}
 function btn(label,action,klass){const e=el('button',label,klass);e.onclick=action;return e;}
 const tr=k=>words[k]??k, glyph=k=>sym[k]??k;
@@ -161,7 +164,9 @@ function drawRing(){
  const [f,s]=g.s.players.map(p=>p.ring);
  ring.querySelector('.quest-status .f0').textContent='持戒者距末日火山 '+(14-f)+' 格';
  ring.querySelector('.quest-status .f1').textContent='戒灵距持戒者 '+(14-s)+' 格';
+ for(const side of [0,1]){const status=ring.querySelector('.quest-status .f'+side),danger=dangerFor(side)&&g.s.players[side].ring===13;status.classList.toggle('victory-warning',danger);status.title=danger?names[side]+'的魔戒进度再前进1格即获胜':'';}
  for(const track of ring.querySelectorAll('.quest-track')){
+  track.querySelector('.quest-fellowship').classList.toggle('ring-danger',dangerFor(0)&&f===13);track.querySelector('.quest-nazgul').classList.toggle('ring-danger',dangerFor(1)&&s===13);
   track.querySelector('.quest-fellowship').style.setProperty('--shift',f*3.33+'%');
   track.querySelector('.quest-nazgul').style.setProperty('--shift',(f+s)*3.33+'%');
   for(const hint of track.querySelectorAll('.quest-reward')){
@@ -201,7 +206,7 @@ function drawCards(){
   const n=btn(undefined,()=>execute('play',x.ID),'card '+(vis?(open?'open':'blocked'):'back'));n.dataset.slot=x.ID;n.disabled=!open||!!s.choice||!!s.victory||aiTurn();
   n.addEventListener('contextmenu',e=>{e.preventDefault();if(!n.disabled)execute('discard',x.ID);});
   n.style.gridColumnStart=s.chapter===3&&x.Row===4?2+i*4:max-row+1+i*2;n.style.gridColumnEnd='span 2';n.style.gridRow=x.Row;
-  if(vis){n.style.setProperty('--c',colors[c.color][1]);n.append(el('b',colors[c.color][0]),el('span',c.effects.map(description).join('；')));if(g.price(c).chain)n.classList.add('chain-ready');if(open)n.append(el('small',g.price(c).coins+' 金币'));}
+  if(vis){n.style.setProperty('--c',colors[c.color][1]);n.append(el('b',colors[c.color][0]),el('span',c.effects.map(description).join('；')));if(c.chain?.requiresForFree&&s.players[viewerSide()].played.some(own=>own.chain.grants===c.chain.requiresForFree))n.classList.add('chain-ready');if(open)n.append(el('small',g.price(c).coins+' 金币'));}
   else n.textContent='未揭示';
   if(artwork){const img=art(vis?artwork[c.id]:'./original-art/chapter-'+s.chapter+'-back.png',vis?cardText(c):'未揭示');img.onerror=()=>{n.classList.remove('with-art');img.remove();};n.prepend(img);n.classList.add('with-art');if(open)n.dataset.price=g.price(c).coins+' 金币';}
   if(vis)largePreview(n,()=>art(artwork?.[c.id],cardText(c)),colors[c.color][0]+'章节牌',()=>details(c,{blocked:!open}));
@@ -310,8 +315,9 @@ function render(){
   for(const [label,value,max] of [['金币',p.coins],['地区',g.count(i),7],['族群',g.raceCount(i),6]]){
    const group=el('div',undefined,'resource-stat'),valueNode=el('dd');valueNode.append(el('strong',String(value)));
    if(max)valueNode.append(el('span','/'+max,'resource-target'));
-   group.append(el('dt',label),valueNode);stats.append(group);
+   group.append(el('dt',label),valueNode);if(dangerFor(i)&&max&&value===max-1){const text=label==='地区'?'再占据1个地区即可获胜':'再获1种族群支持即可获胜';warning(group,names[i]+'：'+text);group.append(el('small',label==='地区'?'还差1区':'还差1族','victory-gap'));}stats.append(group);
   }
+  const ringProgress=el('div',undefined,'resource-ring-progress');ringProgress.append(el('span','魔戒进度'),el('strong',p.ring+'/14'));if(dangerFor(i)&&p.ring===13){warning(ringProgress,names[i]+'：魔戒再前进1格即可获胜');ringProgress.append(el('small','还差1格','victory-gap'));}
   const races=Object.keys(p.races),tags=el('div',undefined,'resource-races');
   if(races.length)for(const race of races){const tag=btn(tr(race),()=>showAlliances(race),'resource-race');tag.title='查看'+tr(race)+'的潜在结盟效果';tags.append(tag);}
   else tags.append(el('small','尚无族群支持'));
@@ -330,7 +336,7 @@ function render(){
   if(!choices.size)optional.append(el('strong','0'));else for(const [label,count] of choices){const value=el('span',undefined,'multi-skill-value');value.append(el('span',label),el('strong','×'+count));value.title='每次支付时可任选其中一种，不计入左侧固定能力';optional.append(value);}skillRow.append(optional);
   const chains=[...new Set(p.played.flatMap(c=>c.chain.grants?[c.chain.grants]:[]))];
   if(chains.length){const chainRow=el('div',undefined,'resource-chains');chainRow.append(el('small','连锁'));for(const key of chains)chainRow.append(el('span',glyph(key),'chain-chip'));skillBox.append(chainRow);}
-  n.append(header,stats,skillBox,tags);return n;
+  n.append(header,stats,ringProgress,skillBox,tags);return n;
  }));
  drawOwned();
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));

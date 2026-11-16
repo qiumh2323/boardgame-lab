@@ -1,0 +1,6 @@
+.victory-warning{border-radius:5px;background:#fff0dd;color:#8d3d25;box-shadow:0 0 0 1px #d79a60,0 0 10px #db95533d;animation:victory-breathe 2.8s ease-in-out infinite}
+.resource-stat.victory-warning{padding:3px 2px}.victory-gap{display:block;font-size:.68rem;font-weight:600;line-height:1.5;color:#94452b;white-space:nowrap}
+.resource-ring-progress{display:flex;align-items:center;gap:8px;font-size:.75rem;margin-top:7px;padding:4px 5px}.resource-ring-progress strong{margin-left:auto;font-size:.8rem}
+.quest-status .victory-warning{padding:3px 6px}.ring-danger{filter:drop-shadow(0 0 4px #e7a752) drop-shadow(0 0 2px #b85022)!important}
+@keyframes victory-breathe{0%,100%{box-shadow:0 0 0 1px #d79a60,0 0 6px #db95532d}50%{box-shadow:0 0 0 1px #c57c43,0 0 13px #db95537a}}
+@media(prefers-reduced-motion:reduce){.victory-warning{animation:none}}
