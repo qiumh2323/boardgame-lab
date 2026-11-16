@@ -1,10 +1,13 @@
 import {createGame} from './engine.mjs';
+import {stepAI} from './ai.mjs';
 const $=s=>document.querySelector(s), names=['护戒同盟','索伦'];
 const words={Lindon:'林顿',Arnor:'亚尔诺',Rhovanion:'罗瓦尼安',Enedwaith:'埃奈德',Rohan:'洛汗',Gondor:'刚铎',Mordor:'魔多',BaradDur:'巴拉督尔',Bree:'布理',Erebor:'孤山',GreyHavens:'灰港',HelmsDeep:'圣盔谷',Isengard:'艾森加德',MinasTirith:'米那斯提力斯',Elves:'精灵',Dwarves:'矮人',Hobbits:'霍比特人',Humans:'人类',Ents:'树人',Wizards:'巫师',Eagles:'巨鹰',Ruse:'诡计',Strength:'力量',Courage:'勇气',Knowledge:'知识',Leadership:'领导力'};
 const colors={gray:['技能','#5a6869'],yellow:['金币','#bb8c25'],blue:['魔戒','#356d99'],green:['族群','#3a7752'],red:['部队','#a34839'],purple:['谋略','#78528a']};
 const flags={Lindon:[10,35],Arnor:[30,20],Rhovanion:[69,20],Enedwaith:[36,55],Rohan:[61,53],Gondor:[55,84],Mordor:[88,76]};
 const sym={HARP:'竖琴',ANVIL:'铁砧',POT:'锅',HORSESHOE:'马蹄铁',FISH:'鱼',BACKPACK:'背包',HORSE:'马',ARROW:'箭',HELMET:'头盔',KNIFE:'短刀',ACORN:'橡果',SCROLL:'卷轴',FIRE:'火焰',BEDROLL:'铺盖',TREASURE_CASKET:'宝匣',ARMOR:'盔甲',AXE:'斧'};
-let g, data, board, picked=null;
+const originalFlags={Lindon:[15,33],Arnor:[43,25],Rhovanion:[80,33],Enedwaith:[39,58],Rohan:[67,61],Gondor:[55,84],Mordor:[88,82]};
+let g, data, board, picked=null, artwork=null, aiSide=null, timer=null;
+const aiTurn=()=>g&&aiSide===g.s.turn&&!g.s.victory;
 function el(tag,text,klass){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(klass)e.className=klass;return e;}
 function btn(label,action,klass){const e=el('button',label,klass);e.onclick=action;return e;}
 const tr=k=>words[k]??k, glyph=k=>sym[k]??k;
@@ -32,13 +35,18 @@ const token=t=>tr(t.race)+' · '+(attributes[t.Attribute]??(t.Trigger==='CHAPTER
 function costText(c){return [c.cost?.coins?c.cost.coins+' 金币':'',skills(c.cost?.skills??c.RequiredSkills)].filter(Boolean).join(' + ')||'免费';}
 function cardText(c){return (colors[c.color]?.[0]??'')+' · '+c.effects.map(description).join('；');}
 function pick(type,i){picked={type,i};render();if(matchMedia('(max-width:800px)').matches)$('#actions').scrollIntoView({block:'nearest'});$('#actions h2')?.focus({preventScroll:true});}
-function execute(type,i){if(g.action(type,i)){picked=null;render();if(g.s.choice||g.s.victory)$('#actions h2')?.focus();}}
+function scheduleAI(){
+ if(!aiTurn()||timer!==null)return;
+ timer=setTimeout(()=>{timer=null;if(!aiTurn())return;try{if(!stepAI(g))throw Error('no legal plan');picked=null;render();scheduleAI();}catch(e){console.error(e);$('#actions').append(el('p','电脑未能继续行动，请返回准备界面重开。'));}},320);
+}
+function execute(type,i){if(!aiTurn()&&g.action(type,i)){picked=null;render();if(g.s.choice||g.s.victory)$('#actions h2')?.focus();scheduleAI();}}
+function art(src,alt){const n=el('img',undefined,'component-art');n.src=src;n.alt=alt;n.decoding='async';return n;}
 function drawMap(){
  const box=$('#map');box.replaceChildren();
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
  for(const r of board.regions)for(const other of r.ConnectedWith)if(r.Name<other){const l=document.createElementNS(ns,'line'),a=flags[r.Name],b=flags[other];for(const [k,v] of Object.entries({x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:'#927d53','stroke-width':'.6'}))l.setAttribute(k,v);svg.append(l);}
- box.append(svg);
- g.regions.forEach((r,i)=>{const n=el('div',undefined,'region');n.style.left=flags[r][0]+'%';n.style.top=flags[r][1]+'%';n.append(el('b',tr(r)));g.s.units[i].forEach((q,j)=>{if(q||g.s.forts[i]===j)n.append(el('span',(g.s.forts[i]===j?'♜ ':'')+q+' ','f'+j));});box.append(n);});
+ if(!artwork)box.append(svg);
+ g.regions.forEach((r,i)=>{const n=el('div',undefined,'region'),point=(artwork?originalFlags:flags)[r];n.style.left=point[0]+'%';n.style.top=point[1]+'%';n.append(el('b',tr(r)));g.s.units[i].forEach((q,j)=>{if(q||g.s.forts[i]===j)n.append(el('span',(g.s.forts[i]===j?'♜ ':'')+q+' ','f'+j));});box.append(n);});
  const [f,s]=g.s.players.map(p=>p.ring);$('#ring').replaceChildren(el('span','持戒者距末日火山 '+(14-f)+' 格','f0'),el('span','戒灵距持戒者 '+(14-s)+' 格','f1'));
 }
 function drawCards(){
@@ -46,24 +54,26 @@ function drawCards(){
  box.style.gridTemplateColumns='repeat('+(max*2)+',minmax(0,1fr))';box.replaceChildren();
  const counts={};for(const x of s.slots){const i=counts[x.Row]??0;counts[x.Row]=i+1;if(x.taken)continue;
   const row=s.slots.filter(y=>y.Row===x.Row).length, open=g.available(x), vis=g.visible(x), c=x.card;
-  const n=btn(undefined,()=>pick('card',x.ID),'card '+(vis?(open?'open':'blocked'):'back'));n.disabled=!open||!!s.choice||!!s.victory;
+  const n=btn(undefined,()=>pick('card',x.ID),'card '+(vis?(open?'open':'blocked'):'back'));n.disabled=!open||!!s.choice||!!s.victory||aiTurn();
   n.style.gridColumnStart=s.chapter===3&&x.Row===4?2+i*4:max-row+1+i*2;n.style.gridColumnEnd='span 2';n.style.gridRow=x.Row;
   if(vis){n.style.setProperty('--c',colors[c.color][1]);n.append(el('b',colors[c.color][0]),el('span',c.effects.map(description).join('；')));n.title='费用：'+costText(c)+(c.chain.requiresForFree?' · '+glyph(c.chain.requiresForFree)+'可免费':'');if(open)n.append(el('small',g.price(c).coins+' 金币'));}
-  else n.textContent='ᚠ · 未揭示';
+  else n.textContent='未揭示';
+  if(artwork){const img=art(vis?artwork[c.id]:'./original-art/chapter-'+s.chapter+'-back.png',vis?cardText(c):'未揭示');img.onerror=()=>{n.classList.remove('with-art');img.remove();};n.prepend(img);n.classList.add('with-art');if(open)n.dataset.price=g.price(c).coins+' 金币';}
   if(picked?.type==='card'&&picked.i===x.ID)n.classList.add('picked');box.append(n);
  }
  $('#remaining').textContent=s.slots.filter(x=>!x.taken).length+' 张剩余';
  const ls=$('#landmarks');ls.className='landmarks';ls.replaceChildren(...s.market.map((l,i)=>btn(tr(board.regions.find(r=>r.Name===l.FortressToPlaceTo).Fortress)+' · '+g.price(l).coins+' 金币',()=>pick('landmark',i))));
- for(const n of ls.children)n.disabled=!!s.choice||!!s.victory;
+ for(const n of ls.children)n.disabled=!!s.choice||!!s.victory||aiTurn();
  if(!s.market.length)ls.textContent='本章没有可选地标。';
 }
 function drawActions(){
  const s=g.s, a=$('#actions');a.replaceChildren();const heading=el('h2',s.choice?.label??'本回合');heading.tabIndex=-1;a.append(heading);
  if(s.victory){a.append(el('p',s.victory.reason));return;}
- if(s.choice){const choices=el('div',undefined,'choices');s.choice.options.forEach((o,i)=>{const label=o.value?.race&&o.value?.id?token(o.value):o.label.split(' → ').map(tr).join(' → ');const card=data.find(c=>c.id===label);choices.append(btn(card?cardText(card):label,()=>{g.select(i);render();$('#actions h2')?.focus({preventScroll:true});}));});a.append(choices);return;}
+ if(aiTurn()){heading.textContent='规则电脑正在行动';return;}
+ if(s.choice){const choices=el('div',undefined,'choices');s.choice.options.forEach((o,i)=>{const label=o.value?.race&&o.value?.id?token(o.value):o.label.split(' → ').map(tr).join(' → ');const card=data.find(c=>c.id===label);choices.append(btn(card?cardText(card):label,()=>{if(aiTurn())return;g.select(i);render();$('#actions h2')?.focus({preventScroll:true});scheduleAI();}));});a.append(choices);return;}
  if(!picked){a.append(el('p','在牌阵中选择一张可拿取的牌，或从地标区选择地标。','hint'));return;}
  const {type,i}=picked,c=type==='card'?s.slots[i].card:s.market[i],price=g.price(c);
- if(type==='card'){a.append(el('p',cardText(c)));const chain=[c.chain.requiresForFree?'免费条件：'+glyph(c.chain.requiresForFree):'',c.chain.grants?'提供连锁：'+glyph(c.chain.grants):''].filter(Boolean);if(chain.length)a.append(el('p',chain.join('；'),'hint'));}
+ if(type==='card'){if(artwork)a.append(art(artwork[c.id],cardText(c)));a.append(el('p',cardText(c)));const chain=[c.chain.requiresForFree?'免费条件：'+glyph(c.chain.requiresForFree):'',c.chain.grants?'提供连锁：'+glyph(c.chain.grants):''].filter(Boolean);if(chain.length)a.append(el('p',chain.join('；'),'hint'));}
  else a.append(el('p','在'+tr(c.FortressToPlaceTo)+'建造要塞；'+c.Effects.map(description).join('；')));
  a.append(el('p','印刷费用：'+costText(c)+(price.chain?' · 连锁免费':''),'hint'));
  const build=btn('支付 '+price.coins+' 金币并建造',()=>execute(type==='card'?'play':'landmark',i),'primary');build.disabled=s.players[s.turn].coins<price.coins;a.append(build);
@@ -71,13 +81,14 @@ function drawActions(){
  a.append(btn('取消选择',()=>{picked=null;render();}));
 }
 function render(){
- const s=g.s;$('#chapter').textContent='第 '+s.chapter+' 章';$('#turn').textContent=s.victory?(s.victory.winner===null?'双方平局':names[s.victory.winner]+'获胜'):names[s.turn]+'行动';
+ const s=g.s;$('#chapter').textContent='第 '+s.chapter+' 章';$('#turn').textContent=s.victory?(s.victory.winner===null?'双方平局':names[s.victory.winner]+'获胜'):names[s.turn]+(aiTurn()?'（电脑）':'')+'行动';
  drawMap();drawCards();drawActions();
  $('#players').replaceChildren(...s.players.map((p,i)=>{const n=el('div',undefined,'panel '+(!s.victory&&i===s.turn?'active':''));n.append(el('h2',names[i]),el('p',p.coins+' 金币 · '+g.count(i)+'/7 地区 · '+g.raceCount(i)+'/6 支持'),el('small',Object.keys(p.races).map(tr).join('、')||'尚无族群支持'));return n;}));
  $('#played').replaceChildren(...s.players.map((p,i)=>{const d=el('div');d.append(el('h3',names[i]));for(const c of p.played)d.append(el('p',cardText(c)+(c.chain.grants?' · '+glyph(c.chain.grants):'')));for(const t of p.tokens)d.append(el('p',token(t)));return d;}));
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
 }
-$('#start').onclick=()=>{g=createGame(data,board);picked=null;$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);};
-$('#return').onclick=()=>{if(!g.s.victory&&!confirm('返回准备界面将结束本局。确定返回？'))return;g=null;picked=null;$('#game').hidden=true;$('#lobby').hidden=false;$('#start').focus();window.scrollTo(0,0);};
+$('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);picked=null;$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};
+$('#return').onclick=()=>{if(!g.s.victory&&!confirm('返回准备界面将结束本局。确定返回？'))return;clearTimeout(timer);timer=null;g=null;picked=null;$('#game').hidden=true;$('#lobby').hidden=false;$('#start').focus();window.scrollTo(0,0);};
+$('#mode').onchange=()=>{$('#seat-field').hidden=$('#mode').value==='pvp';};
 const read=async f=>{const r=await fetch(f);if(!r.ok)throw Error(f);return r.json();};
-try{[data,board]=await Promise.all([read('./chapter-cards.json'),read('./board.json')]);if(data.length!==69||board.layouts.length!==3)throw Error('数据不完整');$('#start').disabled=false;$('#start').textContent='开始双人对战';}catch(e){$('#status').textContent='无法载入游戏资料，请刷新页面重试。';console.error(e);}
+try{[data,board]=await Promise.all([read('./chapter-cards.json?v=2'),read('./board.json')]);if(data.length!==69||board.layouts.length!==3)throw Error('数据不完整');if(['localhost','127.0.0.1','[::1]'].includes(location.hostname)){artwork=await read('./original-art/manifest.json').catch(()=>null);if(artwork&&data.every(c=>artwork[c.id]))document.body.classList.add('original-art');else artwork=null;}$('#start').disabled=false;$('#start').textContent='开始对战';}catch(e){$('#status').textContent='无法载入游戏资料，请刷新页面重试。';console.error(e);}

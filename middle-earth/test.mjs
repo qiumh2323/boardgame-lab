@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createGame} from './engine.mjs';
+import {stepAI,observe,decide} from './ai.mjs';
 const json=f=>JSON.parse(readFileSync(new URL(f,import.meta.url)));
 const cards=json('./chapter-cards.json'),board=json('./board.json');
 const zeros={Ruse:0,Strength:0,Courage:0,Knowledge:0,Leadership:0};
@@ -44,3 +45,14 @@ for(let n=0;n<220;n++){
 }
 for(const count of Object.values(checked))assert.ok(count>0);
 console.log('220 full games, three layouts, discard, flexible skills and chaining:',checked);
+for(let i=0;i<100;i++){
+ const game=createGame(cards,board,random);
+ const hidden=game.s.slots.find(x=>!game.visible(x));
+ const card=hidden.card;
+ Object.defineProperty(hidden,'card',{configurable:true,get(){throw Error('AI attempted to read a hidden chapter card');}});
+ assert.ok(decide(observe(game)));
+ Object.defineProperty(hidden,'card',{value:card,writable:true,configurable:true});
+ for(let n=0;n<800&&!game.s.victory;n++)assert.ok(stepAI(game));
+ assert.ok(game.s.victory);
+}
+console.log('100 complete AI-vs-AI games; unrevealed-card access check passed');
