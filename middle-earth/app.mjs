@@ -99,9 +99,9 @@ function drawRing(){
    const opener=el('button',undefined,'quest-open');opener.type='button';opener.setAttribute('aria-label','放大魔戒轨道查看奖励');
    opener.setAttribute('aria-controls','quest-zoom');opener.setAttribute('aria-expanded','false');opener.append(createTrack());
    const zoom=el('section',undefined,'quest-zoom');zoom.id='quest-zoom';zoom.hidden=true;zoom.setAttribute('aria-label','放大的魔戒轨道');
-   const track=createTrack(),head=el('div',undefined,'quest-zoom-head'),close=btn('关闭',()=>{opener.focus();hideZoom();});
+   const track=createTrack(),head=el('div',undefined,'quest-zoom-head');
    const rail=el('div',undefined,'quest-zoom-rail');rail.append(track);
-   head.append(el('strong','魔戒轨道'),el('small','可左右滑动','quest-scroll-hint'),close);zoom.append(head,rail);ring.append(opener,zoom);
+   head.append(el('strong','魔戒轨道'),el('small','可左右滑动','quest-scroll-hint'));zoom.append(head,rail);ring.append(opener,zoom);
    let hideTimer,pinned=false;
    function positionZoom(){
     if(zoom.hidden)return;
@@ -113,11 +113,11 @@ function drawRing(){
    }
    function showZoom(){clearTimeout(hideTimer);if(zoom.hidden)hideTip();zoom.hidden=false;opener.setAttribute('aria-expanded','true');positionZoom();}
    function hideZoom(){clearTimeout(hideTimer);pinned=false;zoom.hidden=true;opener.setAttribute('aria-expanded','false');hideTip();}
-   const leave=()=>{clearTimeout(hideTimer);hideTimer=setTimeout(()=>{if(!pinned&&!zoom.matches(':hover,:focus-within')&&!opener.matches(':hover,:focus-visible'))hideZoom();},240);};
+   const leave=()=>{clearTimeout(hideTimer);hideTimer=setTimeout(()=>{if(!pinned&&!zoom.matches(':hover')&&!zoom.querySelector(':focus-visible')&&!opener.matches(':hover,:focus-visible'))hideZoom();},240);};
    opener.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')showZoom();});
    opener.addEventListener('pointerleave',leave);zoom.addEventListener('pointerenter',()=>clearTimeout(hideTimer));zoom.addEventListener('pointerleave',leave);
    opener.addEventListener('focus',()=>{if(opener.matches(':focus-visible'))showZoom();});
-   opener.addEventListener('click',()=>{if(pinned)hideZoom();else{pinned=true;showZoom();}});
+   opener.addEventListener('click',e=>{if(e.pointerType==='touch'||matchMedia('(hover:none)').matches){if(pinned)hideZoom();else{pinned=true;showZoom();}}else showZoom();});
    // Events live on the ring's contents; abort window listeners when a new game resets the ring.
    ringVisibility?.abort();ringVisibility=new AbortController();const signal=ringVisibility.signal;
    ring.addEventListener('focusout',leave,{signal});
