@@ -9,4 +9,4 @@
 - 规则出处：[Repos Production 官方规则及辅助表](https://www.rprod.com/en/games/duel-for-middle-earth)；对照官方牌阵、魔戒轨道、地图和结盟标记。
 - 数据出处：[社区规则实现的基础配置](https://github.com/Vermihunter/lotr-duel-for-middle-earth/blob/783649d5d55cbffd7f2dfa342707e4c2965b7a09/src/main/resources/DefaultConfig.json)、[第二来源的章节牌卡图与 CSV](https://github.com/szuperszilard/LotR_Game/tree/8dfea9569fe4dce430a4dfc8c2e7857940ae3413/LotRpics/Done)。第二章地图议事灰牌的费用与技能已按卡面修正；全套牌效和连锁仍待逐张复核。
 - 规则电脑只按公开信息估值，兼顾胜利威胁、技能、金币和区域，不使用训练模型。
-- 本地回环地址会自动启用 `original-art/` 下的 69 张原版章节牌、卡背、封面、地图和轨道。公开版本不包含这些本地素材，保持文字牌面和示意地图。游戏与作品权利归各权利人所有。
+- 本地和独立试玩站均可加载 `original-art/` 下的 69 张原版章节牌、卡背、封面、地图和轨道；无素材时回退为文字牌面和示意地图。独立试玩站的链接无登录限制。游戏与作品权利归各权利人所有。
