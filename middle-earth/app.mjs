@@ -10,6 +10,7 @@ const originalFlags={Lindon:[16,32],Arnor:[43,25],Rhovanion:[81,33],Enedwaith:[3
 const fortressAnchors={Lindon:[6.9,26.6],Arnor:[34.2,19.2],Rhovanion:[70.9,27],Enedwaith:[29.5,52.5],Rohan:[57.1,55.8],Gondor:[45.4,78],Mordor:[78.5,75.5]};
 let g, data, board, picked=null, artwork=null, aiSide=null, timer=null;
 let busy=false;
+let publicCardKnowledge=new Set(),discardKnowledge=[new Set(),new Set()];
 const skillKeys=['Ruse','Strength','Courage','Knowledge','Leadership'];
 const skillArt={Ruse:['1-03.png',113,16,67],Strength:['1-05.png',113,16,67],Courage:['1-06.png',113,16,67],Knowledge:['1-22.png',115,13,68],Leadership:['1-20.png',114,13,68]};
 function skillIcon(key){const [file,x,y,size]=skillArt[key],svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),img=document.createElementNS('http://www.w3.org/2000/svg','image');svg.setAttribute('viewBox',[x,y,size,size].join(' '));svg.setAttribute('class','ability-icon');svg.setAttribute('role','img');svg.setAttribute('aria-label',tr(key));img.setAttribute('width','292');img.setAttribute('height','432');img.setAttribute('href','./original-art/cards/'+file);svg.append(img);return svg;}
@@ -215,6 +216,7 @@ function drawCards(){
   if(picked?.type==='card'&&picked.i===x.ID)n.classList.add('picked');box.append(n);
  }
  $('#remaining').textContent=s.slots.filter(x=>!x.taken).length+' 张剩余';
+ $('#discard-open').textContent='弃牌堆 '+s.discard.length;$('#discard-open').setAttribute('aria-label','查看弃牌堆，共'+s.discard.length+'张');
  const ls=$('#landmarks');ls.className='landmarks';ls.replaceChildren(...s.market.map((l,i)=>{
   const tile=btn(undefined,()=>execute('landmark',i),'landmark-tile');tile.append(landmarkImage(l));
   tile.append(el('strong',landmarkName(l)),el('small',g.price(l).coins+' 金币'));largePreview(tile,()=>landmarkImage(l),landmarkName(l),()=>details(l,{landmark:true}));return tile;
@@ -236,8 +238,8 @@ function drawActions(){
  if(type==='card')a.append(btn('弃牌换金币',()=>execute('discard',i)));
  a.append(btn('取消选择',()=>{picked=null;render();}));
 }
-function inspectOwned(c){
- $('#owned-detail h2').textContent='已建造章节牌';
+function inspectOwned(c,title='已建造章节牌'){
+ $('#owned-detail h2').textContent=title;
  const dialog=$('#owned-detail'),content=$('#owned-content');content.classList.remove('alliance-catalog');content.replaceChildren();
  if(artwork)content.append(art(artwork[c.id],cardText(c)));
  const info=el('section');appendDetails(info,colors[c.color][0]+'章节牌',[
@@ -270,6 +272,21 @@ function showAlliances(raceName=null){
  if(raceName)content.append(btn('查看全部族群',()=>showAlliances()));
  hideTip();hideOwnedZoom();if(!dialog.open)dialog.showModal();
 }
+function drawDiscard(){
+ const box=$('#discard-list');box.replaceChildren();let unknown=0;
+ for(const c of [...g.s.discard].reverse()){
+  const known=publicCardKnowledge.has(c.id)||discardKnowledge[viewerSide()].has(c.id);
+  const item=known?btn(undefined,()=>inspectOwned(c,'弃牌详情'),'discard-card'):el('div',undefined,'discard-card discard-unknown');
+  if(artwork)item.append(art(known?artwork[c.id]:'./original-art/chapter-'+c.chapter+'-back.png',known?cardText(c):'未公开章节牌'));
+  item.append(el('small',known?colors[c.color][0]+' · 第'+c.chapter+'章':'未公开 · 第'+c.chapter+'章'));
+  if(known){item.title=cardText(c);item.append(el('span',c.effects.map(description).join('；'),'discard-effect'));}else unknown++;
+  box.append(item);
+ }
+ if(!g.s.discard.length)box.append(el('p','弃牌堆目前为空。','hint'));
+ $('#discard-summary').textContent='共 '+g.s.discard.length+' 张'+(unknown?'，其中 '+unknown+' 张尚未公开。':'。')+'点击已公开的牌查看大图与解释。';
+}
+$('#discard-open').onclick=()=>{hideTip();hideOwnedZoom();drawDiscard();$('#discard-detail').showModal();};
+$('#discard-close').onclick=()=>$('#discard-detail').close();
 window.addEventListener('scroll',hideOwnedZoom,{capture:true,passive:true});window.addEventListener('resize',hideOwnedZoom);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')hideOwnedZoom();});
 function drawOwned(){
@@ -307,7 +324,8 @@ $('#owned-close').onclick=()=>{$('#owned-detail').close();$('#owned-content').cl
 function render(){
  hideTip();
  hideOwnedZoom();
- const s=g.s;$('#chapter').textContent='第 '+s.chapter+' 章';$('#turn').textContent=s.victory?(s.victory.winner===null?'双方平局':names[s.victory.winner]+'获胜'):names[s.turn]+(aiTurn()?'（电脑）':'')+'行动';
+ const s=g.s;for(const slot of s.slots)if(g.visible(slot))publicCardKnowledge.add(slot.card.id);for(const p of s.players)for(const c of p.played)publicCardKnowledge.add(c.id);if(s.choice?.label.startsWith('从弃牌堆'))for(const c of s.discard)discardKnowledge[s.turn].add(c.id);
+ $('#chapter').textContent='第 '+s.chapter+' 章';$('#turn').textContent=s.victory?(s.victory.winner===null?'双方平局':names[s.victory.winner]+'获胜'):names[s.turn]+(aiTurn()?'（电脑）':'')+'行动';
  drawMap();drawCards();drawActions();
  $('#players').replaceChildren(...s.players.map((p,i)=>{
   const active=!s.victory&&i===s.turn,n=el('section',undefined,'panel resource-panel resource-'+i+(active?' active':''));
@@ -341,9 +359,10 @@ function render(){
   n.append(header,stats,ringProgress,skillBox,tags);return n;
  }));
  drawOwned();
+ if($('#discard-detail').open)drawDiscard();
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
 }
-$('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);picked=null;$('#ring').replaceChildren();$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};
+$('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);publicCardKnowledge=new Set();discardKnowledge=[new Set(),new Set()];picked=null;$('#ring').replaceChildren();$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};
 $('#return').onclick=()=>{if(!g.s.victory&&!confirm('返回准备界面将结束本局。确定返回？'))return;ringDismiss?.();ringVisibility?.abort();hideTip();clearTimeout(timer);timer=null;g=null;picked=null;$('#game').hidden=true;$('#lobby').hidden=false;$('#start').focus();window.scrollTo(0,0);};
 $('#mode').onchange=()=>{$('#seat-field').hidden=$('#mode').value==='pvp';};
 const read=async f=>{const r=await fetch(f);if(!r.ok)throw Error(f);return r.json();};
