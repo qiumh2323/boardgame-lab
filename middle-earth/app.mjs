@@ -5,7 +5,8 @@ const words={Lindon:'林顿',Arnor:'亚尔诺',Rhovanion:'罗瓦尼安',Enedwait
 const colors={gray:['技能','#5a6869'],yellow:['金币','#bb8c25'],blue:['魔戒','#356d99'],green:['族群','#3a7752'],red:['部队','#a34839'],purple:['谋略','#78528a']};
 const flags={Lindon:[10,35],Arnor:[30,20],Rhovanion:[69,20],Enedwaith:[36,55],Rohan:[61,53],Gondor:[55,84],Mordor:[88,76]};
 const sym={HARP:'竖琴',ANVIL:'铁砧',POT:'锅',HORSESHOE:'马蹄铁',FISH:'鱼',BACKPACK:'背包',HORSE:'马',ARROW:'箭',HELMET:'头盔',KNIFE:'短刀',ACORN:'橡果',SCROLL:'卷轴',FIRE:'火焰',BEDROLL:'铺盖',TREASURE_CASKET:'宝匣',ARMOR:'盔甲',AXE:'斧'};
-const originalFlags={Lindon:[15,33],Arnor:[43,25],Rhovanion:[80,33],Enedwaith:[39,58],Rohan:[67,61],Gondor:[55,84],Mordor:[88,82]};
+const originalFlags={Lindon:[16,32],Arnor:[43,25],Rhovanion:[81,33],Enedwaith:[39,58],Rohan:[67,61],Gondor:[55,83],Mordor:[88,81]};
+const landmarkArt={Lindon:[761,380],Arnor:[618,214],Rhovanion:[337,235],Enedwaith:[85,373],Rohan:[502,623],Gondor:[173,601],Mordor:[424,389]};
 let g, data, board, picked=null, artwork=null, aiSide=null, timer=null;
 const aiTurn=()=>g&&aiSide===g.s.turn&&!g.s.victory;
 function el(tag,text,klass){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(klass)e.className=klass;return e;}
@@ -41,13 +42,56 @@ function scheduleAI(){
 }
 function execute(type,i){if(!aiTurn()&&g.action(type,i)){picked=null;render();if(g.s.choice||g.s.victory)$('#actions h2')?.focus();scheduleAI();}}
 function art(src,alt){const n=el('img',undefined,'component-art');n.src=src;n.alt=alt;n.decoding='async';return n;}
+const svgNS='http://www.w3.org/2000/svg';
+function sprite(file,x,y,w,h,sourceW=1024,sourceH=1024){
+ const svg=document.createElementNS(svgNS,'svg'),img=document.createElementNS(svgNS,'image');
+ svg.setAttribute('class','piece-sprite');svg.setAttribute('viewBox',[x,y,w,h].join(' '));svg.setAttribute('aria-hidden','true');
+ img.setAttribute('href','./original-art/'+file+'.png');img.setAttribute('width',sourceW);img.setAttribute('height',sourceH);svg.append(img);return svg;
+}
+function pawn(side,fort){
+ if(!artwork)return el('span',fort?'♜':'⚑');
+ if(side===0)return fort?sprite('components-reference',350,855,45,87,2000,1389):sprite('components-reference',325,1016,52,78,2000,1389);
+ return fort?sprite('pawn-reference',654,342,252,496):sprite('pawn-reference',105,418,237,426);
+}
+function landmarkImage(l){const [x,y]=landmarkArt[l.FortressToPlaceTo];return sprite('landmark-reference',x,y,137,94);}
+function drawRing(){
+ const ring=$('#ring');let track=ring.querySelector('.quest-track');
+ if(!ring.querySelector('.quest-status')){
+  const status=el('div',undefined,'quest-status');status.append(el('span',undefined,'f0'),el('span',undefined,'f1'));
+  if(artwork){
+   track=el('div',undefined,'quest-track');
+   const base=art('./original-art/ring-track.png','魔戒任务轨道');
+   const fixed=art('./original-art/sauronWay.png','');
+   const fellowship=art('./original-art/FotR.png','持戒者滑板'),nazgul=art('./original-art/Sauron.png','戒灵滑板');
+   fixed.classList.add('quest-layer');fellowship.classList.add('quest-layer','quest-fellowship');nazgul.classList.add('quest-layer','quest-nazgul');
+   track.append(base,fixed,fellowship,nazgul);ring.append(track);
+  }
+  ring.append(status);
+ }
+ const [f,s]=g.s.players.map(p=>p.ring);
+ ring.querySelector('.quest-status .f0').textContent='持戒者距末日火山 '+(14-f)+' 格';
+ ring.querySelector('.quest-status .f1').textContent='戒灵距持戒者 '+(14-s)+' 格';
+ if(track){
+  track.querySelector('.quest-fellowship').style.setProperty('--shift',f*3.33+'%');
+  track.querySelector('.quest-nazgul').style.setProperty('--shift',(f+s)*3.33+'%');
+ }
+}
 function drawMap(){
  const box=$('#map');box.replaceChildren();
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('preserveAspectRatio','none');svg.setAttribute('aria-hidden','true');
  for(const r of board.regions)for(const other of r.ConnectedWith)if(r.Name<other){const l=document.createElementNS(ns,'line'),a=flags[r.Name],b=flags[other];for(const [k,v] of Object.entries({x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:'#927d53','stroke-width':'.6'}))l.setAttribute(k,v);svg.append(l);}
  if(!artwork)box.append(svg);
- g.regions.forEach((r,i)=>{const n=el('div',undefined,'region'),point=(artwork?originalFlags:flags)[r];n.style.left=point[0]+'%';n.style.top=point[1]+'%';n.append(el('b',tr(r)));g.s.units[i].forEach((q,j)=>{if(q||g.s.forts[i]===j)n.append(el('span',(g.s.forts[i]===j?'♜ ':'')+q+' ','f'+j));});box.append(n);});
- const [f,s]=g.s.players.map(p=>p.ring);$('#ring').replaceChildren(el('span','持戒者距末日火山 '+(14-f)+' 格','f0'),el('span','戒灵距持戒者 '+(14-s)+' 格','f1'));
+ g.regions.forEach((r,i)=>{
+  const n=el('div',undefined,'region'),point=(artwork?originalFlags:flags)[r],pieces=el('div',undefined,'region-pieces');
+  n.dataset.region=r;n.style.left=point[0]+'%';n.style.top=point[1]+'%';n.append(el('b',tr(r),'region-name'));
+  g.s.units[i].forEach((q,j)=>{
+   const faction=el('span',undefined,'region-faction f'+j);
+   if(g.s.forts[i]===j){const fort=el('span',undefined,'fort-piece');fort.title=names[j]+'要塞';fort.setAttribute('aria-label',fort.title);fort.append(pawn(j,true));faction.append(fort);}
+   if(q){const unit=el('span',undefined,'unit-piece');unit.title=names[j]+'士兵 ×'+q;unit.setAttribute('aria-label',unit.title);unit.append(pawn(j,false),el('strong',String(q)));faction.append(unit);}
+   if(faction.childElementCount)pieces.append(faction);
+  });
+  n.append(pieces);box.append(n);
+ });drawRing();
 }
 function drawCards(){
  const s=g.s,box=$('#cards'),max=Math.max(...s.slots.map(x=>s.slots.filter(y=>y.Row===x.Row).length));
@@ -62,7 +106,10 @@ function drawCards(){
   if(picked?.type==='card'&&picked.i===x.ID)n.classList.add('picked');box.append(n);
  }
  $('#remaining').textContent=s.slots.filter(x=>!x.taken).length+' 张剩余';
- const ls=$('#landmarks');ls.className='landmarks';ls.replaceChildren(...s.market.map((l,i)=>btn(tr(board.regions.find(r=>r.Name===l.FortressToPlaceTo).Fortress)+' · '+g.price(l).coins+' 金币',()=>pick('landmark',i))));
+ const ls=$('#landmarks');ls.className='landmarks';ls.replaceChildren(...s.market.map((l,i)=>{
+  const tile=btn(undefined,()=>pick('landmark',i),'landmark-tile');if(artwork)tile.append(landmarkImage(l));
+  tile.append(el('strong',tr(board.regions.find(r=>r.Name===l.FortressToPlaceTo).Fortress)),el('small',g.price(l).coins+' 金币'));return tile;
+ }));
  for(const n of ls.children)n.disabled=!!s.choice||!!s.victory||aiTurn();
  if(!s.market.length)ls.textContent='本章没有可选地标。';
 }
@@ -74,7 +121,7 @@ function drawActions(){
  if(!picked){a.append(el('p','在牌阵中选择一张可拿取的牌，或从地标区选择地标。','hint'));return;}
  const {type,i}=picked,c=type==='card'?s.slots[i].card:s.market[i],price=g.price(c);
  if(type==='card'){if(artwork)a.append(art(artwork[c.id],cardText(c)));a.append(el('p',cardText(c)));const chain=[c.chain.requiresForFree?'免费条件：'+glyph(c.chain.requiresForFree):'',c.chain.grants?'提供连锁：'+glyph(c.chain.grants):''].filter(Boolean);if(chain.length)a.append(el('p',chain.join('；'),'hint'));}
- else a.append(el('p','在'+tr(c.FortressToPlaceTo)+'建造要塞；'+c.Effects.map(description).join('；')));
+ else {if(artwork){const pic=landmarkImage(c);pic.classList.add('landmark-preview');a.append(pic);}a.append(el('p','在'+tr(c.FortressToPlaceTo)+'建造要塞；'+c.Effects.map(description).join('；')));}
  a.append(el('p','印刷费用：'+costText(c)+(price.chain?' · 连锁免费':''),'hint'));
  const build=btn('支付 '+price.coins+' 金币并建造',()=>execute(type==='card'?'play':'landmark',i),'primary');build.disabled=s.players[s.turn].coins<price.coins;a.append(build);
  if(type==='card')a.append(btn('弃牌换金币',()=>execute('discard',i)));
@@ -87,7 +134,7 @@ function render(){
  $('#played').replaceChildren(...s.players.map((p,i)=>{const d=el('div');d.append(el('h3',names[i]));for(const c of p.played)d.append(el('p',cardText(c)+(c.chain.grants?' · '+glyph(c.chain.grants):'')));for(const t of p.tokens)d.append(el('p',token(t)));return d;}));
  $('#log').replaceChildren(...s.log.slice().reverse().map(l=>el('li',l)));
 }
-$('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);picked=null;$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};
+$('#start').onclick=()=>{const seat=$('#seat').value;aiSide=$('#mode').value==='pve'?(seat==='random'?Math.floor(Math.random()*2):1-Number(seat)):null;g=createGame(data,board);picked=null;$('#ring').replaceChildren();$('#lobby').hidden=true;$('#game').hidden=false;render();window.scrollTo(0,0);scheduleAI();};
 $('#return').onclick=()=>{if(!g.s.victory&&!confirm('返回准备界面将结束本局。确定返回？'))return;clearTimeout(timer);timer=null;g=null;picked=null;$('#game').hidden=true;$('#lobby').hidden=false;$('#start').focus();window.scrollTo(0,0);};
 $('#mode').onchange=()=>{$('#seat-field').hidden=$('#mode').value==='pvp';};
 const read=async f=>{const r=await fetch(f);if(!r.ok)throw Error(f);return r.json();};
