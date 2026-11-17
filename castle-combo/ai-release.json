@@ -1,5 +1,6 @@
 {
-  "version": "V1.6",
+  "version": "V1.7",
+  "search": "gumbel-cache-v1",
   "training_generation": 408,
   "verified": true,
   "model": "assets/champion-gumbel-r0408.json",
