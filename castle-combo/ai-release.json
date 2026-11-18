@@ -1,8 +1,9 @@
 {
-  "version": "V1.7",
+  "version": "V1.8",
   "search": "gumbel-cache-v1",
-  "training_generation": 408,
+  "training_generation": 36,
+  "training_line": "r0408-full-gumbel-loop-20261118",
   "verified": true,
-  "model": "assets/champion-gumbel-r0408.json",
-  "sha256": "952f395e243f219207e36106b0c9b3657bed2bca0e8cbb42d44ca7134458b7e1"
+  "model": "assets/champion-gumbel-r0036.json",
+  "sha256": "ad7019d3b71b48799d4b6c71955bf77e95cd12d0d871c2ad5a36bf1c6d7f443e"
 }
