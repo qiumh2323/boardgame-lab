@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.22';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.23';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -29,9 +29,9 @@ test('full page restores a game, develops from mat before discarding, and update
  assert.equal($('#round-label').textContent,'第 2 轮');assert.ok(!$('#round-label').textContent.includes('牌库'));assert.equal(document.querySelectorAll('#players .player-summary').length,2);assert.ok([...document.querySelectorAll('#players .player')].every(e=>e.children.length===2));assert.ok($('link[href^="compact-table.css"]'));assert.equal($('.reserve-links strong').textContent,'运河板块14/14');
  assert.equal(document.querySelectorAll('#players .player-summary').length,2);assert.ok([...document.querySelectorAll('#players .player')].every(e=>e.children.length===2));assert.ok(!$('#round-label').textContent.includes('牌库'));assert.equal($('#action-buttons [data-type="pass"]'),null);assert.equal($('#market-state'),null);
  assert.equal($('#journal-dropdown').hasAttribute('open'),false);assert.equal($('.sidebar #log'),null);
- assert.equal(document.querySelectorAll('.industry-resources.beer img').length,2);
+ assert.equal(document.querySelectorAll('.industry-resources').length,0);assert.equal($('[data-loc="southern"][data-slot="0"] .resource-count').textContent,'2');
 
- assert.ok($('.market-cube.filled[data-resource="coal"]').classList.contains('resource-piece'));assert.ok($('.market-cube.filled[data-resource="iron"]').classList.contains('resource-piece'));assert.ok($('.industry-resources.beer img').classList.contains('resource-piece'));
+ assert.ok($('.market-cube.filled[data-resource="coal"]').classList.contains('resource-piece'));assert.ok($('.market-cube.filled[data-resource="iron"]').classList.contains('resource-piece'));assert.ok($('.slot .resource-count[data-resource="beer"]').classList.contains('resource-piece'));
  const beer=$('[data-beer-merchant]');assert.ok(beer);const merchant=$(`[data-merchant="${beer.dataset.beerMerchant}"]`),handler=merchant.onclick;let clicks=0;merchant.onclick=()=>clicks++;beer.click();assert.equal(clicks,1);beer.onkeydown({key:'Enter',preventDefault:()=>{}});assert.equal(clicks,2);merchant.onclick=handler;
  assert.equal($('#player-reserve').parentElement.className,'mat-workspace');assert.ok($('link[href^="refinement.css"]'));assert.ok($('link[href^="tabletop.css"]'));assert.equal($('#hand-toggle'),null);assert.ok(document.querySelectorAll('img[src*="piece-coin"]').length>0);assert.ok($('link[href^="legibility.css"]'));assert.ok(document.querySelectorAll('img[src*="beer-white.svg"]').length>0);
  $('[data-pile="draw"]').onmouseenter();assert.equal($('#card-catalogue').hidden,false);assert.match($('#catalogue-heading').textContent,/普通牌 40张/);

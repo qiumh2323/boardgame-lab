@@ -68,3 +68,6 @@
 #game .card.discard-allowed:not(.discard-picked){cursor:pointer}
 @keyframes target-outer-breathe{0%,100%{opacity:.6;box-shadow:0 0 5px 1px #ffd47e66}50%{opacity:1;box-shadow:0 0 12px 3px #ffd47ecc}}
 @media(prefers-reduced-motion:reduce){#game .flow-target:not(.flow-selected)::before,#game .card.discard-allowed:not(.discard-picked)::before{animation:none;opacity:1;box-shadow:0 0 8px 2px #ffd47e99}}
+
+/* One remaining-resource badge replaces the overlaid cubes/barrels on industries. */
+#game .slot .resource-count{left:-5px;right:auto;bottom:-5px;z-index:35;min-width:18px;font-size:12px;line-height:1.3;padding:1px 4px;pointer-events:none}

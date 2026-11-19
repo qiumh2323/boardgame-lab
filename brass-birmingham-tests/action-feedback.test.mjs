@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,applyAction,publicView,cityName} from '../brass-birmingham/engine.js?v=0.22';
+import {configure,createGame,applyAction,publicView,cityName} from '../brass-birmingham/engine.js?v=0.23';
 import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from '../brass-birmingham/action-feedback.js';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));configure(facts);
 const fresh=(n=2)=>{const s=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),91);s.order=s.players.map(p=>p.id);s.players[0].money=100;s.round=2;return s;};

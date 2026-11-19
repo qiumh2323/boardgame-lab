@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,createDeck,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.22';
+import {configure,createGame,createDeck,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.23';
 import {cardCatalogue,cardKey} from '../brass-birmingham/card-library.js';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 const fresh=n=>createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),142);
