@@ -1,0 +1,47 @@
+import {F,cityName,ZH,income} from './engine.js?v=0.15';
+
+export function makeActionFeedback(before,after,actor,action){
+ const p=before.players[actor],next=after.players[actor],a=action,targets=[],previews=[],exhausted=[];
+ let description='';
+ if(a.type==='build'){
+  const level=p.stacks[a.industry][0];description=`建造 ${cityName(a.loc)} ${ZH[a.industry]}${level}级`;
+  targets.push({kind:'tile',key:`${a.loc}:${a.slot}`,effect:'build'});previews.push({owner:actor,type:a.industry,level});
+ }else if(a.type==='network'){
+  description=`铺设${before.era==='canal'?'运河':'铁路'}：`+a.edges.map(id=>{
+   targets.push({kind:'route',key:id,effect:'link'});
+   const edge=F.connections.find(c=>c.id===id);return edge?cityName(edge.from)+'—'+cityName(edge.to):id;
+  }).join('、');
+ }else if(a.type==='develop'){
+  const removed={};description='研发：'+a.industries.map(type=>{
+   const level=p.stacks[type][removed[type]||0];removed[type]=(removed[type]||0)+1;
+   targets.push({kind:'mat',type,level,effect:'develop'});previews.push({owner:actor,type,level});return `${ZH[type]}${level}级`;
+  }).join('、');
+ }else if(a.type==='sell'){
+  description='出售并翻面：'+a.sales.map(sale=>{
+   const t=before.board[sale.key];targets.push({kind:'tile',key:sale.key,effect:'flip'});
+   previews.push({...t,flipped:true});return `${cityName(sale.key.split(':')[0])} ${ZH[t.type]}${t.level}级`;
+  }).join('、');
+ }else if(a.type==='loan')description='贷款 £30，收入降低3级';
+ else if(a.type==='scout')description='侦察，弃3张牌换取两张万能牌';
+ else if(a.type==='liquidate')description=`变卖 ${cityName(a.key.split(':')[0])} 的产业以支付欠款`;
+ else description='弃牌跳过行动';
+ for(const [key,t] of Object.entries(before.board)){
+  const n=after.board[key];
+  if(n&&n.owner===t.owner&&n.type===t.type&&n.level===t.level&&n.resource<t.resource){targets.push({kind:'tile',key,effect:'resource'});if(!t.flipped&&n.flipped){targets.push({kind:'tile',key,effect:'flip'});exhausted.push(`${cityName(key.split(':')[0])}${ZH[t.type]}已耗尽并翻面`);}}
+ }
+ for(const resource of ['coal','iron'])if(after[resource]<before[resource])targets.push({kind:'market',resource,effect:'resource'});
+ for(const m of before.merchants)if(m.beer&&!after.merchants.find(n=>n.id===m.id)?.beer)targets.push({kind:'merchant',id:m.id,effect:'resource'});
+ const details=[`${before.round!==after.round||before.era!==after.era?'含轮末结算，':''}现金 £${p.money} → £${next.money}`];
+ if(p.income!==next.income)details.push(`收入 ${income(p.income)} → ${income(next.income)}`);
+ if(exhausted.length)details.push(exhausted.join('、'));
+ if(before.era!==after.era)details.push('运河时代结算完成，进入铁路时代');else if(!before.gameOver&&after.gameOver)details.push('铁路时代结算完成，对局结束');
+ return {rev:after.rev,actor,type:a.type,description,details,targets,previews};
+}
+
+// The composition is fixed by player count, independent of cards drawn or discarded.
+export function needsMissingCityWarning(view,action,facts){
+ const n=view.players.length;
+ return action.type==='build'&&n<4&&!!facts.cities[action.loc]&&!(facts.cards[n].locations[action.loc]>0);
+}
+
+export function missingCityPreferenceKey(view){return `brass-missing-city-warning:${view.gameId}`;}

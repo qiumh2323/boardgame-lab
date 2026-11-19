@@ -1,10 +1,11 @@
-import {zoomButton,installDragPan} from './table-zoom.js?v=0.14';
-import {cardCatalogue} from './card-library.js?v=0.14';
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.14';
-import {selectAI} from './ai.js?v=0.14';
+import {makeActionFeedback,needsMissingCityWarning,missingCityPreferenceKey} from './action-feedback.js?v=0.15';
+import {zoomButton,installDragPan} from './table-zoom.js?v=0.15';
+import {cardCatalogue} from './card-library.js?v=0.15';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.15';
+import {selectAI} from './ai.js?v=0.15';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.14';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.14';
+import {createDirectFlow} from './direct-flow.js?v=0.15';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.15';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -12,10 +13,12 @@ const STEM={cottonMill:'cotton',coalMine:'coal',ironWorks:'iron',manufacturer:'m
 let state=null,view=null,seat=0,mode='local',room=null,layout,actions=[],cardIndex=0,selectedType='build',selectedLocation=null,aiTimer=null,aiBusy=false,lobby=null,waiting=false;
 let choiceAction=null,choiceSeat=0,saveAvailable=false,matSeat=null;
 const SAVE='brass-night-save-v1';
-const modal=$('#modal');
+const modal=$('#modal');let cityWarningPending=false;
+function closeModal(){let pending=cityWarningPending;cityWarningPending=false;modal.close();if(pending)directFlow.reset();}
+modal.addEventListener('cancel',()=>{if(cityWarningPending){cityWarningPending=false;directFlow.reset();}});
 function toast(t){$('#toast').textContent=t;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,5500);}
 function showDialog(title,content){$('#modal-title').textContent=title;$('#modal-content').innerHTML=content;if(!modal.open)modal.showModal();}
-$('#modal-close').onclick=()=>modal.close();modal.addEventListener('click',e=>{if(e.target===modal)modal.close();});
+$('#modal-close').onclick=closeModal;modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
 function tileUrl(type,level,flipped=false,owner=seat){return `assets/tiles/tile-${COLOR_NAMES[owner]}-${STEM[type]}-${level}${flipped?'-flipped':''}.webp`;}
 function cardUrl(c){let key=c.kind==='location'?c.loc.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()):c.kind==='wildLocation'?'wild-location':c.kind==='wildIndustry'?'wild-industry':c.types.length>1?'cotton-manufacture':({ironWorks:'iron',coalMine:'coal',cottonMill:'cotton-manufacture',manufacturer:'cotton-manufacture',brewery:'brewery',pottery:'pottery'}[c.types[0]]);return `assets/cards/card-${key}.webp`;}
 function assetFallback(e){e.target.style.opacity='.2';}
@@ -27,6 +30,7 @@ function name(){return $('#player-name')?.value?.trim()||$('#player-count').pare
 function count(){return Number($('#player-count').value);}
 function update(){
  if(mode!=='guest'){
+  state.gameId ||= globalThis.crypto?.randomUUID?.()||`brass-${state.seed}-${Date.now()}`;
   view=publicView(state,seat);actions=state.gameOver?[]:legalActions(state,current(state),{allCards:true});save();
   if(mode==='host')for(let s of room.seats)if(s.seat!==0)room.send(s.seat,'snapshot',{state:publicView(state,s.seat),actions:current(state)===s.seat?actions:[],seat:s.seat});
  }
@@ -45,18 +49,39 @@ function render(){
  $('#action-buttons').innerHTML=Object.entries(names).map(([t,label])=>`<button data-type="${t}" ${!myTurn()||waiting?'disabled':''} class="${selectedType===t?'selected':''}">${label}</button>`).join('');
  $('#action-buttons').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectedType=b.dataset.type;selectedLocation=null;render();openActions(selectedType);});
  $('#action-hint').textContent=view.gameOver?'已完成两时代计分。':!myTurn()?(view.players[current(view)].ai?'规则 AI 正在思考…':'等待其他玩家行动。'):view.phase==='liquidation'?'点击自己的产业，变卖以补足欠款。':'请选择行动，地图和玩家面板会高亮合法目标。';
- $('#ai-hint').disabled=!myTurn()||waiting||mode==='guest';$('#ai-hint').title=mode==='guest'?'联机客人使用相同行动提示，AI建议由房主计算':'';
+ $('#action-history-btn').disabled=false;
  $('#log').innerHTML=[...view.log].reverse().slice(0,35).map(t=>`<li>${esc(t)}</li>`).join('');
- renderBoard();renderMat();renderCatalogue();directFlow.paint();if(view.gameOver&&render.endShown!==view.rev){render.endShown=view.rev;showResults();}
+ renderBoard();renderMat();renderCatalogue();directFlow.paint();paintActionFeedback();if(modal.open&&$('#modal-title').textContent==='行动记录')renderActionHistory();if(view.gameOver&&render.endShown!==view.rev){render.endShown=view.rev;showResults();}
 }
 
 
 function renderHand(){
- if(!view)return;const id=matSeat!==null&&view.players[matSeat]?matSeat:seat,p=view.players[id],own=id===seat;
+ if(!view)return;$('#hand').classList.remove('event-cards');const id=matSeat!==null&&view.players[matSeat]?matSeat:seat,p=view.players[id],own=id===seat;
  $('#hand-title').textContent=own?'你的手牌':p.name+'的手牌';
  $('#hand-count').textContent=own?`${p.hand.length}张 · 选择弃牌后确认执行`:`${p.handCount}张`;
  $('#hand').dataset.player=String(id);
- $('#hand').innerHTML=own?p.hand.map((c,i)=>`<button class="card" data-card="${i}" aria-pressed="false" title="${esc(cardName(c))}"><img src="${cardUrl(c)}" alt="${esc(cardName(c))}"><span>${esc(cardName(c))}</span></button>`).join(''):Array.from({length:p.handCount},(_,i)=>`<div class="card card-back" data-card-back="${i}" aria-label="${esc(p.name)}的手牌背面"><img src="assets/cards/piece-card-back.webp" alt="手牌背面"><span>手牌背面</span></div>`).join('');
+ $('#hand').innerHTML=own?p.hand.map((c,i)=>`<button class="card" data-card="${i}" aria-pressed="false" title="${esc(cardName(c))}"><img src="${cardUrl(c)}" alt="${esc(cardName(c))}"><span>${esc(cardName(c))}</span></button>`).join(''):Array.from({length:p.handCount},(_,i)=>`<div class="card card-back" data-card-back="${i}" aria-label="${esc(p.name)}的手牌背面"><img src="assets/cards/piece-card-back.webp" alt="手牌背面"></div>`).join('');
+}
+
+
+let feedbackGame=null,feedbackRev=null,announcementTimer;
+function renderActionHistory(){
+ $('#modal-content').innerHTML=`<p class="modal-note">最新行动在前</p><ol class="action-history-list">${[...view.log].reverse().map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`;
+}
+function paintActionFeedback(){
+ const e=view.lastAction,game=view.gameId;
+ $('#latest-action').hidden=!e;
+ if(e)$('#latest-action').textContent=`刚刚：${view.players[e.actor].name} · ${e.description}`;
+ if(feedbackGame!==game){feedbackGame=game;feedbackRev=view.rev;return;}
+ if(!e||e.rev!==view.rev||feedbackRev===e.rev)return;
+ feedbackRev=e.rev;
+ const announce=$('#action-announcement');announce.style.setProperty('--actor',COLORS[e.actor]);
+ announce.innerHTML=`<div class="action-previews">${e.previews.slice(0,3).map(t=>`<img src="${tileUrl(t.type,t.level,!!t.flipped,t.owner)}" alt="${esc(ZH[t.type])}${t.level}级">`).join('')}</div><div><strong>${esc(view.players[e.actor].name)} · ${esc(e.description)}</strong><p>${e.details.map(esc).join(' · ')}</p></div>`;
+ announce.hidden=false;announce.classList.remove('announce-enter');void announce.offsetWidth;announce.classList.add('announce-enter');
+ clearTimeout(announcementTimer);announcementTimer=setTimeout(()=>announce.hidden=true,4300);announcementTimer.unref?.();
+ $(`#players .player:nth-child(${e.actor+1})`)?.classList.add('event-actor');document.querySelectorAll(`.turn-character[data-player="${e.actor}"],.turn-payment[data-player="${e.actor}"]`).forEach(n=>n.classList.add('event-actor'));
+ for(const t of e.targets){let el=t.kind==='tile'?$(`[data-loc="${t.key.split(':')[0]}"][data-slot="${t.key.split(':')[1]}"]`):t.kind==='route'?$(`[data-route="${t.key}"]`):t.kind==='merchant'?$(`[data-merchant="${t.id}"]`):t.kind==='mat'&&Number($('#hand').dataset.player)===e.actor?$(`[data-mat-type="${t.type}"][data-level="${t.level}"]`):null;if(el)el.classList.add('event-'+t.effect);if(t.kind==='market')document.querySelectorAll('.market-cube.'+t.resource).forEach(n=>n.classList.add('event-resource'));}
+ if(Number($('#hand').dataset.player)===e.actor&&e.type==='scout')$('#hand').classList.add('event-cards');else $('#hand').classList.remove('event-cards');
 }
 
 let catalogueTimer;
@@ -124,19 +149,33 @@ function openActions(type,loc=null,slot=null,edge=null,industry=null){
 function multiSell(){let list=available('sell'),keys=[...new Set(list.flatMap(a=>a.sales.map(x=>x.key)))];showDialog('组合出售',`<p class="modal-note">勾选产业并为每个产业选择商人。所需啤酒会按顺序结算。</p>${keys.map((key,i)=>`<div class="form-row"><label><input type="checkbox" data-sale="${i}"> ${cityName(tileLocation(key))} ${ZH[view.board[key].type]}</label><select data-sale-merchant="${i}">${list.filter(a=>a.sales[0].key===key).map(a=>`<option value="${a.sales[0].merchant}">${cityName(view.merchants.find(m=>m.id===a.sales[0].merchant).loc)}</option>`).join('')}</select></div>`).join('')}<button id="sell-confirm" class="primary wide">确认出售</button>`);$('#sell-confirm').onclick=()=>{let sales=keys.flatMap((key,i)=>$(`[data-sale="${i}"]`).checked?[{key,merchant:Number($(`[data-sale-merchant="${i}"]`).value)}]:[]);if(!sales.length){toast('至少选择一个产业');return;}submit({type:'sell',card:cardIndex,sales});};}
 function scoutDialog(a){showDialog('侦察：额外弃两张牌',`<p class="modal-note">本次行动共弃3张牌，换取两张万能牌。</p>${view.players[seat].hand.map((c,i)=>i===cardIndex?'':`<label class="choice-card"><input type="checkbox" value="${i}" name="scout">${esc(cardName(c))}</label>`).join('')}<button id="scout-confirm" class="primary wide">确认侦察</button>`);$('#scout-confirm').onclick=()=>{let extra=[...document.querySelectorAll('[name=scout]:checked')].map(x=>Number(x.value));if(extra.length!==2){toast('请选择额外两张手牌');return;}submit({...a,extra});};}
 function confirmAction(a){showDialog('确认行动',`<p>${esc(actionLabel(a))}</p><p class="modal-note">${a.type==='pass'?'跳过也会弃1张牌。':a.type==='liquidate'?'产业将从棋盘移除，获得其建造现金成本的一半（向下取整）。':'本次行动使用选中的手牌；提交前会核对所有资源和费用。'}</p><button id="confirm-action" class="primary wide">确认执行</button>`);$('#confirm-action').onclick=()=>submit(a);}
+let acknowledgedCityBuild=null;
 function submit(a){
+ if(waiting)return;
+ const signature=`${view.gameId}:${view.rev}:${seat}:${a.loc}:${a.slot}:${a.industry}:${a.card}`;
+ let suppressed=false;try{suppressed=localStorage.getItem(missingCityPreferenceKey(view))==='1';}catch{}
+ if(needsMissingCityWarning(view,a,F)&&!suppressed&&signature!==acknowledgedCityBuild){
+  const rev=view.rev;cityWarningPending=true;
+  showDialog('本局没有此城市的地点牌',`<p>${view.players.length}人牌组不包含<strong>${esc(cityName(a.loc))}</strong>的地点牌。这里仍可合法建造，但后续通常需要相应产业牌或万能牌，并满足运输网等条件。</p><label class="warning-preference"><input type="checkbox" id="skip-city-warning"> 本局不再提示这类地点</label><div class="warning-controls"><button id="continue-city-build" class="primary">继续建造</button><button id="cancel-city-build">取消</button></div>`);
+  $('#continue-city-build').onclick=()=>{if(view.rev!==rev||!myTurn()){cityWarningPending=false;modal.close();directFlow.reset();toast('局面已更新，请重新选择行动。');return;}if($('#skip-city-warning').checked)try{localStorage.setItem(missingCityPreferenceKey(view),'1');}catch{}acknowledgedCityBuild=signature;cityWarningPending=false;modal.close();sendAction(a);};
+  $('#cancel-city-build').onclick=()=>{cityWarningPending=false;modal.close();directFlow.reset();};return;
+ }
+ sendAction(a);
+}
+function sendAction(a){
  if(waiting)return;if(mode==='guest'){try{waiting=true;room.command(view.rev,a);modal.close();render();}catch(e){waiting=false;toast(e.message);}return;}
  execute(seat,a);
 }
 function execute(id,a){
  let result=applyAction(state,id,a,{auto:state.players[id]?.ai});
  if(!result.ok){if(result.choice){if(id===seat)choiceDialog(a,result.choice);else room?.send(id,'choice',{action:a,choice:result.choice});}else if(id===seat){toast(result.error);directFlow.failed();}else room?.error(id,result.error);return;}
- state=result.state;cardIndex=0;selectedLocation=null;if(id===seat)modal.close();update();
+ const feedback=makeActionFeedback(state,result.state,id,a);
+ state=result.state;state.lastAction=feedback;cardIndex=0;selectedLocation=null;if(id===seat)modal.close();update();
 }
 function choiceDialog(a,choice){modal.close();waiting=false;directFlow.requestChoice(a,choice);}
 function scheduleAI(){
  clearTimeout(aiTimer);if(mode==='guest'||!state||state.gameOver||!state.players[current(state)].ai)return;
- aiTimer=setTimeout(()=>{if(aiBusy)return;aiBusy=true;try{let id=current(state),a=selectAI(state,id);if(a)execute(id,a);else toast('AI没有找到行动，请导出存档反馈。');}catch(e){toast('AI执行失败：'+e.message);}finally{aiBusy=false;scheduleAI();}},550);
+ aiTimer=setTimeout(()=>{if(aiBusy)return;aiBusy=true;try{let id=current(state),a=selectAI(state,id);if(a)execute(id,a);else toast('AI没有找到行动，请导出存档反馈。');}catch(e){toast('AI执行失败：'+e.message);}finally{aiBusy=false;scheduleAI();}},2200);
 }
 function showResults(){showDialog('两时代结算',`<p>${view.winners.map(id=>esc(view.players[id].name)).join('、')} 获胜</p><div class="option-list">${[...view.players].sort((a,b)=>b.vp-a.vp).map(p=>`<p>${esc(p.name)}：${p.vp} VP · 收入${income(p.income)} · £${p.money}</p>`).join('')}</div><p class="modal-note">${view.scores.map(s=>(s.era==='canal'?'运河':'铁路')+'：'+s.points.map((p,i)=>view.players[i].name+' 产业'+p.industry+' / 连接'+p.links).join('，')).join('<br>')}</p>`);}
 function help(){showDialog('玩法与测试说明',`<div class="help-content"><p>2–4人、运河与铁路两个时代。得分最高者获胜。</p><h3>操作顺序</h3><p>先选择行动，再点击地图或玩家面板高亮目标；确定目标后，选择弃牌，再点击确认执行。研发直接点击玩家面板，连接直接点击线路，销售直接点击产业、商人和啤酒来源。只有建造要求对应地点牌或产业牌；其他行动可弃任意牌。每次行动弃1张，首轮每人1次，其后2次；回合结束补到8张。</p><h3>运输与资源</h3><p>煤必须从相连且最近的煤矿取用，没有相连煤矿时须接通任意商人地点才能从市场购买。铁无需运输，先取棋盘铁厂，再买市场。自己的啤酒无需连接，对手啤酒须连接；商人啤酒只能用于向该商人出售。</p><h3>六种行动</h3><p>建造最低级产业；铺路扩展网络；研发移除1–2块并耗铁；出售相连商人收购的商品并耗啤酒；贷款£30、收入下降3级；侦察弃3张换2张万能牌。也可弃牌跳过。</p><h3>时代结算</h3><p>产业翻面立即提升收入，时代结束按翻面产业和连接计分。运河后移除所有一级产业及运河；二级以上保留。铁路时代每条铁路耗煤，双铁路另需啤酒。最终轮不领取收入。</p><h3>联机测试</h3><p>房主创建房间，将8位房间码或邀请链接发给朋友。2–4人均可，未入座的位置可由规则AI补齐。房主需要保持页面开启。断线客人用原浏览器标签重连；房主离线后对局不能继续同步。</p><p>使用 WebRTC 与公共 PeerJS 信令服务，部分校园网、公司网或严格 NAT 可能无法直连。测试版由房主裁判；不含账号、排名和反作弊服务。AI是启发式规则AI，可完成两时代对局。</p><p><a href="rules.pdf" target="_blank" rel="noopener">打开官方英文规则</a></p></div>`);}
@@ -163,7 +202,7 @@ function renderLobby(){
  $('#copy-invite').onclick=()=>navigator.clipboard.writeText(invite).then(()=>toast('邀请链接已复制'),()=>toast(invite));
  if($('#room-start'))$('#room-start').onclick=()=>{if(lobby.seats.some(s=>!s.online)){toast('请等待离线玩家重连后开始');return;}let names=[],ai=[];for(let i=0;i<lobby.count;i++){let s=lobby.seats.find(s=>s.seat===i);names.push(s?s.name:'规则 AI '+(i+1));ai.push(!s);}state=createGame(names,ai);seat=0;mode='host';room.started=true;room.broadcastLobby();modal.close();update();};
 }
-function menu(){showDialog('对局菜单',`<div class="option-list">${view?'<button id="export-btn">导出对局存档</button>':''}${myTurn()&&view.phase==='play'?'<button id="pass-menu-btn">弃1张牌跳过行动</button>':''}${mode==='guest'?'<button id="reconnect-btn">重新连接房主</button>':''}${view?.gameOver?'<button id="results-btn">查看最终结算</button>':''}<button id="back-btn">返回开局界面</button></div><p class="modal-note">本地及房主对局自动存档。联机客人不保存其他玩家的手牌。</p>`);if($('#pass-menu-btn'))$('#pass-menu-btn').onclick=()=>{modal.close();directFlow.begin('pass');};if($('#export-btn'))$('#export-btn').onclick=()=>{let data=mode==='guest'?view:state,blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brass-night-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('存档已导出');};if($('#reconnect-btn'))$('#reconnect-btn').onclick=()=>{room.connect();modal.close();};if($('#results-btn'))$('#results-btn').onclick=showResults;$('#back-btn').onclick=()=>{setTableZoom(null);clearTimeout(aiTimer);room?.destroy();room=null;state=null;view=null;directFlow.reset();mode='local';$('main').hidden=true;$('.lobby').hidden=false;$('#connection-status').textContent='本地对局';$('#resume-btn').hidden=!saveAvailable;modal.close();};}
+function menu(){showDialog('对局菜单',`<div class="option-list">${view?'<button id="export-btn">导出对局存档</button>':''}${myTurn()&&view.phase==='play'?'<button id="pass-menu-btn">弃1张牌跳过行动</button>':''}${mode==='guest'?'<button id="reconnect-btn">重新连接房主</button>':''}${view?.gameOver?'<button id="results-btn">查看最终结算</button>':''}<button id="back-btn">返回开局界面</button></div><p class="modal-note">本地及房主对局自动存档。联机客人不保存其他玩家的手牌。</p>`);if($('#pass-menu-btn'))$('#pass-menu-btn').onclick=()=>{modal.close();directFlow.begin('pass');};if($('#export-btn'))$('#export-btn').onclick=()=>{let data=mode==='guest'?view:state,blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brass-night-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('存档已导出');};if($('#reconnect-btn'))$('#reconnect-btn').onclick=()=>{room.connect();modal.close();};if($('#results-btn'))$('#results-btn').onclick=showResults;$('#back-btn').onclick=()=>{setTableZoom(null);clearTimeout(announcementTimer);$('#action-announcement').hidden=true;feedbackGame=null;clearTimeout(aiTimer);room?.destroy();room=null;state=null;view=null;directFlow.reset();mode='local';$('main').hidden=true;$('.lobby').hidden=false;$('#connection-status').textContent='本地对局';$('#resume-btn').hidden=!saveAvailable;modal.close();};}
 $('#ai-start').onclick=()=>startLocal(count());$('#host-btn').onclick=host;$('#join-btn').onclick=()=>joinDialog();$('#help-btn').onclick=help;$('#menu-btn').onclick=menu;
 function setTableZoom(kind){
  document.body.classList.toggle('board-focus',kind==='board');document.body.classList.toggle('mat-focus',kind==='mat');
@@ -176,10 +215,10 @@ $('#mat-preview').onclick=()=>setTableZoom(document.body.classList.contains('mat
 document.addEventListener('keydown',e=>{if(e.key==='Escape')setTableZoom(null);});
 installDragPan($('.board-column'),()=>document.body.classList.contains('board-focus'));
 setTableZoom(null);
-$('#ai-hint').onclick=()=>{if(!state||!myTurn())return;toast('正在计算建议…');setTimeout(()=>{let a=selectAI(state,seat);if(a){showDialog('规则 AI 建议',`<p>${esc(actionLabel(a))}</p><p class="modal-note">按可得分产业、收入、运输网络与现金评估；建议不保证最优。</p><button id="use-hint" class="primary wide">采用建议</button>`);$('#use-hint').onclick=()=>{cardIndex=a.card||0;submit(a);};}},20);};
+$('#action-history-btn').onclick=()=>{showDialog('行动记录','');renderActionHistory();};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.14').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.15').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 $('#catalogue-close').onclick=()=>$('#card-catalogue').hidden=true;$('#card-catalogue').onmouseenter=()=>clearTimeout(catalogueTimer);$('#card-catalogue').onmouseleave=queueCatalogueClose;$('#card-catalogue').onfocusin=()=>clearTimeout(catalogueTimer);$('#card-catalogue').onfocusout=queueCatalogueClose;

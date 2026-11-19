@@ -11,8 +11,8 @@ export function boardPieces(view,layout){
  let html='';
  view.order.forEach((id,index)=>{
   let p=view.players[id],pos=layout.turnOrder[index],label=`第${index+1}位 ${p.name}，本轮花费 £${p.spent}`;
-  html+=`<div class="turn-character ${view.order[view.turn]===id&&!view.gameOver?'current':''}" style="${at(pos)};--piece-color:var(--${colors[id]})" title="${safe(label)}" aria-label="${safe(label)}"><img class="character-face" src="assets/pieces/piece-character-${portraits[id]}.webp" alt="${safe(p.name)}的行动顺序头像"></div>`;
-  html+=`<div class="turn-payment" style="${at(layout.turnSpend[index])}" data-spent="${p.spent}" title="${safe(label)}">${coins(p.spent).map((v,i)=>coinPiece(v,{payment:true,index:i})).join('')}<span class="payment-total">£${p.spent}</span></div>`;
+  html+=`<div class="turn-character ${view.order[view.turn]===id&&!view.gameOver?'current':''}" data-player="${id}" style="${at(pos)};--piece-color:var(--${colors[id]})" title="${safe(label)}" aria-label="${safe(label)}"><img class="character-face" src="assets/pieces/piece-character-${portraits[id]}.webp" alt="${safe(p.name)}的行动顺序头像"></div>`;
+  html+=`<div class="turn-payment" data-player="${id}" style="${at(layout.turnSpend[index])}" data-spent="${p.spent}" title="${safe(label)}">${coins(p.spent).map((v,i)=>coinPiece(v,{payment:true,index:i})).join('')}<span class="payment-total">£${p.spent}</span></div>`;
  });
  let groups=new Map();for(let p of view.players)for(let kind of ['vp','income']){
   let value=kind==='vp'?p.vp:p.income,space=kind==='vp'?((value%100)+100)%100:Math.min(99,Math.max(0,value)),pos=layout.track[String(space)];if(!pos)continue;

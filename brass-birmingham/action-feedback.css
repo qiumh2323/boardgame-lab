@@ -1,0 +1,35 @@
+#game #action-history-btn{font-size:13px;line-height:1.4;margin-top:6px;padding:7px 4px}
+#game .latest-action{display:block;margin:3px 0 0;padding:5px 0 0 7px;border-left:2px solid #c5a66d;color:#d4dce0;font-size:12px;line-height:1.5;max-height:80px;overflow:auto;white-space:normal}
+.action-history-list{margin:8px 0;padding:0 0 0 24px;font-size:14px;line-height:1.8}
+.action-history-list li{padding:7px 2px;border-bottom:1px solid #ffffff18}
+.action-announcement{position:fixed;left:16px;bottom:16px;z-index:70;width:max-content;max-width:min(680px,calc(100vw - 32px));display:flex;align-items:center;gap:12px;padding:13px 17px;border:1px solid #a1a98c;border-left:5px solid var(--actor,#d8b374);border-radius:5px;background:#172b39f5;box-shadow:0 6px 24px #000a;pointer-events:none}
+.action-announcement strong{font-size:15px;font-weight:500;line-height:1.65;color:#f4e5bd}
+.action-announcement p{font-size:13px;line-height:1.5;margin:4px 0 0;color:#c0cfd6}
+.action-previews{display:flex;gap:4px;flex:none}.action-previews:empty{display:none}.action-previews img{display:block;width:38px;height:38px;object-fit:contain;border:1px solid var(--actor);box-shadow:1px 2px 3px #000b}
+.announce-enter{animation:announce-in .25s ease-out}
+.event-build>img{animation:industry-arrive .65s ease-out}
+.event-flip>img{animation:industry-flip .75s ease-in-out}
+.event-link>img{animation:link-arrive .65s ease-out}
+.event-develop{animation:develop-mark .95s ease-out}
+.event-resource .resource-piece,.market-cube.event-resource,.merchant-tile.event-resource{animation:resource-glow .95s ease-in-out}
+#players .event-actor{animation:actor-glow .9s ease-out}
+.event-cards .card{animation:industry-arrive .6s ease-out}
+@keyframes announce-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@keyframes industry-arrive{from{opacity:.15;transform:translateY(-9px) scale(.75)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes industry-flip{0%{opacity:.3;transform:perspective(300px) rotateY(85deg)}100%{opacity:1;transform:perspective(300px) rotateY(0)}}
+@keyframes link-arrive{from{opacity:.15;transform:scaleX(.2)}to{opacity:1;transform:scaleX(1)}}
+@keyframes develop-mark{0%,45%{box-shadow:0 0 0 3px #ffdc96,0 0 14px #ffcf8180}100%{box-shadow:0 0 0 0 transparent}}
+@keyframes resource-glow{0%,50%{filter:brightness(1.7) drop-shadow(0 0 4px #ffe8ad)}100%{filter:brightness(1)}}
+@keyframes actor-glow{0%,40%{background:#6b6244;outline:2px solid #f0d591}100%{outline:0 solid transparent}}
+.warning-preference{display:flex;align-items:center;gap:7px;margin:18px 0;font-size:14px;line-height:1.5}.warning-preference input{width:17px;height:17px;flex:none}
+.warning-controls{display:flex;gap:8px}.warning-controls button{flex:1;margin:0!important}
+#game .hand-panel .card-back{display:flex;align-items:stretch}
+#game .hand-panel .card-back img{flex:1 1 auto;min-height:0;height:100%;width:100%;object-fit:contain}
+@media(max-width:700px){.action-announcement{left:8px;bottom:8px;max-width:calc(100vw - 16px);padding:9px 10px;gap:7px}.action-announcement strong{font-size:13px}.action-previews img{width:29px;height:29px}}
+@media(prefers-reduced-motion:reduce){.announce-enter,.event-build>img,.event-flip>img,.event-link>img,.event-develop,.event-resource .resource-piece,.market-cube.event-resource,.merchant-tile.event-resource,#players .event-actor,.event-cards .card{animation:none}}
+
+.turn-character.event-actor img{animation:resource-glow .9s ease-in-out}.turn-payment.event-actor .physical-coin{animation:industry-arrive .65s ease-out}
+@media(prefers-reduced-motion:reduce){.turn-character.event-actor img,.turn-payment.event-actor .physical-coin{animation:none}}
+
+.slot.event-resource,.merchant-tile.event-resource{animation:develop-mark .8s ease-out}
+@media(prefers-reduced-motion:reduce){.slot.event-resource,.merchant-tile.event-resource{animation:none}}
