@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 80">
+ <defs>
+  <linearGradient id="wood" x1="0" x2="1"><stop stop-color="#b8c0c2"/><stop offset=".24" stop-color="#fffef5"/><stop offset=".55" stop-color="#f1eee2"/><stop offset="1" stop-color="#929fa5"/></linearGradient>
+  <linearGradient id="hoop" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#87949c"/><stop offset=".3" stop-color="#f4f6f3"/><stop offset=".55" stop-color="#6e7e88"/><stop offset="1" stop-color="#3e515d"/></linearGradient>
+ </defs>
+ <ellipse cx="33" cy="74" rx="24" ry="4" fill="#071521" opacity=".65"/>
+ <path d="M15 10Q32 3 49 10C59 28 59 52 49 69Q32 78 15 69C5 52 5 28 15 10Z" fill="url(#wood)" stroke="#253e4c" stroke-width="2"/>
+ <path d="M22 12C16 33 16 48 22 70M32 12V73M42 12C48 33 48 48 42 70" fill="none" stroke="#849295" stroke-width="1" opacity=".6"/>
+ <ellipse cx="32" cy="11" rx="18" ry="7" fill="#e9e9df" stroke="#6d7e87" stroke-width="2"/>
+ <ellipse cx="32" cy="10" rx="14" ry="4" fill="#fffef5" stroke="#acb5b5"/>
+ <path d="M10 23Q32 31 54 23L56 30Q32 38 8 30ZM8 49Q32 57 56 49L54 56Q32 64 10 56Z" fill="url(#hoop)" stroke="#435b68" stroke-width="1"/>
+ <path d="M15 67Q32 74 49 67L48 72Q32 79 16 72Z" fill="url(#hoop)" stroke="#435b68" stroke-width="1"/>
+ <circle cx="33" cy="43" r="3" fill="#c4c5ba" stroke="#6d7e87"/>
+</svg>

@@ -1,9 +1,9 @@
-import {cardCatalogue} from './card-library.js?v=0.9';
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.9';
-import {selectAI} from './ai.js?v=0.9';
+import {cardCatalogue} from './card-library.js?v=0.10';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.10';
+import {selectAI} from './ai.js?v=0.10';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.9';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.9';
+import {createDirectFlow} from './direct-flow.js?v=0.10';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.10';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -39,7 +39,7 @@ function render(){
  const estimate=estimateEraScore(view);
  $('#players').innerHTML=view.players.map(p=>`<article class="player ${!view.gameOver&&current(view)===p.id?'active':''}" style="--owner:${COLORS[p.id]}"><b>${esc(p.name)} ${p.id===seat?'<span class="you">你</span>':''}</b><span>${p.vp} VP</span><div class="score-estimate" data-player="${p.id}" tabindex="0" aria-label="预估 ${p.vp+estimate[p.id].industry+estimate[p.id].links} 分" title="若本时代现在结束：已得 ${p.vp} + 产业 ${estimate[p.id].industry} + 连接 ${estimate[p.id].links} = ${p.vp+estimate[p.id].industry+estimate[p.id].links}。计分轨道在时代结束时结算。"><strong>${p.vp+estimate[p.id].industry+estimate[p.id].links}</strong></div><div class="stats"><span>现金 £${p.money}</span><span>收入 ${income(p.income)>=0?'+':''}${income(p.income)}</span><span>手牌 ${p.handCount}</span></div></article>`).join('');
 
- $('#hand-count').textContent=`${p.hand.length}张 · 确定目标后选择弃牌`;
+ $('#hand-count').textContent=`${p.hand.length}张 · 选择弃牌后确认执行`;
  $('#hand').innerHTML=p.hand.map((c,i)=>`<button class="card ${cardIndex===i?'selected':''}" data-card="${i}" aria-pressed="${cardIndex===i}" title="${esc(cardName(c))}"><img src="${cardUrl(c)}" alt="${esc(cardName(c))}"><span>${esc(cardName(c))}</span></button>`).join('');
  $('#hand').querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>{cardIndex=Number(b.dataset.card);selectedLocation=null;render();});
  const names={build:'建造',network:'铺路',develop:'研发',sell:'出售',loan:'贷款',scout:'侦察'};
@@ -68,12 +68,12 @@ function slots(loc){return layout.slots[loc]||[];}
 function renderBoard(){
  let html='';for(let [loc,city]of Object.entries({...F.cities,...Object.fromEntries(Object.keys(F.farms).map(k=>[k,{slots:[['brewery']]}]))}))slots(loc).forEach(([x,y],i)=>{
   let key=loc+':'+i,t=view.board[key],label=t?`${cityName(loc)} ${view.players[t.owner].name} ${ZH[t.type]}${t.level}级${t.flipped?'（已翻面）':''}`:`${cityName(loc)} ${city.slots[i]?.map(t=>ZH[t]).join('/')} 空位`;
-  html+=`<button class="slot" style="left:${x*100}%;top:${y*100}%;${t?'border:2px solid '+COLORS[t.owner]:''}" data-loc="${loc}" data-slot="${i}" title="${esc(label)}" aria-label="${esc(label)}">${t?`<img style="width:100%;height:100%" src="${tileUrl(t.type,t.level,t.flipped,t.owner)}" alt="">${t.resource?`<span class="industry-resources ${t.type==='brewery'?'beer':''}">${Array.from({length:t.resource},()=>t.type==='brewery'?'<img src="assets/pieces/piece-beer.webp" alt="啤酒">':`<i class="industry-cube ${t.type==='coalMine'?'coal':'iron'}"></i>`).join('')}</span><span class="resource-count">${t.resource}</span>`:''}`:''}</button>`;
+  html+=`<button class="slot" style="left:${x*100}%;top:${y*100}%;${t?'border:2px solid '+COLORS[t.owner]:''}" data-loc="${loc}" data-slot="${i}" title="${esc(label)}" aria-label="${esc(label)}">${t?`<img style="width:100%;height:100%" src="${tileUrl(t.type,t.level,t.flipped,t.owner)}" alt="">${t.resource?`<span class="industry-resources ${t.type==='brewery'?'beer':''}">${Array.from({length:t.resource},()=>t.type==='brewery'?'<img src="assets/pieces/beer-white.svg" alt="啤酒">':`<i class="industry-cube ${t.type==='coalMine'?'coal':'iron'}"></i>`).join('')}</span><span class="resource-count">${t.resource}</span>`:''}`:''}</button>`;
  });
  for(let m of view.merchants){let siblings=view.merchants.filter(x=>x.loc===m.loc),idx=siblings.indexOf(m),pos=layout.merchants[m.loc]?.[idx],beer=layout.merchantBeer[m.loc]?.[idx];if(!pos)continue;
   let label=m.buys==='blank'?'空白商人':m.buys==='any'?'接收全部商品':ZH[m.buys];let stem={blank:'2_nothing',any:'2_manufacturecottonpottery',cottonMill:'2_cotton',manufacturer:'2_manufacture',pottery:'3_pottery'}[m.buys];
   html+=`<button class="merchant-tile" style="left:${pos[0]*100}%;top:${pos[1]*100}%" data-merchant="${m.id}" title="${cityName(m.loc)}：${label}${m.beer?'，有啤酒':''}" aria-label="${cityName(m.loc)}${label}"><img src="assets/pieces/piece-merchant-${stem}.webp" alt="${label}"></button>`;
-  if(m.beer&&beer)html+=`<img class="merchant-beer" style="left:${beer[0]*100}%;top:${beer[1]*100}%" src="assets/pieces/piece-beer.webp" alt="${cityName(m.loc)}商人啤酒">`;
+  if(m.beer&&beer)html+=`<img class="merchant-beer" style="left:${beer[0]*100}%;top:${beer[1]*100}%" src="assets/pieces/beer-white.svg" alt="${cityName(m.loc)}商人啤酒">`;
  }
  for(let pile of layout.decks){let qty=pile.kind==='draw'?view.deckCount:view.wild[pile.kind==='wildLocation'?'location':'industry'];let label=pile.kind==='draw'?'抽牌堆':pile.kind==='wildLocation'?'万能地点牌':'万能产业牌',url=pile.kind==='draw'?'assets/cards/piece-card-back.webp':cardUrl({kind:pile.kind});
   html+=`<button class="board-pile ${qty?'':'pile-empty'}" data-pile="${pile.kind}" style="left:${pile.center[0]*100}%;top:${pile.center[1]*100}%;width:${pile.size[0]*100}%;height:${pile.size[1]*100}%" title="${label}：${qty}张" aria-label="${label}：${qty}张">${qty?`<img src="${url}" alt="${label}">`:''}<span>${label} ${qty}</span></button>`;
@@ -90,6 +90,7 @@ function renderBoard(){
 }
 function renderMat(){
  let id=matSeat!==null&&view.players[matSeat]?matSeat:seat,p=view.players[id];
+ $('#mat-player').style.setProperty('--mat-players',view.players.length);
  $('#mat-player').innerHTML=view.players.map(p=>`<button type="button" data-mat-player="${p.id}" aria-pressed="${p.id===id}" class="${p.id===id?'selected':''}" style="--owner:${COLORS[p.id]}" title="查看${esc(p.name)}的面板">${esc(p.name)}${p.id===seat?'（你）':''}</button>`).join('');
  $('#mat-player').querySelectorAll('[data-mat-player]').forEach(b=>b.onclick=()=>{matSeat=Number(b.dataset.matPlayer);renderMat();directFlow.paint();});
  let html='';for(let type of TYPES)for(let d of F.industries[type]){let [x,y]=layout.playerMat.slots[type][d.level-1],count=p.stacks[type].filter(n=>n===d.level).length,isNext=nextTile(view,id,type)?.level===d.level&&count>0;
@@ -128,7 +129,7 @@ function scheduleAI(){
  aiTimer=setTimeout(()=>{if(aiBusy)return;aiBusy=true;try{let id=current(state),a=selectAI(state,id);if(a)execute(id,a);else toast('AI没有找到行动，请导出存档反馈。');}catch(e){toast('AI执行失败：'+e.message);}finally{aiBusy=false;scheduleAI();}},550);
 }
 function showResults(){showDialog('两时代结算',`<p>${view.winners.map(id=>esc(view.players[id].name)).join('、')} 获胜</p><div class="option-list">${[...view.players].sort((a,b)=>b.vp-a.vp).map(p=>`<p>${esc(p.name)}：${p.vp} VP · 收入${income(p.income)} · £${p.money}</p>`).join('')}</div><p class="modal-note">${view.scores.map(s=>(s.era==='canal'?'运河':'铁路')+'：'+s.points.map((p,i)=>view.players[i].name+' 产业'+p.industry+' / 连接'+p.links).join('，')).join('<br>')}</p>`);}
-function help(){showDialog('玩法与测试说明',`<div class="help-content"><p>2–4人、运河与铁路两个时代。得分最高者获胜。</p><h3>操作顺序</h3><p>先选择行动，再点击地图或玩家面板高亮目标；确定目标后，在悬浮手牌框选择弃牌。研发直接点击玩家面板，连接直接点击线路，销售直接点击产业、商人和啤酒来源。只有建造要求对应地点牌或产业牌；其他行动可弃任意牌。每次行动弃1张，首轮每人1次，其后2次；回合结束补到8张。</p><h3>运输与资源</h3><p>煤必须从相连且最近的煤矿取用，没有相连煤矿时须接通任意商人地点才能从市场购买。铁无需运输，先取棋盘铁厂，再买市场。自己的啤酒无需连接，对手啤酒须连接；商人啤酒只能用于向该商人出售。</p><h3>六种行动</h3><p>建造最低级产业；铺路扩展网络；研发移除1–2块并耗铁；出售相连商人收购的商品并耗啤酒；贷款£30、收入下降3级；侦察弃3张换2张万能牌。也可弃牌跳过。</p><h3>时代结算</h3><p>产业翻面立即提升收入，时代结束按翻面产业和连接计分。运河后移除所有一级产业及运河；二级以上保留。铁路时代每条铁路耗煤，双铁路另需啤酒。最终轮不领取收入。</p><h3>联机测试</h3><p>房主创建房间，将8位房间码或邀请链接发给朋友。2–4人均可，未入座的位置可由规则AI补齐。房主需要保持页面开启。断线客人用原浏览器标签重连；房主离线后对局不能继续同步。</p><p>使用 WebRTC 与公共 PeerJS 信令服务，部分校园网、公司网或严格 NAT 可能无法直连。测试版由房主裁判；不含账号、排名和反作弊服务。AI是启发式规则AI，可完成两时代对局。</p><p><a href="rules.pdf" target="_blank" rel="noopener">打开官方英文规则</a></p></div>`);}
+function help(){showDialog('玩法与测试说明',`<div class="help-content"><p>2–4人、运河与铁路两个时代。得分最高者获胜。</p><h3>操作顺序</h3><p>先选择行动，再点击地图或玩家面板高亮目标；确定目标后，选择弃牌，再点击确认执行。研发直接点击玩家面板，连接直接点击线路，销售直接点击产业、商人和啤酒来源。只有建造要求对应地点牌或产业牌；其他行动可弃任意牌。每次行动弃1张，首轮每人1次，其后2次；回合结束补到8张。</p><h3>运输与资源</h3><p>煤必须从相连且最近的煤矿取用，没有相连煤矿时须接通任意商人地点才能从市场购买。铁无需运输，先取棋盘铁厂，再买市场。自己的啤酒无需连接，对手啤酒须连接；商人啤酒只能用于向该商人出售。</p><h3>六种行动</h3><p>建造最低级产业；铺路扩展网络；研发移除1–2块并耗铁；出售相连商人收购的商品并耗啤酒；贷款£30、收入下降3级；侦察弃3张换2张万能牌。也可弃牌跳过。</p><h3>时代结算</h3><p>产业翻面立即提升收入，时代结束按翻面产业和连接计分。运河后移除所有一级产业及运河；二级以上保留。铁路时代每条铁路耗煤，双铁路另需啤酒。最终轮不领取收入。</p><h3>联机测试</h3><p>房主创建房间，将8位房间码或邀请链接发给朋友。2–4人均可，未入座的位置可由规则AI补齐。房主需要保持页面开启。断线客人用原浏览器标签重连；房主离线后对局不能继续同步。</p><p>使用 WebRTC 与公共 PeerJS 信令服务，部分校园网、公司网或严格 NAT 可能无法直连。测试版由房主裁判；不含账号、排名和反作弊服务。AI是启发式规则AI，可完成两时代对局。</p><p><a href="rules.pdf" target="_blank" rel="noopener">打开官方英文规则</a></p></div>`);}
 async function host(){
  try{room?.destroy();room=new Room(roomEvent);mode='host';state=null;view=null;seat=0;showDialog('正在创建房间','<p class="modal-note">正在连接房间服务…</p>');await room.create(name(),count());}catch(e){toast(e.message);showDialog('房间连接失败',`<p class="error">${esc(e.message)}</p><p class="modal-note">可以关闭后使用本地规则 AI 对战。</p>`);}
 }
@@ -159,10 +160,10 @@ $('#mat-preview').onclick=()=>showDialog('玩家面板','<img class="modal-image
 $('#ai-hint').onclick=()=>{if(!state||!myTurn())return;toast('正在计算建议…');setTimeout(()=>{let a=selectAI(state,seat);if(a){showDialog('规则 AI 建议',`<p>${esc(actionLabel(a))}</p><p class="modal-note">按可得分产业、收入、运输网络与现金评估；建议不保证最优。</p><button id="use-hint" class="primary wide">采用建议</button>`);$('#use-hint').onclick=()=>{cardIndex=a.card||0;submit(a);};}},20);};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.9').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.10').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 $('#catalogue-close').onclick=()=>$('#card-catalogue').hidden=true;$('#card-catalogue').onmouseenter=()=>clearTimeout(catalogueTimer);$('#card-catalogue').onmouseleave=queueCatalogueClose;$('#card-catalogue').onfocusin=()=>clearTimeout(catalogueTimer);$('#card-catalogue').onfocusout=queueCatalogueClose;
 const directFlow=createDirectFlow({view:()=>view,seat:()=>seat,myTurn,actions:()=>actions,submit,showMyMat:()=>{matSeat=seat;renderMat();}});
-$('#hand-toggle').onclick=()=>{let panel=$('#hand-float');panel.classList.toggle('collapsed');$('#hand-toggle').textContent=panel.classList.contains('collapsed')?'展开手牌':'收起手牌';};
+
 init();

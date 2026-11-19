@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.9';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.10';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -17,13 +17,13 @@ test('full page restores a game, develops from mat before discarding, and update
  assert.equal($('#action-buttons [data-type="pass"]'),null);assert.equal($('#market-state'),null);
  assert.equal($('#journal-dropdown').hasAttribute('open'),false);assert.equal($('.sidebar #log'),null);
  assert.equal(document.querySelectorAll('.industry-resources.beer img').length,2);
- assert.equal($('#player-reserve').parentElement.className,'mat-workspace');
+ assert.equal($('#player-reserve').parentElement.className,'mat-workspace');assert.ok($('link[href^="refinement.css"]'));assert.ok($('link[href^="tabletop.css"]'));assert.equal($('#hand-toggle'),null);assert.equal(document.querySelectorAll('img[src*="piece-coin"]').length,0);assert.ok(document.querySelectorAll('img[src*="beer-white.svg"]').length>0);
  $('[data-pile="draw"]').onmouseenter();assert.equal($('#card-catalogue').hidden,false);assert.match($('#catalogue-heading').textContent,/普通牌 40张/);
  assert.ok(document.querySelectorAll('.catalogue-card .in-hand').length>0);$('#catalogue-close').onclick();assert.equal($('#card-catalogue').hidden,true);
  $('#menu-btn').onclick();assert.ok($('#pass-menu-btn'));$('#pass-menu-btn').onclick();assert.equal($('#modal').open,false);assert.match($('#flow-text').textContent,/跳过/);$('#flow-cancel').onclick();
  $('#action-buttons [data-type="develop"]').onclick();assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('flow-target'));
  let before=$('[data-mat-type="coalMine"][data-level="1"]').dataset.count;$('[data-mat-type="coalMine"][data-level="1"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);
- $('#flow-finish').onclick();assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));$('[data-card="0"]').onclick();
+ assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));$('[data-card="0"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);$('#flow-finish').onclick();
  assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,'0');assert.equal(JSON.parse(store.get('brass-night-save-v1')).players[0].stacks.coalMine[0],2);
  assert.equal($('#modal').open,false);assert.match($('#flow-text').textContent,/先选择行动/);assert.ok(document.querySelectorAll('.catalogue-card .seen').length>0);
  for(const [n,draw,total] of [[3,27,54],[4,28,64]]){

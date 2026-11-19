@@ -4,16 +4,12 @@ const portraits=['watt','brunel','arkwright','bessemer'];
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const at=([x,y])=>`left:${x*100}%;top:${y*100}%`;
 export function coins(amount){let n=Math.max(0,Math.floor(amount)),list=[];for(let value of [15,5,1])while(n>=value){list.push(value);n-=value;}return list;}
-export function coinPiece(value,{payment=false,index=0}={}){
- const style=payment?` style="--coin-x:${index%3};--coin-y:${Math.floor(index/3)}"`:'';
- return `<span class="physical-coin${payment?' payment-coin':''}" data-value="${value}"${style}><img src="assets/pieces/piece-coin-${value}.webp" alt="${payment?'本轮花费 ':''}£${value}"><b aria-hidden="true">${value}</b></span>`;
-}
 export function boardPieces(view,layout){
  let html='';
  view.order.forEach((id,index)=>{
   let p=view.players[id],pos=layout.turnOrder[index],label=`第${index+1}位 ${p.name}，本轮花费 £${p.spent}`;
   html+=`<div class="turn-character ${view.order[view.turn]===id&&!view.gameOver?'current':''}" style="${at(pos)};--piece-color:var(--${colors[id]})" title="${safe(label)}" aria-label="${safe(label)}"><img class="character-face" src="assets/pieces/piece-character-${portraits[id]}.webp" alt="${safe(p.name)}的行动顺序头像"></div>`;
-  html+=`<div class="turn-payment" style="${at(layout.turnSpend[index])}" data-spent="${p.spent}" title="${safe(label)}">${coins(p.spent).map((v,i)=>coinPiece(v,{payment:true,index:i})).join('')}<span class="payment-total">£${p.spent}</span></div>`;
+  html+=`<div class="turn-payment" style="${at(layout.turnSpend[index])}" data-spent="${p.spent}" title="${safe(label)}"><span class="payment-total">£${p.spent}</span></div>`;
  });
  let groups=new Map();for(let p of view.players)for(let kind of ['vp','income']){
   let value=kind==='vp'?p.vp:p.income,space=kind==='vp'?((value%100)+100)%100:Math.min(99,Math.max(0,value)),pos=layout.track[String(space)];if(!pos)continue;
@@ -29,10 +25,10 @@ export function routePieces(view,layout,connections){
   let loc=layout.routes[c.id]?.eras?.[view.era]||layout.routes[c.id];if(!loc)return '';let owner=view.links[c.id]?.owner;
   const tangent=loc.tangent,angle=tangent?Math.atan2(tangent[1][1]-tangent[0][1],tangent[1][0]-tangent[0][0])*180/Math.PI:loc.angle;
   let label=`${c.from}—${c.to}${owner!==undefined?'：'+view.players[owner].name:''}`;
-  return `<button class="route-piece ${owner===undefined?'route-empty':'route-placed'}" data-route="${c.id}" data-route-era="${view.era}" style="${at(loc.center)};--angle:${angle}deg;${loc.width?'width:'+loc.width+'%;':''}" title="${safe(label)}" aria-label="${safe(label)}">${owner!==undefined?`<img src="assets/pieces/piece-link-${colors[owner]}-${view.era}.webp" alt="${view.era==='canal'?'运河':'铁路'}连接板块">`:'<span></span>'}</button>`;
+  return `<button class="route-piece ${owner===undefined?'route-empty':'route-placed'}" data-route="${c.id}" data-route-era="${view.era}" style="${at(loc.center)};--angle:${angle}deg;${loc.width?'width:'+loc.width+'%;height:'+(loc.width*5/9)+'%;':''}" title="${safe(label)}" aria-label="${safe(label)}">${owner!==undefined?`<img src="assets/pieces/piece-link-${colors[owner]}-${view.era}.webp" alt="${view.era==='canal'?'运河':'铁路'}连接板块">`:'<span></span>'}</button>`;
  }).join('');
 }
 export function playerReserve(p,era){
  let left=14-p.linkCount;
- return `<div class="reserve-links" aria-label="剩余${left}枚${era==='canal'?'运河':'铁路'}连接板块"><strong>${era==='canal'?'运河':'铁路'}连接板块 · 剩余 ${left}/14</strong><div class="link-reserve-pieces">${Array.from({length:left},(_,i)=>`<img style="--reserve-i:${i}" src="assets/pieces/piece-link-${colors[p.id]}-${era}.webp" alt="备用连接板块">`).join('')}</div></div><div class="player-purse"><strong>现金 £${p.money}</strong><div>${coins(p.money).map(v=>coinPiece(v)).join('')}</div></div>`;
+ return `<div class="reserve-links" aria-label="剩余${left}枚${era==='canal'?'运河':'铁路'}连接板块"><strong>${era==='canal'?'运河':'铁路'}连接板块 · 剩余 ${left}/14</strong><div class="link-reserve-pieces">${Array.from({length:left},(_,i)=>`<img style="--reserve-i:${i}" src="assets/pieces/piece-link-${colors[p.id]}-${era}.webp" alt="备用连接板块">`).join('')}</div></div><div class="player-purse"><strong>现金</strong><div class="cash-amount">£${p.money}</div></div>`;
 }

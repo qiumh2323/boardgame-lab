@@ -1,4 +1,4 @@
-import {legalActions,applyAction,network,tileData,isGoods,distances,F,income,nextTile,current,ends} from './engine.js?v=0.9';
+import {legalActions,applyAction,network,tileData,isGoods,distances,F,income,nextTile,current,ends} from './engine.js?v=0.10';
 
 // Rule-based heuristic: only public board data and the acting player's hand.
 // No access to the draw order or opponents' cards is used in evaluation.
