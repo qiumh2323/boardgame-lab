@@ -1,12 +1,31 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,applyAction,legalActions,current,publicView,income,incomeTop,network,distances,F,clone,TYPES,estimateEraScore} from '../brass-birmingham/engine.js?v=0.26';
-import {selectAI} from '../brass-birmingham/ai.js?v=0.26';
+import {configure,createGame,applyAction,legalActions,current,publicView,income,incomeTop,network,distances,F,clone,TYPES,estimateEraScore} from '../brass-birmingham/engine.js?v=0.27';
+import {selectAI} from '../brass-birmingham/ai.js?v=0.27';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 function fresh(n=2){let s=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),87);s.order=s.players.map(p=>p.id);return s;}
 function play(s,a){let r=applyAction(s,current(s),a,{auto:true});assert.ok(r.ok,r.error);return r.state;}
 function tile(owner,type,level=1,resource=0,flipped=false){return {owner,type,level,resource,flipped};}
+test('merchant setup uses marked slots and gives beer only to non-blank tiles',()=>{
+ const groups=[
+  [2,[1,2,2,0,0],{blank:2,any:1,cottonMill:1,manufacturer:1}],
+  [3,[1,2,2,2,0],{blank:3,any:1,cottonMill:1,manufacturer:1,pottery:1}],
+  [4,[1,2,2,2,2],{blank:3,any:1,cottonMill:2,manufacturer:2,pottery:1}]
+ ];
+ const cities=['shrewsbury','gloucester','oxford','warrington','nottingham'];
+ for(const [size,slots,mix] of groups){
+  const game=createGame(Array.from({length:size},(_,i)=>`P${i}`),Array(size).fill(false),52);
+  assert.deepEqual(cities.map(city=>game.merchants.filter(m=>m.loc===city).length),slots);
+  const counts={};
+  for(const merchant of game.merchants){
+   counts[merchant.buys]=(counts[merchant.buys]??0)+1;
+   assert.equal(merchant.beer,merchant.buys!=='blank');
+  }
+  assert.deepEqual(counts,mix);
+ }
+});
+
 test('physical setup: 40/54/64 ordinary cards, 45 industry tiles per player',()=>{
  for(let [n,count]of [[2,40],[3,54],[4,64]]){let s=fresh(n);assert.equal(s.deck.length+s.players.reduce((t,p)=>t+p.hand.length,0)+s.hiddenDiscard.length,count);for(let p of s.players){assert.equal(p.money,17);assert.equal(p.income,10);assert.equal(Object.values(p.stacks).flat().length,45);}assert.equal(s.merchants.length,n===2?5:n===3?7:9);}
 });

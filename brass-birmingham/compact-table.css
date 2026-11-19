@@ -27,3 +27,47 @@ body.mat-focus #game .mat-workspace .player-reserve{position:static;width:100%;h
 @media(max-width:700px){body.board-focus #game .board-column,body.mat-focus #game .mat-panel{inset:104px 0 0;height:calc(100dvh - 104px)}body.board-focus #game #zoom-btn,body.mat-focus #game .mat-panel #mat-preview{top:114px}body.mat-focus #game .mat-panel .mat-workspace{width:calc(100vw - 24px);grid-template-columns:minmax(0,1fr) 64px}body.mat-focus #game .mat-panel .section-heading{width:calc(100vw - 24px)}}
 
 #game .mat-panel #mat-preview{top:7px;right:7px;width:28px;height:28px;padding:5px}
+
+/* Keep the switcher, mat and reserves on the same grid at every size. */
+#game .mat-panel .mat-workspace {
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 68px;
+ align-items:start;
+ column-gap:8px;
+ row-gap:5px;
+ padding:0;
+ height:auto;
+ max-height:none;
+ aspect-ratio:auto;
+}
+#game .mat-panel .mat-workspace > .section-heading {
+ grid-column:1 / -1;
+ width:100%;
+ height:auto;
+ min-height:0;
+}
+#game .mat-panel .mat-workspace > .mat-board {align-self:start}
+#game .mat-panel .mat-workspace > .player-reserve {
+ position:static;
+ inset:auto;
+ align-self:start;
+ width:100%;
+ height:auto;
+ padding:0 3px 3px;
+}
+#game .mat-panel .reserve-links > strong {line-height:1.25}
+#game .mat-board .mat-tile .mat-count {left:-5%;bottom:-5%;right:auto;top:auto}
+#game .mat-board .mat-tile.locked:not(.flow-target):not(.flow-selected) > img {
+ filter:grayscale(.93) saturate(.45) brightness(.73);
+}
+@media(min-width:1000px){
+ #game .mat-panel {grid-template-rows:minmax(0,1fr)}
+ #game .mat-panel .mat-workspace {width:min(100%,calc((100cqh - 44px)*1.2363 + 76px));margin:0 auto}
+}
+body.mat-focus #game .mat-panel .mat-workspace {
+ width:min(calc(100vw - 44px),calc((100dvh - 140px)*1.2363 + 76px));
+}
+@media(max-width:700px){
+ #game .mat-panel .mat-workspace {grid-template-columns:minmax(0,1fr) 64px}
+ body.mat-focus #game .mat-panel .mat-workspace {width:min(calc(100vw - 24px),calc((100dvh - 175px)*1.2363 + 72px))}
+}

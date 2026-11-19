@@ -838,33 +838,9 @@
     }
   },
   "merchantMix": {
-    "2": [
-      "blank",
-      "blank",
-      "any",
-      "cottonMill",
-      "manufacturer"
-    ],
-    "3": [
-      "blank",
-      "blank",
-      "any",
-      "cottonMill",
-      "manufacturer",
-      "pottery",
-      "manufacturer"
-    ],
-    "4": [
-      "blank",
-      "blank",
-      "any",
-      "cottonMill",
-      "manufacturer",
-      "pottery",
-      "manufacturer",
-      "any",
-      "cottonMill"
-    ]
+    "2": ["blank", "blank", "any", "cottonMill", "manufacturer"],
+    "3": ["blank", "blank", "any", "cottonMill", "manufacturer", "pottery", "blank"],
+    "4": ["blank", "blank", "any", "cottonMill", "manufacturer", "pottery", "blank", "manufacturer", "cottonMill"]
   },
   "connections": [
     {

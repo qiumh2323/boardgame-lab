@@ -1,4 +1,4 @@
-import {F,ZH,applyAction} from './engine.js?v=0.26';
+import {F,ZH,applyAction} from './engine.js?v=0.27';
 // City border order requested by the player: purple, yellow, red, blue, green.
 export const CITY_CARD_COLOUR_GROUPS=[
  ['birmingham','coventry','nuneaton','redditch'],

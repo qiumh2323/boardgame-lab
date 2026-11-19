@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {parseHTML} from 'linkedom';
 import {createDirectFlow} from '../brass-birmingham/direct-flow.js';
 import fs from 'node:fs';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.26';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.27';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));facts.connections.push({id:'a',from:'birmingham',to:'coventry'},{id:'b',from:'coventry',to:'nuneaton'});configure(facts);
 function setup(){
  const {document,window}=parseHTML(`<html><body><section id="hand-float"><button id="hand-toggle"></button>${[0,1,2,3].map(i=>`<button data-card="${i}"></button>`).join('')}</section><div id="flow-bar"><p id="flow-text"></p><div id="flow-options"></div><button id="flow-finish"></button><button id="flow-cancel"></button></div><div id="action-buttons">${['build','network','develop','sell','scout'].map(t=>`<button data-type="${t}"></button>`).join('')}</div><div id="mat-board"></div><button data-loc="birmingham" data-slot="0"></button><button data-loc="coventry" data-slot="0"></button><button data-loc="northern" data-slot="0"></button><button data-merchant="0"></button><button data-mat-type="coalMine" data-level="1"></button><button data-mat-type="coalMine" data-level="2"></button><button data-route="a"></button><button data-route="b"></button></body></html>`);

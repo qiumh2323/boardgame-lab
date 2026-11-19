@@ -1,12 +1,12 @@
-import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.26';
-import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.26';
-import {zoomButton,installDragPan} from './table-zoom.js?v=0.26';
-import {cardCatalogue} from './card-library.js?v=0.26';
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.26';
-import {selectAI} from './ai.js?v=0.26';
+import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.27';
+import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.27';
+import {zoomButton,installDragPan} from './table-zoom.js?v=0.27';
+import {cardCatalogue} from './card-library.js?v=0.27';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.27';
+import {selectAI} from './ai.js?v=0.27';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.26';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.26';
+import {createDirectFlow} from './direct-flow.js?v=0.27';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.27';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -67,7 +67,7 @@ function renderHand(){
  $('#hand-title').textContent=own?'你的手牌':p.name+'的手牌';
  $('#hand-count').textContent=own?`${p.hand.length}张 · 选择弃牌后确认执行`:`${p.handCount}张`;
  $('#hand').dataset.player=String(id);
- $('#hand').innerHTML=own?sortedHand(p.hand).map(({card:c,index:i})=>`<button class="card" data-card="${i}" aria-pressed="false" title="${esc(cardName(c))}"><img src="${cardUrl(c)}" alt="${esc(cardName(c))}"><span>${esc(cardName(c))}</span></button>`).join(''):Array.from({length:p.handCount},(_,i)=>`<div class="card card-back" data-card-back="${i}" aria-label="${esc(p.name)}的手牌背面"><img src="assets/cards/piece-card-back.webp" alt="手牌背面"></div>`).join('');
+ $('#hand').innerHTML=own?sortedHand(p.hand).map(({card:c,index:i})=>`<button class="card" data-card="${i}" aria-pressed="false" title="${esc(cardName(c))}"><img src="${cardUrl(c)}" alt="${esc(cardName(c))}"><span class="hand-card-name" aria-hidden="true">${esc(cardName(c))}</span></button>`).join(''):Array.from({length:p.handCount},(_,i)=>`<div class="card card-back" data-card-back="${i}" aria-label="${esc(p.name)}的手牌背面"><img src="assets/cards/piece-card-back.webp" alt="手牌背面"></div>`).join('');
 }
 
 
@@ -238,7 +238,7 @@ setTableZoom(null);
 $('#action-history-btn').onclick=()=>{showDialog('行动记录','');renderActionHistory();};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.26').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json?v=0.27').then(r=>r.json()),fetch('layout.json?v=0.27').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 $('#card-catalogue').onmouseenter=()=>{catalogueHovered=true;clearTimeout(catalogueTimer);};$('#card-catalogue').onmouseleave=()=>{catalogueHovered=false;queueCatalogueClose();};
