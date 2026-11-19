@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,publicView} from '../brass-birmingham/engine.js?v=0.24';
+import {configure,createGame,publicView} from '../brass-birmingham/engine.js?v=0.25';
 import {CITY_CARD_COLOUR_GROUPS,sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from '../brass-birmingham/interaction-help.js';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 function fresh(){const s=createGame(['You','AI'],[false,true],88);s.order=[0,1];s.round=2;s.players[0].money=100;return s;}
@@ -30,7 +30,7 @@ test('all city cards are covered once and sorted by border colour with duplicate
  assert.deepEqual([...CITY_CARD_COLOUR_GROUPS.flat()].sort(),Object.keys(facts.cities).sort());
  const hand=['derby','birmingham','cannock','coalbrookdale','stone','birmingham','belper','cannock'].map((loc,id)=>({kind:'location',loc,id}));
  const before=structuredClone(hand),result=sortedHand(hand);
- assert.deepEqual(result.map(x=>x.card.loc),['coalbrookdale','cannock','cannock','birmingham','birmingham','stone','belper','derby']);
+ assert.deepEqual(result.map(x=>x.card.loc),['birmingham','birmingham','coalbrookdale','cannock','cannock','stone','belper','derby']);
  for(const x of result)assert.equal(hand[x.index].id,x.card.id);assert.deepEqual(hand,before);
 });
 test('industry types and dual cards group deterministically even when dual type arrays differ in order',()=>{

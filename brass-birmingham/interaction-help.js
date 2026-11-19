@@ -1,9 +1,9 @@
-import {F,ZH,applyAction} from './engine.js?v=0.24';
-// Verified against the downloaded card borders: yellow, red, purple, blue, teal.
+import {F,ZH,applyAction} from './engine.js?v=0.25';
+// City border order requested by the player: purple, yellow, red, blue, green.
 export const CITY_CARD_COLOUR_GROUPS=[
+ ['birmingham','coventry','nuneaton','redditch'],
  ['coalbrookdale','dudley','kidderminster','wolverhampton','worcester'],
  ['burtonOnTrent','cannock','stafford','tamworth','walsall'],
- ['birmingham','coventry','nuneaton','redditch'],
  ['leek','stokeOnTrent','stone','uttoxeter'],
  ['belper','derby']
 ];
