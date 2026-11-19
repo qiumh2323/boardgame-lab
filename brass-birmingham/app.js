@@ -7,7 +7,7 @@ import {cardCatalogue} from './card-library.js?v=0.32';
 import {configure,F,TYPES,ZH,cityName,cardName,createDeck,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.32';
 import {selectAI} from './ai.js?v=0.32';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.36';
+import {createDirectFlow} from './direct-flow.js?v=0.38';
 import {boardPieces,routePieces,playerReserve,merchantTileStem,tablePieceAssets} from './table-pieces.js?v=0.33';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

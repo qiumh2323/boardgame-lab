@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import {configure,createGame} from '../brass-birmingham/engine.js?v=0.32';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));facts.connections.push({id:'a',from:'birmingham',to:'coventry'},{id:'b',from:'coventry',to:'nuneaton'});configure(facts);
 function setup(){
- const {document,window}=parseHTML(`<html><body><section id="hand-float"><button id="hand-toggle"></button>${[0,1,2,3].map(i=>`<button data-card="${i}"></button>`).join('')}</section><div id="flow-bar"><p id="flow-text"></p><div id="flow-options"></div><button id="flow-finish"></button><button id="flow-cancel"></button></div><div id="action-buttons">${['build','network','develop','sell','scout'].map(t=>`<button data-type="${t}"></button>`).join('')}</div><div id="mat-board"></div><button data-loc="birmingham" data-slot="0"></button><button data-loc="coventry" data-slot="0"></button><button data-loc="northern" data-slot="0"></button><button data-merchant="0"></button><button data-mat-type="coalMine" data-level="1"></button><button data-mat-type="coalMine" data-level="2"></button><button data-route="a"></button><button data-route="b"></button></body></html>`);
+ const {document,window}=parseHTML(`<html><body><section id="hand-float"><button id="hand-toggle"></button>${[0,1,2,3].map(i=>`<button data-card="${i}"></button>`).join('')}</section><div id="flow-bar"><p id="flow-text"></p><div id="flow-options"></div><button id="flow-finish"></button><button id="flow-cancel"></button></div><div id="action-buttons">${['build','network','develop','sell','scout'].map(t=>`<button data-type="${t}"></button>`).join('')}</div><div id="mat-board"></div><div id="industry-picker" hidden></div><button data-loc="birmingham" data-slot="0"></button><button data-loc="coventry" data-slot="0"></button><button data-loc="northern" data-slot="0"></button><button data-merchant="0"></button><button data-mat-type="coalMine" data-level="1"></button><button data-mat-type="coalMine" data-level="2"></button><button data-route="a"></button><button data-route="b"></button></body></html>`);
  globalThis.document=document;document.querySelector('#mat-board').scrollIntoView=()=>{};
  let view=createGame(['You','AI'],[false,true],34);view.order=[0,1];view.era='rail';view.round=2;view.players[0].stacks.coalMine=[1,2];view.board={'birmingham:0':{owner:0,type:'cottonMill',level:2,resource:0,flipped:false},'northern:0':{owner:0,type:'brewery',level:2,resource:2,flipped:false}};view.links={'birmingham-oxford':{owner:0}};view.merchants=[{id:0,loc:'oxford',buys:'any',beer:false}];let sent=[],acts=[
  {type:'build',loc:'birmingham',slot:0,industry:'cottonMill',card:1},{type:'build',loc:'coventry',slot:0,industry:'pottery',card:2},
@@ -20,7 +20,7 @@ function setup(){
 }
 test('build highlights union of all hand-supported slots before asking for a matching discard',()=>{
  let {flow,$,click,sent}=setup();flow.begin('build');assert.ok($('[data-loc="birmingham"]').classList.contains('flow-target'));assert.ok($('[data-loc="coventry"]').classList.contains('flow-target'));
- click('[data-loc="birmingham"]');assert.ok($('[data-card="1"]').classList.contains('discard-allowed'));assert.ok(!$('[data-card="2"]').classList.contains('discard-allowed'));click('[data-card="2"]');assert.equal(sent.length,0);click('[data-card="1"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'build',loc:'birmingham',slot:0,industry:'cottonMill',card:1});
+ click('[data-loc="birmingham"]');assert.equal($('#industry-picker').hidden,false);assert.equal($('#industry-picker').children.length,1);assert.ok(!$('[data-card="1"]').classList.contains('discard-allowed'));click('[data-industry-option="cottonMill"]');assert.ok($('[data-card="1"]').classList.contains('discard-allowed'));assert.ok(!$('[data-card="2"]').classList.contains('discard-allowed'));click('[data-card="2"]');assert.equal(sent.length,0);click('[data-card="1"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'build',loc:'birmingham',slot:0,industry:'cottonMill',card:1});
 });
 test('develop selects consecutive lowest tiles on the player mat then discards one card',()=>{
  let {flow,$,click,sent}=setup();flow.begin('develop');assert.ok($('[data-level="1"]').classList.contains('flow-target'));assert.ok(!$('[data-level="2"]').classList.contains('flow-target'));
@@ -63,7 +63,7 @@ test('breathing guidance marks only available actions while choosing an action',
 });
 
 test('deselecting a discard restores pending selection, hides confirm and resets accessibility state',()=>{
- const {flow,$,click,sent}=setup();flow.begin('build');click('[data-loc="birmingham"]');
+ const {flow,$,click,sent}=setup();flow.begin('build');click('[data-loc="birmingham"]');click('[data-industry-option="cottonMill"]');
  for(let i=0;i<3;i++){
   click('[data-card="1"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'true');assert.equal($('#flow-finish').hidden,false);
   click('[data-card="1"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'false');assert.ok(!$('[data-card="1"]').classList.contains('discard-picked'));assert.ok($('[data-card="1"]').classList.contains('discard-allowed'));assert.equal($('#flow-finish').hidden,true);

@@ -76,7 +76,6 @@ export function createDirectFlow(api){
    variants=list.filter(a=>a.industry===industry);discard();
    $('[data-card].discard-allowed')?.focus();
   };
-  if(types.length===1){pick(types[0]);return;}
   industryChoice={loc,slot,types,pick};stage='industry';paint();
   $('#industry-picker [data-industry-option]')?.focus();
  }
