@@ -20,13 +20,13 @@ test('all canal and rail pieces leave industry, merchant and market resource slo
   for(const [key,positions] of Object.entries(groups))positions.forEach((pos,i)=>obstacles.push({name:`${kind}:${key}:${i}`,shape:rect(pos,size,size)}));
  for(const [key,[x1,y1,x2,y2]] of Object.entries(layout.routeKeepouts))obstacles.push({name:'label:'+key,shape:rect([(x1+x2)/2,(y1+y2)/2],x2-x1,y2-y1)});
  for(const [key,route] of Object.entries(layout.routes))for(const [era,pose] of Object.entries(route.eras)){
-  const width=(pose.width||5.4)/100,shape=rect(pose.center,width,width*5/9,pose.angle);
+  const width=layout.routePieceWidth/100,shape=rect(pose.center,width,width*5/9,pose.angle);
   for(const obstacle of obstacles)assert.equal(overlaps(shape,obstacle.shape),false,`${era} ${key} overlaps ${obstacle.name}`);
  }
 });
 test('placed connection pieces do not cover another connection in either era',()=>{
  for(const era of ['canal','rail']){
-  const pieces=Object.entries(layout.routes).flatMap(([key,r])=>{const p=r.eras[era];return p?[{key,shape:rect(p.center,(p.width||5.4)/100,(p.width||5.4)/180,p.angle)}]:[];});
+  const pieces=Object.entries(layout.routes).flatMap(([key,r])=>{const p=r.eras[era];return p?[{key,shape:rect(p.center,layout.routePieceWidth/100,layout.routePieceWidth/180,p.angle)}]:[];});
   for(let i=0;i<pieces.length;i++)for(let j=i+1;j<pieces.length;j++)assert.equal(overlaps(pieces[i].shape,pieces[j].shape),false,`${era}: ${pieces[i].key} overlaps ${pieces[j].key}`);
  }
 });
@@ -36,7 +36,7 @@ test('Chinese labels cover every region and avoid board targets, names, connecti
  for(const [groups,size] of [[layout.slots,.0465],[layout.merchants,.0445],[layout.markets,.0168],[layout.merchantBeer,.033]])
   for(const [key,positions] of Object.entries(groups))positions.forEach((pos,i)=>obstacles.push({name:`${key}:${i}`,shape:rect(pos,size,size)}));
  for(const [key,[x1,y1,x2,y2]] of Object.entries(layout.routeKeepouts))obstacles.push({name:'English:'+key,shape:rect([(x1+x2)/2,(y1+y2)/2],x2-x1,y2-y1)});
- for(const [key,route] of Object.entries(layout.routes))for(const [era,p] of Object.entries(route.eras))obstacles.push({name:`${key}:${era}`,shape:rect(p.center,(p.width||5.4)/100,(p.width||5.4)/180,p.angle)});
+ for(const [key,route] of Object.entries(layout.routes))for(const [era,p] of Object.entries(route.eras))obstacles.push({name:`${key}:${era}`,shape:rect(p.center,layout.routePieceWidth/100,layout.routePieceWidth/180,p.angle)});
  for(const [key,pos] of Object.entries(layout.track))obstacles.push({name:'track:'+key,shape:rect(pos,.0215,.0215)});
  for(const [key,pos] of layout.turnOrder.entries())obstacles.push({name:'portrait:'+key,shape:rect(pos,.074,.074)});
  for(const [key,pos] of layout.turnSpend.entries())obstacles.push({name:'spent:'+key,shape:rect([pos[0],pos[1]+.0085],.067,.078)});

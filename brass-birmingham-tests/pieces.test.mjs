@@ -46,7 +46,7 @@ test('round expenditure has an independent position to the right of each portrai
 });
 
 test('southern fork link uses the vertical trunk in both eras',()=>{
- for(let era of ['canal','rail']){let pose=layout.routes['kidderminster-worcester'].eras[era];assert.equal(pose.angle,90);assert.ok(pose.center[0]*1400>465&&pose.center[0]*1400<495);assert.ok(pose.center[1]*1400>1140&&pose.center[1]*1400<1190);assert.ok(!pose.width||pose.width<=5.4);}
+ for(let era of ['canal','rail']){let pose=layout.routes['kidderminster-worcester'].eras[era];assert.equal(pose.angle,90);assert.ok(pose.center[0]*1400>465&&pose.center[0]*1400<495);assert.ok(pose.center[1]*1400>1140&&pose.center[1]*1400<1190);}
 });
 
 test('cash reserve and spent coins use real denominations that sum to their separate totals',()=>{
@@ -54,4 +54,15 @@ test('cash reserve and spent coins use real denominations that sum to their sepa
  const sum=html=>[...html.matchAll(/data-value="(\d+)"/g)].reduce((n,m)=>n+Number(m[1]),0);
  assert.equal(sum(playerReserve(s.players[0],'canal')),98);
  const html=boardPieces(s,layout);assert.equal(sum(html),23);assert.ok(html.includes('本轮花费 £15'));checkArt(html+playerReserve(s.players[0],'canal'));
+});
+
+
+test('every link renders at the same size across both eras',()=>{
+ const s=createGame(['A','B'],[false,false],43);
+ for(const era of ['canal','rail']){
+  const html=routePieces({...s,era},layout,facts.connections);
+  const sizes=[...html.matchAll(/width:([\d.]+%);height:([\d.]+%)/g)].map(m=>m[0]);
+  assert.equal(sizes.length,facts.connections.filter(route=>route[era]).length);
+  assert.deepEqual([...new Set(sizes)],[`width:${layout.routePieceWidth}%;height:${layout.routePieceWidth*5/9}%`]);
+ }
 });
