@@ -79,7 +79,7 @@
  grid-template-columns:var(--hand-label-width) minmax(0,1fr);
  grid-template-rows:minmax(0,1fr);
  align-items:start;
- column-gap:4px;
+ column-gap:clamp(8px,.65vw,11px);
  border:1px solid #556675;
 }
 #game #hand .card.discard-allowed {border-color:#efd18a}
@@ -106,6 +106,11 @@
  font-size:clamp(10px,.9vw,13px);
  line-height:1;
  white-space:nowrap;
+}
+@media(min-width:1000px){
+ /* The image's intrinsic size must not push the card row into the bottom padding. */
+ #game .hand-panel .hand {height:auto;grid-template-rows:minmax(0,1fr)}
+ #game #hand .card {min-height:0}
 }
 @media(max-width:999px){
  #game #hand .card > img {height:auto;aspect-ratio:215 / 300}
