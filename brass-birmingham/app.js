@@ -1,9 +1,9 @@
-import {cardCatalogue} from './card-library.js?v=0.10';
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.10';
-import {selectAI} from './ai.js?v=0.10';
+import {cardCatalogue} from './card-library.js?v=0.11';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.11';
+import {selectAI} from './ai.js?v=0.11';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.10';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.10';
+import {createDirectFlow} from './direct-flow.js?v=0.11';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.11';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -81,6 +81,7 @@ function renderBoard(){
  for(let resource of ['coal','iron']){let positions=layout.markets[resource],empty=positions.length-view[resource];for(let i=0;i<positions.length;i++){let [x,y]=positions[i];html+=`<span class="market-cube ${resource} ${i>=empty?'filled':'empty'}" style="left:${x*100}%;top:${y*100}%" title="${resource==='coal'?'煤':'铁'}市场 £${Math.floor(i/2)+1} ${i>=empty?'有货':'空位'}"></span>`;}}
  html+=boardPieces(view,layout)+routePieces(view,layout,F.connections);
  $('#board-tokens').innerHTML=html;
+ $('#board-labels').innerHTML=Object.entries(layout.cityLabels).map(([loc,p])=>`<span class="city-zh" data-city-label="${loc}" style="left:${p.center[0]*100}%;top:${p.center[1]*100}%;width:${p.width*100}%;height:${p.height*100}%;--label-font:${p.font/14}cqw">${esc(cityName(loc))}</span>`).join('');
  $('#board-tokens').querySelectorAll('[data-loc]').forEach(b=>b.onclick=()=>{let loc=b.dataset.loc,i=Number(b.dataset.slot),t=view.board[loc+':'+i];if(view.phase==='liquidation'){if(myTurn()&&t?.owner===seat)confirmAction({type:'liquidate',key:loc+':'+i});return;}if(myTurn()){selectedLocation=loc;openActions(selectedType==='sell'&&t?.owner===seat?'sell':'build',loc,i);}else if(t)toast(`${view.players[t.owner].name} · ${ZH[t.type]} ${t.level}级 · ${t.flipped?'已翻面':'未翻面'}${t.resource?' · 资源'+t.resource:''}`);});
  $('#board-tokens').querySelectorAll('[data-merchant]').forEach(b=>b.onclick=()=>{let m=view.merchants.find(m=>m.id===Number(b.dataset.merchant));toast(`${cityName(m.loc)}：${m.buys==='blank'?'不收商品':m.buys==='any'?'接收所有商品':'接收'+ZH[m.buys]}，${m.beer?'有商人啤酒':'没有商人啤酒'}`);});
  $('#board-tokens').querySelectorAll('[data-pile]').forEach(b=>b.onclick=()=>{if(b.dataset.pile!=='draw'&&myTurn())directFlow.begin('scout');else if(b.dataset.pile==='draw')openCatalogue();else toast(b.title);});
@@ -91,7 +92,7 @@ function renderBoard(){
 function renderMat(){
  let id=matSeat!==null&&view.players[matSeat]?matSeat:seat,p=view.players[id];
  $('#mat-player').style.setProperty('--mat-players',view.players.length);
- $('#mat-player').innerHTML=view.players.map(p=>`<button type="button" data-mat-player="${p.id}" aria-pressed="${p.id===id}" class="${p.id===id?'selected':''}" style="--owner:${COLORS[p.id]}" title="查看${esc(p.name)}的面板">${esc(p.name)}${p.id===seat?'（你）':''}</button>`).join('');
+ $('#mat-player').innerHTML=view.players.map(p=>`<button type="button" data-mat-player="${p.id}" aria-pressed="${p.id===id}" class="${p.id===id?'selected':''}" style="--owner:${COLORS[p.id]}" title="查看${esc(p.name)}的面板">玩家面板（${p.id===seat?'你':p.ai?'AI '+(view.players.filter(x=>x.ai).findIndex(x=>x.id===p.id)+1):esc(p.name)}）</button>`).join('');
  $('#mat-player').querySelectorAll('[data-mat-player]').forEach(b=>b.onclick=()=>{matSeat=Number(b.dataset.matPlayer);renderMat();directFlow.paint();});
  let html='';for(let type of TYPES)for(let d of F.industries[type]){let [x,y]=layout.playerMat.slots[type][d.level-1],count=p.stacks[type].filter(n=>n===d.level).length,isNext=nextTile(view,id,type)?.level===d.level&&count>0;
   html+=`<button class="mat-tile ${count?'':'depleted'} ${isNext?'next-tile':''}" data-mat-type="${type}" data-level="${d.level}" data-count="${count}" style="left:${x*100}%;top:${y*100}%;--owner:${COLORS[id]}" title="${esc(p.name)} ${ZH[type]} ${d.level}级，剩余${count}块；建造 £${d.cost}${d.costCoal?' 煤'+d.costCoal:''}${d.costIron?' 铁'+d.costIron:''}；${d.vp}VP，收入+${d.income}" aria-label="${ZH[type]}${d.level}级剩余${count}块">${count?`${Array.from({length:count-1},(_,i)=>`<img class="mat-under" style="--depth:${count-1-i}" src="${tileUrl(type,d.level,false,id)}" alt="">`).join('')}<img src="${tileUrl(type,d.level,false,id)}" alt="">`:''}<span class="mat-count">${count}</span>${isNext?'<span class="mat-next">下一块</span>':''}</button>`;
@@ -155,12 +156,16 @@ function renderLobby(){
 }
 function menu(){showDialog('对局菜单',`<div class="option-list">${view?'<button id="export-btn">导出对局存档</button>':''}${myTurn()&&view.phase==='play'?'<button id="pass-menu-btn">弃1张牌跳过行动</button>':''}${mode==='guest'?'<button id="reconnect-btn">重新连接房主</button>':''}${view?.gameOver?'<button id="results-btn">查看最终结算</button>':''}<button id="back-btn">返回开局界面</button></div><p class="modal-note">本地及房主对局自动存档。联机客人不保存其他玩家的手牌。</p>`);if($('#pass-menu-btn'))$('#pass-menu-btn').onclick=()=>{modal.close();directFlow.begin('pass');};if($('#export-btn'))$('#export-btn').onclick=()=>{let data=mode==='guest'?view:state,blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brass-night-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('存档已导出');};if($('#reconnect-btn'))$('#reconnect-btn').onclick=()=>{room.connect();modal.close();};if($('#results-btn'))$('#results-btn').onclick=showResults;$('#back-btn').onclick=()=>{clearTimeout(aiTimer);room?.destroy();room=null;state=null;view=null;directFlow.reset();mode='local';$('main').hidden=true;$('.lobby').hidden=false;$('#connection-status').textContent='本地对局';$('#resume-btn').hidden=!saveAvailable;modal.close();};}
 $('#ai-start').onclick=()=>startLocal(count());$('#host-btn').onclick=host;$('#join-btn').onclick=()=>joinDialog();$('#help-btn').onclick=help;$('#menu-btn').onclick=menu;
-$('#zoom-btn').onclick=()=>{document.body.classList.toggle('board-focus');$('#zoom-btn').textContent=document.body.classList.contains('board-focus')?'返回同屏布局':'放大棋盘';};
-$('#mat-preview').onclick=()=>showDialog('玩家面板','<img class="modal-image" src="assets/player-mat-night.webp?v=0.2" alt="完整玩家面板"><p class="modal-note">实际剩余板块以对局下方产业面板为准。</p>');
+$('#zoom-btn').onclick=()=>{let enlarged=document.body.classList.toggle('board-focus');$('#zoom-btn').setAttribute('aria-pressed',String(enlarged));$('#zoom-btn').setAttribute('aria-label',enlarged?'缩小地图':'放大地图');$('#zoom-btn').title=enlarged?'缩小地图':'放大地图';};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('board-focus');$('#zoom-btn').setAttribute('aria-pressed','false');$('#zoom-btn').setAttribute('aria-label','放大地图');$('#zoom-btn').title='放大地图';}});
+$('#mat-preview').onclick=()=>{
+ let board=$('#mat-board').cloneNode(true);board.removeAttribute('id');board.classList.add('mat-enlarged');board.querySelector('.corner-zoom')?.remove();board.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));board.querySelectorAll('button').forEach(e=>{e.disabled=true;e.removeAttribute('data-mat-type');});
+ let id=matSeat!==null&&view.players[matSeat]?matSeat:seat;showDialog(`${view.players[id].name}的玩家面板`,board.outerHTML);
+};
 $('#ai-hint').onclick=()=>{if(!state||!myTurn())return;toast('正在计算建议…');setTimeout(()=>{let a=selectAI(state,seat);if(a){showDialog('规则 AI 建议',`<p>${esc(actionLabel(a))}</p><p class="modal-note">按可得分产业、收入、运输网络与现金评估；建议不保证最优。</p><button id="use-hint" class="primary wide">采用建议</button>`);$('#use-hint').onclick=()=>{cardIndex=a.card||0;submit(a);};}},20);};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.10').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.11').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 $('#catalogue-close').onclick=()=>$('#card-catalogue').hidden=true;$('#card-catalogue').onmouseenter=()=>clearTimeout(catalogueTimer);$('#card-catalogue').onmouseleave=queueCatalogueClose;$('#card-catalogue').onfocusin=()=>clearTimeout(catalogueTimer);$('#card-catalogue').onfocusout=queueCatalogueClose;

@@ -2,7 +2,7 @@
 export let F;
 export const TYPES=['cottonMill','coalMine','ironWorks','manufacturer','pottery','brewery'];
 export const ZH={cottonMill:'棉纺厂',coalMine:'煤矿',ironWorks:'铁厂',manufacturer:'制造厂',pottery:'陶器厂',brewery:'酿酒厂'};
-export const CITY_ZH={birmingham:'伯明翰',coventry:'考文垂',dudley:'达德利',walsall:'沃尔索尔',wolverhampton:'伍尔弗汉普顿',coalbrookdale:'科尔布鲁克代尔',kidderminster:'基德明斯特',worcester:'伍斯特',redditch:'雷迪奇',cannock:'坎诺克',tamworth:'塔姆沃思',stafford:'斯塔福德',burtonOnTrent:'特伦特河畔伯顿',nuneaton:'纽尼顿',stone:'斯通',stokeOnTrent:'特伦特河畔斯托克',uttoxeter:'尤托克西特',leek:'利克',belper:'贝尔珀',derby:'德比',northern:'北部农场',southern:'南部农场',shrewsbury:'什鲁斯伯里',gloucester:'格洛斯特',oxford:'牛津',warrington:'沃灵顿',nottingham:'诺丁汉'};
+export const CITY_ZH={birmingham:'伯明翰',coventry:'考文垂',dudley:'达德利',walsall:'沃尔索尔',wolverhampton:'伍尔弗汉普顿',coalbrookdale:'科尔布鲁克代尔',kidderminster:'基德明斯特',worcester:'伍斯特',redditch:'雷迪奇',cannock:'坎诺克',tamworth:'塔姆沃思',stafford:'斯塔福德',burtonOnTrent:'特伦特河畔伯顿',nuneaton:'纳尼顿',stone:'斯通',stokeOnTrent:'特伦特河畔斯托克',uttoxeter:'尤托克西特',leek:'利克',belper:'贝尔珀',derby:'德比',northern:'北部农场',southern:'南部农场',shrewsbury:'什鲁斯伯里',gloucester:'格洛斯特',oxford:'牛津',warrington:'沃灵顿',nottingham:'诺丁汉'};
 export const cityName=id=>CITY_ZH[id]||id;
 export const clone=x=>structuredClone(x);
 export function configure(f){F=f;}

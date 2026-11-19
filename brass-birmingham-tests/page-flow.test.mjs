@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.10';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.11';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -14,6 +14,12 @@ test('full page restores a game, develops from mat before discarding, and update
  let $=q=>document.querySelector(q);$('#resume-btn').onclick();
  assert.equal($('#hand-float').hidden,false);assert.equal(document.querySelectorAll('#hand [data-card]').length,8);assert.equal(document.querySelectorAll('.score-estimate').length,2);assert.equal($('.score-estimate').textContent,'0');assert.equal($('#mat-player').tagName,'DIV');assert.equal(document.querySelectorAll('[data-mat-player]').length,2);let trackBefore=$('.track-token.vp').getAttribute('data-track-space');$('[data-mat-player="1"]').onclick();assert.ok($('#mat-tokens').innerHTML.includes('tile-purple-'));assert.equal($('[data-mat-player="1"]').getAttribute('aria-pressed'),'true');$('[data-mat-player="0"]').onclick();assert.equal($('.track-token.vp').getAttribute('data-track-space'),trackBefore);assert.equal(document.querySelectorAll('.mat-tile').length,29);
 
+
+ assert.equal($('#game > .game-status'),null);assert.ok($('.sidebar').firstElementChild.classList.contains('dock-status'));assert.ok($('link[href^="localization.css"]'));
+ assert.equal($('#zoom-btn').parentElement.id,'board-wrap');assert.equal($('#mat-preview').parentElement.id,'mat-board');assert.equal(document.querySelectorAll('[data-city-label]').length,27);assert.equal($('[data-city-label="nuneaton"]').textContent,'纳尼顿');
+ assert.equal($('[data-mat-player="0"]').textContent,'玩家面板（你）');assert.equal($('[data-mat-player="1"]').textContent,'玩家面板（AI 1）');
+ $('#zoom-btn').onclick();assert.ok(document.body.classList.contains('board-focus'));assert.equal($('#zoom-btn').getAttribute('aria-pressed'),'true');assert.ok($('#zoom-btn svg'));$('#zoom-btn').onclick();assert.ok(!document.body.classList.contains('board-focus'));
+ $('#mat-preview').onclick();assert.equal($('#modal').open,true);assert.ok($('#modal-content .mat-enlarged').innerHTML.includes('tile-yellow-'));assert.equal(document.querySelectorAll('#modal-content .mat-count').length,29);assert.equal($('#modal-content #mat-tokens'),null);$('#modal-close').onclick();
  assert.equal($('#action-buttons [data-type="pass"]'),null);assert.equal($('#market-state'),null);
  assert.equal($('#journal-dropdown').hasAttribute('open'),false);assert.equal($('.sidebar #log'),null);
  assert.equal(document.querySelectorAll('.industry-resources.beer img').length,2);

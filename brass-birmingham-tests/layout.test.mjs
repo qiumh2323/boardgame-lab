@@ -30,3 +30,16 @@ test('placed connection pieces do not cover another connection in either era',()
   for(let i=0;i<pieces.length;i++)for(let j=i+1;j<pieces.length;j++)assert.equal(overlaps(pieces[i].shape,pieces[j].shape),false,`${era}: ${pieces[i].key} overlaps ${pieces[j].key}`);
  }
 });
+test('Chinese labels cover every region and avoid board targets, names, connections and other Chinese labels',()=>{
+ assert.deepEqual(Object.keys(layout.cityLabels).sort(),Object.keys(layout.anchors).sort());
+ const obstacles=[];
+ for(const [groups,size] of [[layout.slots,.0425],[layout.merchants,.0425],[layout.markets,.0148],[layout.merchantBeer,.031]])
+  for(const [key,positions] of Object.entries(groups))positions.forEach((pos,i)=>obstacles.push({name:`${key}:${i}`,shape:rect(pos,size,size)}));
+ for(const [key,[x1,y1,x2,y2]] of Object.entries(layout.routeKeepouts))obstacles.push({name:'English:'+key,shape:rect([(x1+x2)/2,(y1+y2)/2],x2-x1,y2-y1)});
+ for(const [key,route] of Object.entries(layout.routes))for(const [era,p] of Object.entries(route.eras))obstacles.push({name:`${key}:${era}`,shape:rect(p.center,(p.width||5.4)/100,(p.width||5.4)/180,p.angle)});
+ for(const [key,p] of Object.entries(layout.cityLabels)){
+  const shape=rect(p.center,p.width,p.height);
+  for(const obstacle of obstacles)assert.equal(overlaps(shape,obstacle.shape),false,`${key} label overlaps ${obstacle.name}`);
+  obstacles.push({name:'Chinese:'+key,shape});
+ }
+});
