@@ -1,26 +1,26 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#15212b"><title>工业革命：伯明翰 · 夜间对战</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="table.css?v=0.5"><link rel="stylesheet" href="flow.css?v=0.4"><link rel="stylesheet" href="alignment.css?v=0.5"><link rel="stylesheet" href="workspace.css?v=0.8"><link rel="stylesheet" href="dock.css?v=0.8"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#15212b"><title>工业革命：伯明翰 · 在线对战</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="table.css?v=0.5"><link rel="stylesheet" href="flow.css?v=0.4"><link rel="stylesheet" href="alignment.css?v=0.5"><link rel="stylesheet" href="workspace.css?v=0.9"><link rel="stylesheet" href="dock.css?v=0.9"></head>
 <body>
-<header class="topbar"><a class="brand" href="./"><span class="seal">B</span><span>工业革命：伯明翰<small>夜间对战 · 测试版 0.8</small></span></a><nav><span id="connection-status" role="status">本地对局</span><details class="journal" id="journal-dropdown"><summary>对局记录</summary><ol id="log"></ol></details><button id="help-btn" class="quiet">玩法与规则</button><button id="menu-btn" class="quiet">对局菜单</button></nav></header>
+<header class="topbar"><a class="brand" href="./"><span class="seal">B</span><span>工业革命：伯明翰<small>在线对战 · 测试版 0.9</small></span></a><nav><span id="connection-status" role="status">本地对局</span><details class="journal" id="journal-dropdown"><summary>对局记录</summary><ol id="log"></ol></details><button id="help-btn" class="quiet">玩法与规则</button><button id="menu-btn" class="quiet">对局菜单</button></nav></header>
 <section id="lobby" class="lobby">
  <div class="lobby-copy"><p class="period">黑乡，1770—1870</p><h1>点亮你的<br>工业版图。</h1><p class="intro">沿运河铺路，让煤炭与啤酒流动。<br>从第一座工厂，走向铁路时代。</p>
  <div class="setup-controls"><label>你的名字<input id="player-name" maxlength="18" value="玩家" autocomplete="nickname"></label><label>对局人数<select id="player-count"><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option></select></label></div>
  <button id="ai-start" class="primary wide">与规则 AI 开始对局</button><div class="lobby-actions"><button id="host-btn">创建联机房间</button><button id="join-btn">加入房间</button></div><button id="resume-btn" class="quiet wide" hidden>继续上次本地对局</button>
  <p class="lobby-note">完整双时代 · 合法行动校验 · 2—4人<br>联机时请房主保持页面开启。</p></div>
- <figure class="lobby-board"><img src="assets/board-night.webp" alt="伯明翰完整夜间棋盘"><figcaption>运河时代 1770—1830 / 铁路时代 1830—1870</figcaption></figure>
+ <figure class="lobby-board"><img src="assets/board-night.webp" alt="伯明翰完整棋盘"><figcaption>运河时代 1770—1830 / 铁路时代 1830—1870</figcaption></figure>
 </section>
 <main id="game" hidden>
  <div class="game-status"><div><strong id="era-label"></strong><span id="round-label"></span></div><div id="turn-label" aria-live="polite"></div><button id="zoom-btn" class="quiet">放大棋盘</button></div>
- <div class="table-layout"><section class="board-column"><div class="board-wrap" id="board-wrap"><img class="board-art" src="assets/board-night.webp" alt="夜间棋盘"><svg id="route-layer" viewBox="0 0 1000 1000" aria-label="连接线路"></svg><div id="board-tokens"></div></div><div id="board-caption">点击城市产业位查看可执行行动</div></section>
+ <div class="table-layout"><section class="board-column"><div class="board-wrap" id="board-wrap"><img class="board-art" src="assets/board-night.webp" alt="棋盘"><svg id="route-layer" viewBox="0 0 1000 1000" aria-label="连接线路"></svg><div id="board-tokens"></div></div><div id="board-caption">点击城市产业位查看可执行行动</div></section>
  <aside class="sidebar"><section id="players" aria-label="玩家状态"></section><section class="action-panel"><h2>本次行动</h2><p id="action-hint"></p><div id="action-buttons" class="action-buttons"></div><button id="ai-hint" class="quiet wide">规则 AI 建议</button></section></aside></div>
  <section class="hand-panel" id="hand-float" hidden><div class="section-heading"><h2 id="hand-title">你的手牌</h2><span id="hand-count"></span><button id="hand-toggle" class="quiet">收起手牌</button></div><div id="hand" class="hand"></div></section>
- <section class="mat-panel"><div class="section-heading"><h2>夜间玩家面板</h2><select id="mat-player" aria-label="查看玩家产业面板"></select><button id="mat-preview" class="quiet">查看面板原图</button></div><div class="mat-workspace"><div id="mat-board" class="mat-board"><img class="mat-art" src="assets/player-mat-night.webp?v=0.2" alt="完整夜间玩家产业面板"><div id="mat-tokens"></div></div><div id="player-reserve" class="player-reserve"></div></div><div id="mat-stacks" class="mat-stacks"></div></section>
+ <section class="mat-panel"><div class="section-heading"><h2>玩家面板</h2><div id="mat-player" class="mat-player-buttons" role="group" aria-label="查看玩家产业面板"></div><button id="mat-preview" class="quiet">查看面板原图</button></div><div class="mat-workspace"><div id="mat-board" class="mat-board"><img class="mat-art" src="assets/player-mat-night.webp?v=0.2" alt="完整玩家产业面板"><div id="mat-tokens"></div></div><div id="player-reserve" class="player-reserve"></div></div><div id="mat-stacks" class="mat-stacks"></div></section>
 </main>
 <footer>个人测试项目 · 游戏与美术归 Roxley 及原作者所有 · <a href="NOTICE.txt" target="_blank" rel="noopener">来源与说明</a> · <a href="rules.pdf" target="_blank" rel="noopener">官方英文规则</a></footer>
 <dialog id="modal"><div class="dialog-heading"><h2 id="modal-title"></h2><button id="modal-close" class="quiet" aria-label="关闭">✕</button></div><div id="modal-content"></div></dialog>
 <section id="flow-bar" hidden aria-live="polite"><p id="flow-text"></p><div id="flow-options"></div><div class="flow-controls"><button id="flow-finish" class="primary" hidden>完成选择，选择弃牌</button><button id="flow-cancel" hidden>取消行动</button></div></section>
 <section id="card-catalogue" class="card-catalogue" hidden aria-label="牌组构成"><div class="catalogue-toolbar"><h2 id="catalogue-heading"></h2><button id="catalogue-close" aria-label="关闭牌组清单">✕</button></div><p>展示牌组构成；标记自己手牌和公开出现的牌，不显示牌序或他人手牌。</p><div id="catalogue-cards"></div></section>
 <div id="toast" role="status" hidden></div>
-<script src="vendor/peerjs.min.js"></script><script type="module" src="app.js?v=0.8"></script>
+<script src="vendor/peerjs.min.js"></script><script type="module" src="app.js?v=0.9"></script>
 </body></html>

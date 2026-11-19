@@ -1,6 +1,6 @@
 /* Desktop table: board, player mat and action rail stay in one viewport. */
 .board-focus #game .board-column{position:fixed;inset:54px 0 0;width:100vw;height:calc(100dvh - 54px);z-index:40;display:flex;align-items:center;justify-content:center;background:#15212bf7;overflow:hidden}.board-focus #game .board-wrap{width:min(calc(100vw - 20px),calc(100dvh - 74px));height:min(calc(100vw - 20px),calc(100dvh - 74px));max-width:none;max-height:none;aspect-ratio:1;flex:none}.board-focus #zoom-btn{position:fixed;right:16px;top:12px;z-index:50;background:#3c5060;border:1px solid #d2bb88}
-.route-piece{width:7.8%;height:4.3333%}.route-piece img{object-fit:contain}.hand-panel .card{flex-basis:100px}.hand-panel .card img{height:136px}.hand-panel .card span{font-size:11px;min-height:29px}.hand-panel .card{opacity:1}.mat-panel .section-heading{flex-wrap:wrap}.mat-board .mat-tile .mat-count{font-size:14cqw}
+.route-piece{width:6.6%;height:3.6667%}.route-piece img{object-fit:contain}.hand-panel .card{flex-basis:100px}.hand-panel .card img{height:136px}.hand-panel .card span{font-size:11px;min-height:29px}.hand-panel .card{opacity:1}.mat-panel .section-heading{flex-wrap:wrap}.mat-board .mat-tile .mat-count{font-size:14cqw}
 @media(min-width:1100px){
  body:has(#game:not([hidden])){height:100dvh;overflow:hidden}
  body:has(#game:not([hidden]))>.topbar{height:53px;padding:7px 16px}.topbar .seal{width:32px;height:32px;font-size:25px}.brand{font-size:17px}.brand small{margin-top:2px;font-size:10px}
@@ -15,7 +15,7 @@
 }
 @media(min-width:1100px) and (max-height:760px){#game:not([hidden]){grid-template-rows:28px minmax(0,1fr) clamp(150px,22vh,180px)}.hand-panel .card img{height:auto;max-height:calc(clamp(150px,22vh,180px) - 69px)}.player-reserve{max-height:52px}.mat-panel #mat-preview{display:none}.journal{display:none}#flow-bar{max-height:190px}.action-panel h2{display:none}}
 @media(max-width:1099px) and (min-width:701px){.table-layout{grid-template-columns:minmax(0,1fr) 230px}.board-wrap{max-width:calc(100dvh - 95px)}.hand-panel{width:min(760px,calc(100vw - 340px))}.hand-panel .card{flex-basis:100px}.hand-panel .card img{height:136px}}
-@media(max-width:700px){.route-piece{width:7.8%;height:4.3333%}.hand-panel .card{flex-basis:72px}.hand-panel .card img{height:98px}.hand-panel .card span{font-size:9px;min-height:24px}#flow-bar{bottom:178px}main{padding-bottom:285px}}
+@media(max-width:700px){.route-piece{width:6.6%;height:3.6667%}.hand-panel .card{flex-basis:72px}.hand-panel .card img{height:98px}.hand-panel .card span{font-size:9px;min-height:24px}#flow-bar{bottom:178px}main{padding-bottom:285px}}
 
 /* Score preview is separate from the physical score track. */
 .estimate-note{font-size:10px;line-height:1.5;color:#c0b18f;margin:0 0 7px}.score-estimate{grid-column:1/-1;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;padding:4px 0;border-top:1px solid #ffffff12}.score-estimate strong{color:#f2d590;font-size:12px}.score-estimate span,.score-estimate small{font-size:10px;color:#afbdc7}.score-estimate small{width:100%}
