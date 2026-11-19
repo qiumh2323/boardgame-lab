@@ -4,12 +4,15 @@ const portraits=['watt','brunel','arkwright','bessemer'];
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const at=([x,y])=>`left:${x*100}%;top:${y*100}%`;
 export function coins(amount){let n=Math.max(0,Math.floor(amount)),list=[];for(let value of [15,5,1])while(n>=value){list.push(value);n-=value;}return list;}
+export function coinPiece(value,{payment=false,index=0}={}){
+ return `<span class="physical-coin${payment?' payment-coin':''}" data-value="${value}"${payment?` style="--coin-x:${index%3};--coin-y:${Math.floor(index/3)}"`:''} title="£${value}"><img src="assets/pieces/piece-coin-${value}.webp" alt="${payment?'本轮花费 ':''}£${value}"></span>`;
+}
 export function boardPieces(view,layout){
  let html='';
  view.order.forEach((id,index)=>{
   let p=view.players[id],pos=layout.turnOrder[index],label=`第${index+1}位 ${p.name}，本轮花费 £${p.spent}`;
   html+=`<div class="turn-character ${view.order[view.turn]===id&&!view.gameOver?'current':''}" style="${at(pos)};--piece-color:var(--${colors[id]})" title="${safe(label)}" aria-label="${safe(label)}"><img class="character-face" src="assets/pieces/piece-character-${portraits[id]}.webp" alt="${safe(p.name)}的行动顺序头像"></div>`;
-  html+=`<div class="turn-payment" style="${at(layout.turnSpend[index])}" data-spent="${p.spent}" title="${safe(label)}"><span class="payment-total">£${p.spent}</span></div>`;
+  html+=`<div class="turn-payment" style="${at(layout.turnSpend[index])}" data-spent="${p.spent}" title="${safe(label)}">${coins(p.spent).map((v,i)=>coinPiece(v,{payment:true,index:i})).join('')}<span class="payment-total">£${p.spent}</span></div>`;
  });
  let groups=new Map();for(let p of view.players)for(let kind of ['vp','income']){
   let value=kind==='vp'?p.vp:p.income,space=kind==='vp'?((value%100)+100)%100:Math.min(99,Math.max(0,value)),pos=layout.track[String(space)];if(!pos)continue;
@@ -30,5 +33,5 @@ export function routePieces(view,layout,connections){
 }
 export function playerReserve(p,era){
  let left=14-p.linkCount;
- return `<div class="reserve-links" aria-label="剩余${left}枚${era==='canal'?'运河':'铁路'}连接板块"><strong>${era==='canal'?'运河':'铁路'}连接板块 · 剩余 ${left}/14</strong><div class="link-reserve-pieces">${Array.from({length:left},(_,i)=>`<img style="--reserve-i:${i}" src="assets/pieces/piece-link-${colors[p.id]}-${era}.webp" alt="备用连接板块">`).join('')}</div></div><div class="player-purse"><strong>现金</strong><div class="cash-amount">£${p.money}</div></div>`;
+ return `<div class="reserve-links" aria-label="剩余${left}枚${era==='canal'?'运河':'铁路'}连接板块"><strong>${era==='canal'?'运河':'铁路'}连接板块 · 剩余 ${left}/14</strong><div class="link-reserve-pieces">${Array.from({length:left},(_,i)=>`<img style="--reserve-i:${i}" src="assets/pieces/piece-link-${colors[p.id]}-${era}.webp" alt="备用连接板块">`).join('')}</div></div><div class="player-purse"><strong>现金</strong><div class="cash-amount">£${p.money}</div><div class="cash-coins">${coins(p.money).map(v=>coinPiece(v)).join('')}</div></div>`;
 }

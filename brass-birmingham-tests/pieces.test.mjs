@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {boardPieces,routePieces,playerReserve,coins} from '../brass-birmingham/table-pieces.js';
-import {configure,createGame,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.12';
+import {configure,createGame,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.13';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));
 const layout=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/layout.json',import.meta.url)));
 configure(facts);
@@ -23,7 +23,7 @@ test('four players get four portraits, four VP and four income tokens with real 
 test('placing a link reduces reserve, renders matching owner and era artwork and records coins',()=>{
  let s=createGame(['A','B'],[false,false],43),id=current(s);let r=applyAction(s,id,{type:'network',card:0,edges:['birmingham-oxford']});assert.ok(r.ok,r.error);s=r.state;
  let html=routePieces(publicView(s,id),layout,facts.connections),reserve=playerReserve(s.players[id],s.era);
- assert.equal((html.match(/route-placed/g)||[]).length,1);assert.equal((reserve.match(/alt="备用连接板块"/g)||[]).length,13);assert.equal(s.players[id].spent,3);assert.ok(boardPieces(s,layout).includes('£3'));assert.ok(!boardPieces(s,layout).includes('coin-'));checkArt(html+reserve);
+ assert.equal((html.match(/route-placed/g)||[]).length,1);assert.equal((reserve.match(/alt="备用连接板块"/g)||[]).length,13);assert.equal(s.players[id].spent,3);assert.ok(boardPieces(s,layout).includes('£3'));assert.ok(boardPieces(s,layout).includes('piece-coin-1.webp'));checkArt(html+reserve);
 });
 test('tokens follow loans, income spaces, score laps, and round expenditure resets',()=>{
  let s=createGame(['A','B'],[false,false],43),id=current(s),r=applyAction(s,id,{type:'loan',card:0});assert.ok(r.ok);s=r.state;let html=boardPieces(s,layout);assert.ok(html.includes(`class="track-token income" data-track-space="7" data-player="${id}"`));s.players[id].vp=137;html=boardPieces(s,layout);assert.ok(html.includes('data-track-space="37"'));assert.ok(html.includes('+100'));
@@ -47,4 +47,11 @@ test('round expenditure has an independent position to the right of each portrai
 
 test('southern fork link uses the vertical trunk in both eras',()=>{
  for(let era of ['canal','rail']){let pose=layout.routes['kidderminster-worcester'].eras[era];assert.equal(pose.angle,90);assert.ok(pose.center[0]*1400>465&&pose.center[0]*1400<495);assert.ok(pose.center[1]*1400>1140&&pose.center[1]*1400<1190);assert.ok(!pose.width||pose.width<=5.4);}
+});
+
+test('cash reserve and spent coins use real denominations that sum to their separate totals',()=>{
+ let s=createGame(['A','B'],[false,false],43);s.players[0].money=98;s.players[0].spent=23;
+ const sum=html=>[...html.matchAll(/data-value="(\d+)"/g)].reduce((n,m)=>n+Number(m[1]),0);
+ assert.equal(sum(playerReserve(s.players[0],'canal')),98);
+ const html=boardPieces(s,layout);assert.equal(sum(html),23);assert.ok(html.includes('本轮花费 £15'));checkArt(html+playerReserve(s.players[0],'canal'));
 });

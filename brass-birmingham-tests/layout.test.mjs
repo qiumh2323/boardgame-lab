@@ -39,7 +39,7 @@ test('Chinese labels cover every region and avoid board targets, names, connecti
  for(const [key,route] of Object.entries(layout.routes))for(const [era,p] of Object.entries(route.eras))obstacles.push({name:`${key}:${era}`,shape:rect(p.center,(p.width||5.4)/100,(p.width||5.4)/180,p.angle)});
  for(const [key,pos] of Object.entries(layout.track))obstacles.push({name:'track:'+key,shape:rect(pos,.0215,.0215)});
  for(const [key,pos] of layout.turnOrder.entries())obstacles.push({name:'portrait:'+key,shape:rect(pos,.074,.074)});
- for(const [key,pos] of layout.turnSpend.entries())obstacles.push({name:'spent:'+key,shape:rect(pos,.061,.061)});
+ for(const [key,pos] of layout.turnSpend.entries())obstacles.push({name:'spent:'+key,shape:rect([pos[0],pos[1]+.0085],.067,.078)});
  for(const pile of layout.decks)obstacles.push({name:'pile:'+pile.kind,shape:rect(pile.center,...pile.size)});
  for(const [key,p] of Object.entries(layout.cityLabels)){
   assert.ok(p.font>=17,`${key} Chinese name must remain enlarged`);

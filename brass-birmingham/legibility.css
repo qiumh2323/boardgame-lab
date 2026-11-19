@@ -1,0 +1,48 @@
+:root{--table-text:13px}
+.brand small{font-size:12px}
+#game #players .player{display:grid;grid-template-columns:minmax(0,1fr);height:auto;min-height:0;gap:4px;padding:6px 7px;font-size:var(--table-text)}
+#game .player>b{font-size:var(--table-text)}
+.player-vp-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#game .score-current,#game .score-estimate{display:flex;align-items:baseline;justify-content:space-between;gap:4px;border:0;padding:0;grid-column:auto;min-width:0;line-height:1.3}
+#game .score-current>span,#game .score-estimate>span{font-size:var(--table-text);color:#c4d0d5;white-space:nowrap}
+#game .score-current>strong,#game .score-estimate>strong{font-size:16px;font-variant-numeric:tabular-nums}
+#game .score-current>strong{color:#ece1c9}
+#game #players .stats{font-size:var(--table-text);gap:4px 7px;flex-wrap:wrap;white-space:normal}
+#game .dock-status,#game .dock-status #turn-label{font-size:var(--table-text)}
+#game .dock-status #era-label{font-size:14px}
+#game #action-hint,#game #flow-text{font-size:var(--table-text);line-height:1.65}
+#game .action-buttons button,#game #ai-hint,#game .flow-controls button,#game #flow-options button{font-size:var(--table-text);line-height:1.4}
+#game #mat-player button{font-size:var(--table-text);line-height:1.4;padding:5px 6px}
+#game .mat-panel .section-heading{height:32px}
+#game .hand-panel .section-heading h2,#game .hand-panel .section-heading span{font-size:var(--table-text)}
+#game .hand-panel .card span{font-size:var(--table-text);min-height:32px;line-height:1.3;padding:3px 1px}
+#game .hand-panel .card.discard-picked::after{font-size:12px}
+.board-pile span{font-size:var(--table-text)}
+#game .player-reserve strong{font-size:var(--table-text);line-height:1.5}
+.mat-board .mat-tile .mat-count{font-size:19cqw;width:30%;height:30%}
+.catalogue-toolbar h2,.catalogue-card strong{font-size:13px}
+.card-catalogue>p,.catalogue-card,.catalogue-card span{font-size:var(--table-text)}
+#journal-dropdown summary,#journal-dropdown ol{font-size:13px}
+
+/* Keep the original metal texture, with a light rim and enough separation from the table. */
+.physical-coin{display:block;position:relative;width:32px;height:32px;flex:none;border-radius:50%;background:radial-gradient(circle,#f7e3ad 35%,#e7ca8355 65%,#f8d48222 75%);box-shadow:0 0 0 1px #eddcb680,0 2px 0 #b49b69,1px 4px 5px #000b}
+.physical-coin[data-value="5"]{box-shadow:0 0 0 1px #eaf5fb99,0 2px 0 #a4b8c2,1px 4px 5px #000b}
+.physical-coin>img{display:block;width:100%;height:100%;border-radius:50%;object-fit:contain;filter:brightness(1.22) contrast(1.16) saturate(1.08) drop-shadow(0 0 1px #fff1c988)}
+.physical-coin::after{content:'';position:absolute;inset:1px;border:1px solid #fff2cc99;border-radius:50%;box-shadow:inset 1px 1px 1px #fff7,inset -1px -1px 1px #263846aa;pointer-events:none}
+#game .player-purse .cash-amount{font-size:20px;margin:4px 0 7px}
+#game .player-purse .cash-coins{display:grid;grid-template-columns:repeat(2,30px);justify-content:center;gap:5px 3px;margin:0;padding:2px 2px 5px}
+.cash-coins .physical-coin{width:30px;height:30px}
+#game .turn-payment .payment-coin{position:absolute;left:calc(3% + var(--coin-x)*25%);top:calc(8% + var(--coin-y)*13%);width:48%;height:48%;filter:none}
+#game .turn-payment .payment-total{top:auto;bottom:-8%;left:50%;transform:translate(-50%,0);font-size:clamp(9px,1vw,13px);padding:1px 4px}
+
+/* Transform only the resource artwork: the slots and their click targets stay still. */
+.resource-piece{transition:transform .14s ease,filter .14s ease,box-shadow .14s ease}
+.slot .industry-resources .resource-piece{pointer-events:auto}
+.market-cube.filled{cursor:default}
+.market-cube.filled:hover{transform:translate(-50%,calc(-50% - 3px)) scale(1.07);filter:brightness(1.2);z-index:15}
+.slot .industry-resources .resource-piece:hover{transform:translateY(-3px) scale(1.07);filter:brightness(1.2) drop-shadow(0 3px 2px #000a);position:relative;z-index:8}
+.slot:has(.resource-piece:hover){z-index:16}
+.merchant-beer.resource-piece{pointer-events:auto;cursor:pointer}
+.merchant-beer.resource-piece:hover,.merchant-beer.resource-piece:focus-visible{transform:translate(-50%,calc(-50% - 3px)) scale(1.08);filter:brightness(1.15) drop-shadow(0 3px 2px #000b);z-index:16}
+@media(min-width:1000px){#game .mat-panel{grid-template-rows:32px minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){.resource-piece{transition:none}.market-cube.filled:hover,.merchant-beer.resource-piece:hover,.merchant-beer.resource-piece:focus-visible{transform:translate(-50%,-50%);filter:brightness(1.2)}.slot .industry-resources .resource-piece:hover{transform:none;filter:brightness(1.2)}}

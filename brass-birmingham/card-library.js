@@ -1,4 +1,4 @@
-import {createDeck} from './engine.js?v=0.12';
+import {createDeck} from './engine.js?v=0.13';
 
 export const cardKey=c=>c.kind==='location'?`location:${c.loc}`:c.kind==='industry'?`industry:${[...c.types].sort().join(',')}`:c.kind;
 
