@@ -56,8 +56,8 @@
 
 /* Keep card geometry stable when selecting, deselecting, cancelling or hovering. */
 #game .hand-panel .card,#game .hand-panel .card:hover,#game .hand-panel .card.discard-allowed:hover,#game .hand-panel .card.discard-picked{transform:none;transition:background .15s,border-color .15s;overflow:visible;position:relative}
-#game .hand-panel .hand{padding:10px 8px;overflow:visible}
-#game .hand-panel{padding-bottom:10px}
+#game .hand-panel .hand{gap:clamp(8px,.8vw,13px);padding:10px 8px 14px;overflow:visible}
+#game .hand-panel{padding-bottom:14px}
 /* An empty, transparent ring sits outside the target; it never tints its artwork. */
 #game .flow-target:not(.flow-selected),#game .card.discard-allowed:not(.discard-picked){animation:none}
 #game .flow-target:not(.flow-selected)::before,#game .card.discard-allowed:not(.discard-picked)::before{
@@ -76,27 +76,27 @@
 #game #hand .card {
  --hand-label-width:clamp(10px,1vw,14px);
  display:grid;
- grid-template-columns:minmax(0,1fr) var(--hand-label-width);
+ grid-template-columns:var(--hand-label-width) minmax(0,1fr);
  grid-template-rows:minmax(0,1fr);
  align-items:start;
- gap:1px;
+ column-gap:4px;
  border:1px solid #556675;
 }
 #game #hand .card.discard-allowed {border-color:#efd18a}
 #game #hand .card > img {
  display:block;
- grid-column:1;
+ grid-column:2;
  width:100%;
  height:100%;
  min-height:0;
  max-height:none;
  object-fit:contain;
- object-position:center top;
+ object-position:left top;
 }
 #game #hand .card .hand-card-name {
  position:absolute;
- top:0;
- right:1px;
+ top:2px;
+ left:0;
  width:var(--hand-label-width);
  writing-mode:vertical-rl;
  text-orientation:upright;

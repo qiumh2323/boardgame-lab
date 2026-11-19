@@ -58,7 +58,7 @@ body.mat-focus #game .mat-workspace .player-reserve{position:static;width:100%;h
 #game .mat-panel .reserve-links > strong {line-height:1.25}
 #game .mat-board .mat-tile .mat-count {left:-5%;bottom:-5%;right:auto;top:auto}
 #game .mat-board .mat-tile.locked:not(.flow-target):not(.flow-selected) > img {
- filter:grayscale(.93) saturate(.45) brightness(.73);
+ filter:grayscale(.76) saturate(.9) brightness(.77);
 }
 @media(min-width:1000px){
  #game .mat-panel {grid-template-rows:minmax(0,1fr)}

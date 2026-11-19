@@ -78,7 +78,7 @@ function render(){
 function renderHand(){
  if(!view)return;$('#hand').classList.remove('event-cards');const id=matSeat!==null&&view.players[matSeat]?matSeat:seat,p=view.players[id],own=id===seat;
  $('#hand-title').textContent=own?'你的手牌':p.name+'的手牌';
- $('#hand-count').textContent=own?`${p.hand.length}张 · 选择弃牌后确认执行`:`${p.handCount}张`;
+ $('#hand-count').textContent=`${own?p.hand.length:p.handCount}张`;
  $('#hand').dataset.player=String(id);
  $('#hand').innerHTML=own?sortedHand(p.hand).map(({card:c,index:i})=>`<button class="card" data-card="${i}" aria-pressed="false" title="${esc(cardName(c))}"><img src="${cardUrl(c)}" alt="${esc(cardName(c))}"><span class="hand-card-name" aria-hidden="true">${esc(cardName(c))}</span></button>`).join(''):Array.from({length:p.handCount},(_,i)=>`<div class="card card-back" data-card-back="${i}" aria-label="${esc(p.name)}的手牌背面"><img src="assets/cards/piece-card-back.webp" alt="手牌背面"></div>`).join('');
 }
