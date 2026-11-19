@@ -34,8 +34,8 @@ export function distances(s,starts){let d=Object.fromEntries(starts.map(x=>[x,0]
 export const merchantConnected=(s,loc)=>Object.keys(distances(s,[loc])).some(x=>F.merchants[x]);
 function flip(s,t){if(t.flipped)return;t.flipped=true;let d=tileData(t);s.players[t.owner].income=Math.min(99,s.players[t.owner].income+d.income);}
 function spend(s,p,n){insist(p.money>=n,'现金不足，需要 £'+n);p.money-=n;p.spent+=n;}
-function choose(ctx,kind,options){
- insist(options.length,'没有可用的'+kind);if(options.length===1)return options[0];
+function choose(ctx,kind,options,explicit=false){
+ insist(options.length,'没有可用的'+kind);if(options.length===1&&!explicit)return options[0];
  let i=ctx.index++,value=ctx.choices?.[i];if(value!==undefined){let found=options.find(o=>o.id===value);insist(found,'资源选择已失效');return found;}
  if(ctx.auto)return options[0];let err=Error('请选择'+kind);err.choice={index:i,kind,options};throw err;
 }
@@ -50,7 +50,7 @@ function takeResource(s,id,resource,locations,ctx,merchant=null){
   let cap=resource==='coal'?14:10,count=s[resource],price=count>0?Math.floor((cap-count)/2)+1:(resource==='coal'?8:6);
   spend(s,p,price);s[resource]=Math.max(0,count-1);return;
  }
- let pick=choose(ctx,{coal:'煤矿（必须最近）',iron:'铁厂',beer:'啤酒来源'}[resource],options);
+ let pick=choose(ctx,{coal:'煤矿（必须最近）',iron:'铁厂',beer:'啤酒来源'}[resource],options,resource==='beer');
  if(pick.id.startsWith('merchant:')){merchant.beer=false;merchantBonus(s,p,merchant,ctx);return;}
  let tile=s.board[pick.id];tile.resource--;if(!tile.resource)flip(s,tile);
 }

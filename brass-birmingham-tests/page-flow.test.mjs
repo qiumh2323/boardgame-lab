@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {parseHTML} from 'linkedom';
+import {configure,createGame} from '../brass-birmingham/engine.js';
+test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
+ const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
+ globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
+ configure(JSON.parse(fs.readFileSync(new URL('facts.json',root),'utf8')));let s=createGame(['You','AI'],[false,true],28);s.order=[0,1];s.round=2;s.players[0].money=100;
+ const store=new Map([['brass-night-save-v1',JSON.stringify(s)]]);globalThis.localStorage={getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)};
+ globalThis.fetch=async url=>({json:async()=>JSON.parse(fs.readFileSync(new URL(url.split('?')[0],root),'utf8'))});
+ window.HTMLElement.prototype.scrollIntoView=()=>{};let modal=document.querySelector('#modal');modal.close=()=>modal.open=false;modal.showModal=()=>modal.open=true;
+ await import('../brass-birmingham/app.js?integration');await new Promise(r=>setImmediate(r));
+ let $=q=>document.querySelector(q);$('#resume-btn').onclick();
+ assert.equal($('#hand-float').hidden,false);assert.equal(document.querySelectorAll('.mat-tile').length,29);
+ $('#action-buttons [data-type="develop"]').onclick();assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('flow-target'));
+ let before=$('[data-mat-type="coalMine"][data-level="1"]').dataset.count;$('[data-mat-type="coalMine"][data-level="1"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);
+ $('#flow-finish').onclick();assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));$('[data-card="0"]').onclick();
+ assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,'0');assert.equal(JSON.parse(store.get('brass-night-save-v1')).players[0].stacks.coalMine[0],2);
+ assert.equal($('#modal').open,false);assert.match($('#flow-text').textContent,/先选择行动/);
+});
