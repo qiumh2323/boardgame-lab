@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,applyAction,publicView,cityName} from '../brass-birmingham/engine.js?v=0.16';
-import {makeActionFeedback,needsMissingCityWarning,missingCityPreferenceKey} from '../brass-birmingham/action-feedback.js';
+import {configure,createGame,applyAction,publicView,cityName} from '../brass-birmingham/engine.js?v=0.17';
+import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from '../brass-birmingham/action-feedback.js';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));configure(facts);
 const fresh=(n=2)=>{const s=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),91);s.order=s.players.map(p=>p.id);s.players[0].money=100;s.round=2;return s;};
 function feedback(s,a){const r=applyAction(s,0,a,{auto:true});assert.ok(r.ok,r.error);return makeActionFeedback(s,r.state,0,a);}
@@ -36,4 +36,19 @@ test('sale feedback identifies flipped industries and the beer source, and is sa
 
 test('corrected simplified Chinese place names are shared by all public labels',()=>{
  for(const [key,name] of Object.entries({stokeOnTrent:'斯托克',coalbrookdale:'柯尔布鲁德尔',burtonOnTrent:'特伦河畔伯顿',tamworth:'谭沃斯',stone:'斯东',nuneaton:'纳尼顿'}))assert.equal(cityName(key),name);
+});
+
+const warningFacts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url),'utf8'));
+test('network reminders cover both endpoints for every route and player count',()=>{
+ for(const n of [2,3,4])for(const edge of warningFacts.connections){
+  const view={players:Array(n)},action={type:'network',edges:[edge.id]};
+  const expected=n===4?[]:[...new Set([edge.from,edge.to])].filter(loc=>warningFacts.cities[loc]&&!warningFacts.cards[n].locations[loc]);
+  assert.deepEqual(missingCardCities(view,action,warningFacts),expected,`${n} players ${edge.id}`);
+  assert.equal(needsMissingCityWarning(view,action,warningFacts),expected.length>0);
+ }
+});
+test('double connections deduplicate missing cities and share the game preference',()=>{
+ const action={type:'network',edges:['belper-derby','derby-uttoxeter']};
+ for(const [n,expected] of [[2,['belper','derby','uttoxeter']],[3,['belper','derby']],[4,[]]])assert.deepEqual(missingCardCities({players:Array(n)},action,warningFacts),expected);
+ assert.equal(missingCityPreferenceKey({gameId:'same-game'}),'brass-missing-city-warning:same-game');
 });

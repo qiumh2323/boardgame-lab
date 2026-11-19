@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,applyAction,legalActions,current,publicView,income,incomeTop,network,distances,F,clone,TYPES,estimateEraScore} from '../brass-birmingham/engine.js?v=0.16';
-import {selectAI} from '../brass-birmingham/ai.js?v=0.16';
+import {configure,createGame,applyAction,legalActions,current,publicView,income,incomeTop,network,distances,F,clone,TYPES,estimateEraScore} from '../brass-birmingham/engine.js?v=0.17';
+import {selectAI} from '../brass-birmingham/ai.js?v=0.17';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 function fresh(n=2){let s=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),87);s.order=s.players.map(p=>p.id);return s;}
 function play(s,a){let r=applyAction(s,current(s),a,{auto:true});assert.ok(r.ok,r.error);return r.state;}

@@ -1,4 +1,4 @@
-import {F,cityName,ZH,income} from './engine.js?v=0.16';
+import {F,cityName,ZH,income} from './engine.js?v=0.17';
 
 export function makeActionFeedback(before,after,actor,action){
  const p=before.players[actor],next=after.players[actor],a=action,targets=[],previews=[],exhausted=[];
@@ -39,9 +39,11 @@ export function makeActionFeedback(before,after,actor,action){
 }
 
 // The composition is fixed by player count, independent of cards drawn or discarded.
-export function needsMissingCityWarning(view,action,facts){
- const n=view.players.length;
- return action.type==='build'&&n<4&&!!facts.cities[action.loc]&&!(facts.cards[n].locations[action.loc]>0);
+export function missingCardCities(view,action,facts){
+ const n=view.players.length;if(n>=4)return [];
+ let cities=action.type==='build'?[action.loc]:action.type==='network'?(action.edges||[]).flatMap(id=>{const edge=facts.connections.find(c=>c.id===id);return edge?[edge.from,edge.to]:[];}):[];
+ return [...new Set(cities)].filter(loc=>facts.cities[loc]&&!(facts.cards[n].locations[loc]>0));
 }
+export function needsMissingCityWarning(view,action,facts){return missingCardCities(view,action,facts).length>0;}
 
 export function missingCityPreferenceKey(view){return `brass-missing-city-warning:${view.gameId}`;}
