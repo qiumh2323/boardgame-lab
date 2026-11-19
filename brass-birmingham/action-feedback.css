@@ -53,7 +53,18 @@
 #game #action-history-btn:hover{background:#455c44;border-color:#ead29b}
 #game #action-history-btn:focus-visible{outline:2px solid #f4dfb2;outline-offset:2px}
 #action-history-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
-#game .flow-target:not(.flow-selected),#game .card.discard-allowed:not(.discard-picked){animation:action-ready-breathe 2.6s ease-in-out infinite}
-/* Extend the mat glow around the entire physical stack, above its artwork. */
-#game .mat-tile.flow-target::after{content:'';position:absolute;left:-3px;top:-3px;right:calc(-3px - var(--stack-x,0px));bottom:calc(-3px - var(--stack-y,0px));border:2px solid #f6d26f;border-radius:4px;pointer-events:none;z-index:10;animation:action-ready-breathe 2.6s ease-in-out infinite}
-@media(prefers-reduced-motion:reduce){#game .flow-target:not(.flow-selected),#game .card.discard-allowed:not(.discard-picked),#game .mat-tile.flow-target::after{animation:none;box-shadow:0 0 0 1px #d8b37480,0 0 7px #d8b37440}}
+
+/* Keep card geometry stable when selecting, deselecting, cancelling or hovering. */
+#game .hand-panel .card,#game .hand-panel .card:hover,#game .hand-panel .card.discard-allowed:hover,#game .hand-panel .card.discard-picked{transform:none;transition:background .15s,border-color .15s;overflow:visible;position:relative}
+#game .hand-panel .hand{padding:10px 8px;overflow:visible}
+#game .hand-panel{padding-bottom:10px}
+/* An empty, transparent ring sits outside the target; it never tints its artwork. */
+#game .flow-target:not(.flow-selected),#game .card.discard-allowed:not(.discard-picked){animation:none}
+#game .flow-target:not(.flow-selected)::before,#game .card.discard-allowed:not(.discard-picked)::before{
+ content:'';position:absolute;inset:-4px;border:2px solid #ffe1a0;border-radius:6px;background:none;pointer-events:none;z-index:30;animation:target-outer-breathe 2s ease-in-out infinite
+}
+#game .mat-tile.flow-target:not(.flow-selected)::before{right:calc(-4px - var(--stack-x,0px));bottom:calc(-4px - var(--stack-y,0px))}
+#game .flow-target:not(.flow-selected){overflow:visible}
+#game .card.discard-allowed:not(.discard-picked){cursor:pointer}
+@keyframes target-outer-breathe{0%,100%{opacity:.6;box-shadow:0 0 5px 1px #ffd47e66}50%{opacity:1;box-shadow:0 0 12px 3px #ffd47ecc}}
+@media(prefers-reduced-motion:reduce){#game .flow-target:not(.flow-selected)::before,#game .card.discard-allowed:not(.discard-picked)::before{animation:none;opacity:1;box-shadow:0 0 8px 2px #ffd47e99}}

@@ -1,4 +1,4 @@
-import {F,ZH,applyAction} from './engine.js?v=0.21';
+import {F,ZH,applyAction} from './engine.js?v=0.22';
 // Sort a display copy; data-card retains the authoritative hand index.
 export function sortedHand(hand){
  const rank={location:0,industry:1,wildLocation:2,wildIndustry:3};

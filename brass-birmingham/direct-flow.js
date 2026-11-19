@@ -1,4 +1,4 @@
-import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.21';
+import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.22';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createDirectFlow(api){
  let draft=null,stage='idle',variants=[],resource=null,pendingSale=null,lastRevision=null,selectedCard=null;
@@ -89,7 +89,8 @@ export function createDirectFlow(api){
    api.explain?.(el,isRoute?{route:el.dataset.route}:{loc:el.dataset.loc,slot:+el.dataset.slot},draft?.edges||[]);
   });
   if(v.phase==='liquidation'&&api.myTurn()){for(let [key,t] of Object.entries(v.board))if(t.owner===api.seat()){let el=$(`[data-loc="${tileLocation(key)}"][data-slot="${key.split(':')[1]}"]`);mark(el);if(el)el.onclick=()=>send({type:'liquidate',key});}bar('点击自己的高亮产业，变卖以支付收入欠款。');return;}
-  all('[data-card]').forEach(b=>{let i=+b.dataset.card,allowed=targetReady()&&(draft.type!=='build'||variants.some(a=>a.card===i));b.classList.toggle('discard-allowed',allowed);b.classList.toggle('discard-picked',draft?.type==='scout'?draft.extra?.includes(i):selectedCard===i);b.classList.remove('selected');b.onclick=()=>chooseCard(i);});
+  if(!targetReady())selectedCard=null;
+  all('[data-card]').forEach(b=>{let i=+b.dataset.card,allowed=targetReady()&&(draft.type!=='build'||variants.some(a=>a.card===i));b.classList.toggle('discard-allowed',allowed);const picked=targetReady()&&(draft?.type==='scout'?!!draft.extra?.includes(i):selectedCard===i);b.classList.toggle('discard-picked',picked);b.setAttribute('aria-pressed',String(picked));b.classList.remove('selected');b.onclick=()=>chooseCard(i);});
   all('#action-buttons [data-type]').forEach(b=>{b.classList.toggle('selected',draft?.type===b.dataset.type);b.disabled=!api.myTurn()||!candidates(b.dataset.type).length;b.classList.toggle('action-ready',stage==='idle'&&v.phase==='play'&&!v.gameOver&&api.myTurn()&&!b.disabled);b.onclick=()=>begin(b.dataset.type);});
   $('#flow-cancel').onclick=reset;$('#flow-finish').onclick=finish;
   if(!api.myTurn()){bar(v.gameOver?'对局已结束':'等待其他玩家行动');return;}

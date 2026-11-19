@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {parseHTML} from 'linkedom';
 import {createDirectFlow} from '../brass-birmingham/direct-flow.js';
-import {configure} from '../brass-birmingham/engine.js?v=0.21';
+import {configure} from '../brass-birmingham/engine.js?v=0.22';
 configure({connections:[{id:'a',from:'birmingham',to:'coventry'},{id:'b',from:'coventry',to:'nuneaton'}]});
 function setup(){
  const {document,window}=parseHTML(`<html><body><section id="hand-float"><button id="hand-toggle"></button>${[0,1,2,3].map(i=>`<button data-card="${i}"></button>`).join('')}</section><div id="flow-bar"><p id="flow-text"></p><div id="flow-options"></div><button id="flow-finish"></button><button id="flow-cancel"></button></div><div id="action-buttons">${['build','network','develop','sell','scout'].map(t=>`<button data-type="${t}"></button>`).join('')}</div><div id="mat-board"></div><button data-loc="birmingham" data-slot="0"></button><button data-loc="coventry" data-slot="0"></button><button data-loc="northern" data-slot="0"></button><button data-merchant="0"></button><button data-mat-type="coalMine" data-level="1"></button><button data-mat-type="coalMine" data-level="2"></button><button data-route="a"></button><button data-route="b"></button></body></html>`);
@@ -52,4 +52,18 @@ test('breathing guidance marks only available actions while choosing an action',
  flow.begin('network');assert.ok(!$('[data-type="build"]').classList.contains('action-ready'));
  click('#flow-cancel');assert.ok($('[data-type="build"]').classList.contains('action-ready'));
  view.gameOver=true;view.rev++;flow.paint();assert.ok(!$('[data-type="build"]').classList.contains('action-ready'));
+});
+
+test('deselecting a discard restores pending selection, hides confirm and resets accessibility state',()=>{
+ const {flow,$,click,sent}=setup();flow.begin('build');click('[data-loc="birmingham"]');
+ for(let i=0;i<3;i++){
+  click('[data-card="1"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'true');assert.equal($('#flow-finish').hidden,false);
+  click('[data-card="1"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'false');assert.ok(!$('[data-card="1"]').classList.contains('discard-picked'));assert.ok($('[data-card="1"]').classList.contains('discard-allowed'));assert.equal($('#flow-finish').hidden,true);
+ }
+ click('[data-card="1"]');click('#flow-cancel');assert.equal(sent.length,0);assert.equal($('#flow-finish').hidden,true);assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'false');assert.equal(document.querySelectorAll('.discard-allowed,.discard-picked,.flow-selected,.flow-target').length,0);
+});
+test('removing the last route clears a previously chosen discard before another route is chosen',()=>{
+ const {flow,$,click,sent}=setup();flow.begin('network');click('[data-route="a"]');click('[data-card="2"]');click('[data-route="a"]');
+ assert.equal($('[data-card="2"]').getAttribute('aria-pressed'),'false');assert.ok(!$('[data-card="2"]').classList.contains('discard-picked'));assert.equal($('#flow-finish').hidden,true);
+ click('[data-route="a"]');assert.equal($('#flow-finish').hidden,true);click('[data-card="3"]');click('#flow-finish');assert.equal(sent[0].card,3);
 });
