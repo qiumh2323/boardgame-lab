@@ -1,11 +1,11 @@
-import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.17';
+import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.18';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createDirectFlow(api){
  let draft=null,stage='idle',variants=[],resource=null,pendingSale=null,lastRevision=null,selectedCard=null;
  const $=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)];
  function reset(){draft=null;variants=[];stage='idle';resource=null;pendingSale=null;selectedCard=null;paint();}
  function bar(text,options=[],finish=false){
-  $('#flow-text').textContent=text;$('#flow-options').innerHTML=options.map((o,i)=>`<button data-flow-option="${i}">${esc(o.label)}</button>`).join('');
+  api.hint?.(text);$('#flow-text').textContent=text;$('#flow-options').innerHTML=options.map((o,i)=>`<button data-flow-option="${i}">${esc(o.label)}</button>`).join('');
   all('[data-flow-option]').forEach(b=>b.onclick=options[+b.dataset.flowOption].click);
   $('#flow-finish').hidden=!finish;$('#flow-cancel').hidden=stage==='idle';
  }
@@ -78,9 +78,16 @@ export function createDirectFlow(api){
   if(!$('#flow-bar'))return;
   all('.flow-target,.flow-selected').forEach(e=>e.classList.remove('flow-target','flow-selected'));
   let v=api.view();$('#hand-float').hidden=!v;$('#flow-bar').hidden=!v;
-  if(!v)return;
+  if(!v){api.hint?.('');return;}
   if(lastRevision!==v.rev){draft=null;variants=[];resource=null;pendingSale=null;stage='idle';selectedCard=null;lastRevision=v.rev;}
   all('[data-loc],[data-route],[data-merchant],[data-mat-type]').forEach(e=>e.onclick=()=>{});
+  all('[data-loc],[data-route]').forEach(el=>el.onclick=()=>{
+   if(!api.myTurn()){api.explain?.(el,{});return;}
+   const isRoute=el.dataset.route!==undefined,type=isRoute?'network':'build';
+   if(stage==='idle'){begin(type);el.onclick();return;}
+   if(draft?.type!==type||!['target','discard'].includes(stage)){api.explain?.(el,{...(isRoute?{route:el.dataset.route}:{loc:el.dataset.loc,slot:+el.dataset.slot})},[]);return;}
+   api.explain?.(el,isRoute?{route:el.dataset.route}:{loc:el.dataset.loc,slot:+el.dataset.slot},draft?.edges||[]);
+  });
   if(v.phase==='liquidation'&&api.myTurn()){for(let [key,t] of Object.entries(v.board))if(t.owner===api.seat()){let el=$(`[data-loc="${tileLocation(key)}"][data-slot="${key.split(':')[1]}"]`);mark(el);if(el)el.onclick=()=>send({type:'liquidate',key});}bar('点击自己的高亮产业，变卖以支付收入欠款。');return;}
   all('[data-card]').forEach(b=>{let i=+b.dataset.card,allowed=targetReady()&&(draft.type!=='build'||variants.some(a=>a.card===i));b.classList.toggle('discard-allowed',allowed);b.classList.toggle('discard-picked',draft?.type==='scout'?draft.extra?.includes(i):selectedCard===i);b.classList.remove('selected');b.onclick=()=>chooseCard(i);});
   all('#action-buttons [data-type]').forEach(b=>{b.classList.toggle('selected',draft?.type===b.dataset.type);b.disabled=!api.myTurn()||!candidates(b.dataset.type).length;b.onclick=()=>begin(b.dataset.type);});

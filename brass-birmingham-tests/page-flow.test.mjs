@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.17';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.18';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -18,6 +18,8 @@ test('full page restores a game, develops from mat before discarding, and update
  $('#lobby-rules').onclick();assert.ok(modal.open);$('#modal-close').onclick();
  for(const n of [4,3,2]){$(`[data-player-count="${n}"]`).onclick();$('#ai-start').onclick();const started=JSON.parse(store.get('brass-night-save-v1'));assert.equal(started.players.length,n);assert.equal(started.players[0].name,'玩家');assert.equal($('#lobby').hidden,true);$('#menu-btn').onclick();$('#back-btn').onclick();assert.equal($('#lobby').hidden,false);}
  store.set('brass-night-save-v1',JSON.stringify(s));$('#resume-btn').onclick();
+ const indices=[...document.querySelectorAll('#hand [data-card]')].map(el=>+el.dataset.card),hand=s.players[0].hand;let seenIndustry=false;
+ for(const i of indices){if(hand[i].kind==='industry')seenIndustry=true;if(hand[i].kind==='location')assert.equal(seenIndustry,false);}
  assert.equal($('#hand-float').hidden,false);assert.equal(document.querySelectorAll('#hand [data-card]').length,8);assert.equal(document.querySelectorAll('.score-estimate').length,2);assert.equal($('.score-estimate strong').textContent,'0');assert.match($('.score-current').textContent,/当前VP/);assert.match($('.score-estimate').textContent,/预计VP/);assert.equal($('#mat-player').tagName,'DIV');assert.equal(document.querySelectorAll('[data-mat-player]').length,2);let trackBefore=$('.track-token.vp').getAttribute('data-track-space');$('[data-mat-player="1"]').onclick();assert.ok($('#mat-tokens').innerHTML.includes('tile-purple-'));assert.equal($('[data-mat-player="1"]').getAttribute('aria-pressed'),'true');assert.equal(document.querySelectorAll('#hand [data-card]').length,0);assert.equal(document.querySelectorAll('#hand [data-card-back]').length,8);assert.ok([...document.querySelectorAll('#hand img')].every(e=>e.getAttribute('src')==='assets/cards/piece-card-back.webp'));assert.match($('#hand-title').textContent,/AI/);assert.equal(document.querySelectorAll('#hand .card-back span').length,0);assert.equal($('#hand').textContent,'');$('[data-mat-player="0"]').onclick();assert.equal($('.track-token.vp').getAttribute('data-track-space'),trackBefore);assert.equal(document.querySelectorAll('#hand [data-card]').length,8);assert.equal(document.querySelectorAll('#hand [data-card-back]').length,0);assert.equal(document.querySelectorAll('.mat-tile').length,29);
 
 
@@ -65,6 +67,18 @@ test('full page restores a game, develops from mat before discarding, and update
  proposeRoute();assert.equal($('#modal-title').textContent,'连接通向缺少地点牌的城市');assert.match($('#modal-content').textContent,/斯托克/);assert.match($('#modal-content').textContent,/斯东/);assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,0);
  $('#cancel-city-build').onclick();assert.ok(!modal.open);assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,0);
  proposeRoute();$('#skip-city-warning').checked=true;$('#continue-city-build').onclick();assert.ok(!modal.open);assert.ok(JSON.parse(store.get('brass-night-save-v1')).links['stokeOnTrent-stone']);assert.equal(store.get('brass-missing-city-warning:warning-network'),'1');
+ $('#menu-btn').onclick();$('#back-btn').onclick();
+
+ const over=createGame(['You','AI'],[false,true],73);over.gameId='own-cover';over.round=2;over.order=[0,1];over.players[0].money=100;over.players[0].stacks.ironWorks=over.players[0].stacks.ironWorks.filter(level=>level>1);over.board['birmingham:2']={owner:0,type:'ironWorks',level:1,resource:1,flipped:false};over.links['birmingham-oxford']={owner:0};over.players[0].hand=Array.from({length:8},()=>({kind:'location',loc:'birmingham'}));
+ restore(over);
+ const blocked=$('[data-route="birmingham-oxford"]');blocked.getBoundingClientRect=()=>({left:200,width:30,bottom:300});blocked.onclick();assert.equal($('#placement-hint').hidden,false);assert.match($('#placement-hint').textContent,/该线路不能建造/);assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,0);$('#flow-cancel').onclick();
+ const blockedIndustry=$('[data-loc="derby"][data-slot="0"]');blockedIndustry.getBoundingClientRect=()=>({left:200,width:30,bottom:300});blockedIndustry.onclick();assert.match($('#placement-hint').textContent,/没有匹配/);$('#flow-cancel').onclick();
+ assert.equal($('#player-action-hint').hidden,false);assert.match($('#player-action-hint').textContent,/先选择行动/);
+ const proposeCover=()=>{$('#action-buttons [data-type="build"]').onclick();$('[data-loc="birmingham"][data-slot="2"]').onclick();$('[data-card="0"]').onclick();$('#flow-finish').onclick();};
+ proposeCover();assert.equal($('#modal-title').textContent,'确认覆盖自己的产业');assert.equal(JSON.parse(store.get('brass-night-save-v1')).board['birmingham:2'].level,1);$('#cancel-overbuild').onclick();assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,0);
+ proposeCover();$('#skip-overbuild-warning').checked=true;$('#continue-overbuild').onclick();assert.ok(!modal.open);assert.equal(JSON.parse(store.get('brass-night-save-v1')).board['birmingham:2'].level,2);assert.equal(store.get('brass-own-overbuild-warning:own-cover'),'1');
+ $('#menu-btn').onclick();$('#back-btn').onclick();restore(over);proposeCover();assert.ok(!modal.open);assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,1);
+ $('#menu-btn').onclick();$('#back-btn').onclick();restore({...over,gameId:'another-cover'});proposeCover();assert.equal($('#modal-title').textContent,'确认覆盖自己的产业');$('#modal-close').onclick();assert.match($('#flow-text').textContent,/先选择行动/);
  $('#menu-btn').onclick();$('#back-btn').onclick();
 
 });
