@@ -1,8 +1,21 @@
-import {F,ZH,applyAction} from './engine.js?v=0.23';
-// Sort a display copy; data-card retains the authoritative hand index.
+import {F,ZH,applyAction} from './engine.js?v=0.24';
+// Verified against the downloaded card borders: yellow, red, purple, blue, teal.
+export const CITY_CARD_COLOUR_GROUPS=[
+ ['coalbrookdale','dudley','kidderminster','wolverhampton','worcester'],
+ ['burtonOnTrent','cannock','stafford','tamworth','walsall'],
+ ['birmingham','coventry','nuneaton','redditch'],
+ ['leek','stokeOnTrent','stone','uttoxeter'],
+ ['belper','derby']
+];
+const cityOrder=new Map(CITY_CARD_COLOUR_GROUPS.flat().map((loc,i)=>[loc,i]));
+const industryOrder=['coalMine','ironWorks','brewery','cottonMill','cottonMill+manufacturer','manufacturer','pottery'];
+const industryKey=card=>[...(card.types||[])].sort().join('+');
+function withinGroup(card){return card.kind==='location'?(cityOrder.get(card.loc)??999):card.kind==='industry'?(industryOrder.indexOf(industryKey(card))<0?999:industryOrder.indexOf(industryKey(card))):0;}
+// Sort only the display copy; equal cards stay adjacent without changing discard indices.
 export function sortedHand(hand){
  const rank={location:0,industry:1,wildLocation:2,wildIndustry:3};
- return hand.map((card,index)=>({card,index})).sort((a,b)=>(rank[a.card.kind]??4)-(rank[b.card.kind]??4)||a.index-b.index);
+ const key=card=>card.kind==='location'?card.loc:card.kind==='industry'?industryKey(card):card.kind;
+ return hand.map((card,index)=>({card,index})).sort((a,b)=>(rank[a.card.kind]??4)-(rank[b.card.kind]??4)||withinGroup(a.card)-withinGroup(b.card)||key(a.card).localeCompare(key(b.card))||a.index-b.index);
 }
 export const ownOverbuild=(view,seat,a)=>a.type==='build'&&view.board[`${a.loc}:${a.slot}`]?.owner===seat;
 export const overbuildPreferenceKey=view=>`brass-own-overbuild-warning:${view.gameId}`;
