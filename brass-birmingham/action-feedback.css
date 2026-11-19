@@ -13,7 +13,6 @@
 .event-develop{animation:develop-mark .95s ease-out}
 .event-resource .resource-piece,.market-cube.event-resource,.merchant-tile.event-resource{animation:resource-glow .95s ease-in-out}
 #players .event-actor{animation:actor-glow .9s ease-out}
-.event-cards .card{animation:industry-arrive .6s ease-out}
 @keyframes announce-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
 @keyframes industry-arrive{from{opacity:.15;transform:translateY(-9px) scale(.75)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes industry-flip{0%{opacity:.3;transform:perspective(300px) rotateY(85deg)}100%{opacity:1;transform:perspective(300px) rotateY(0)}}
@@ -26,7 +25,7 @@
 #game .hand-panel .card-back{display:flex;align-items:stretch}
 #game .hand-panel .card-back img{flex:1 1 auto;min-height:0;height:100%;width:100%;object-fit:contain}
 @media(max-width:700px){.action-announcement{left:8px;bottom:8px;max-width:calc(100vw - 16px);padding:9px 10px;gap:7px}.action-announcement strong{font-size:13px}.action-previews img{width:29px;height:29px}}
-@media(prefers-reduced-motion:reduce){.announce-enter,.event-build>img,.event-flip>img,.event-link>img,.event-develop,.event-resource .resource-piece,.market-cube.event-resource,.merchant-tile.event-resource,#players .event-actor,.event-cards .card{animation:none}}
+@media(prefers-reduced-motion:reduce){.announce-enter,.event-build>img,.event-flip>img,.event-link>img,.event-develop,.event-resource .resource-piece,.market-cube.event-resource,.merchant-tile.event-resource,#players .event-actor{animation:none}}
 
 .turn-character.event-actor img{animation:resource-glow .9s ease-in-out}.turn-payment.event-actor .physical-coin{animation:industry-arrive .65s ease-out}
 @media(prefers-reduced-motion:reduce){.turn-character.event-actor img,.turn-payment.event-actor .physical-coin{animation:none}}
@@ -72,46 +71,59 @@
 /* One remaining-resource badge replaces the overlaid cubes/barrels on industries. */
 #game .slot .resource-count{left:-5px;right:auto;bottom:-5px;z-index:35;min-width:18px;font-size:12px;line-height:1.3;padding:1px 4px;pointer-events:none}
 
-/* A shared artwork column gives face-up cards and backs the same dimensions. */
+/* Both card faces use the same artwork box, with the name over the lower edge. */
 #game #hand .card {
- --hand-label-width:clamp(10px,1vw,14px);
  display:grid;
- grid-template-columns:var(--hand-label-width) minmax(0,1fr);
+ grid-template-columns:minmax(0,1fr);
  grid-template-rows:minmax(0,1fr);
  align-items:start;
- column-gap:clamp(8px,.65vw,11px);
+ justify-items:center;
+ padding:0;
  border:1px solid #556675;
 }
 #game #hand .card.discard-allowed {border-color:#efd18a}
-#game #hand .card > img {
+#game #hand .hand-card-art {
+ position:relative;
+ width:100%;
+ aspect-ratio:215 / 300;
+ overflow:hidden;
+}
+#game #hand .hand-card-art > img {
  display:block;
- grid-column:2;
  width:100%;
  height:100%;
- min-height:0;
  max-height:none;
  object-fit:contain;
- object-position:left top;
 }
 #game #hand .card .hand-card-name {
  position:absolute;
- top:2px;
- left:0;
- width:var(--hand-label-width);
- writing-mode:vertical-rl;
- text-orientation:upright;
- background:transparent;
+ inset:auto 0 0;
  min-height:0;
- padding:2px 0 0;
+ padding:3px 2px;
+ background:#142331ec;
+ color:#fff2d0;
+ text-align:center;
  font-size:clamp(10px,.9vw,13px);
- line-height:1;
- white-space:nowrap;
+ line-height:1.25;
 }
+#game #hand .card.discard-picked::after {z-index:1}
 @media(min-width:1000px){
- /* The image's intrinsic size must not push the card row into the bottom padding. */
  #game .hand-panel .hand {height:auto;grid-template-rows:minmax(0,1fr)}
- #game #hand .card {min-height:0}
+ #game #hand .card {min-height:0;container-type:size;align-items:end}
+ #game #hand .hand-card-art {width:min(100%,calc(100cqh * 215 / 300))}
 }
-@media(max-width:999px){
- #game #hand .card > img {height:auto;aspect-ratio:215 / 300}
+#action-motion {position:fixed;inset:0;pointer-events:none;z-index:69}
+.motion-piece {position:absolute;display:grid;justify-items:center;filter:drop-shadow(0 3px 7px #000b)}
+.motion-piece img {display:block;width:100%;object-fit:contain}
+.motion-card {width:clamp(26px,4vw,53px)}
+.motion-coin {width:31px}
+.motion-tile {width:clamp(26px,4vw,48px)}
+.motion-link {width:clamp(42px,6vw,78px)}
+.motion-piece span {position:absolute;top:100%;width:max-content;padding:2px 6px;border-radius:4px;background:#162734;color:#ffdf95;font:bold 12px/1.35 sans-serif;white-space:nowrap}
+#game .event-flight.event-build > img,#game .event-flight.event-link > img {animation:motion-land .32s .56s both}
+#game #action-buttons .event-committed {animation:develop-mark .8s ease-out}
+@keyframes motion-land {from{opacity:0;transform:scale(.84)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+ #action-motion {display:none}
+ #game .event-flight.event-build > img,#game .event-flight.event-link > img,#game #action-buttons .event-committed {animation:none}
 }

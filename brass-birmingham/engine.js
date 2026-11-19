@@ -1,7 +1,7 @@
 // Independent rules implementation. facts.json contains physical game quantities.
 export let F;
 export const TYPES=['cottonMill','coalMine','ironWorks','manufacturer','pottery','brewery'];
-export const ZH={cottonMill:'棉纺厂',coalMine:'煤矿',ironWorks:'铁厂',manufacturer:'制造厂',pottery:'陶器厂',brewery:'酿酒厂'};
+export const ZH={cottonMill:'棉纺厂',coalMine:'煤矿',ironWorks:'铁厂',manufacturer:'包装厂',pottery:'陶器厂',brewery:'酿酒厂'};
 export const CITY_ZH={birmingham:'伯明翰',coventry:'考文垂',dudley:'达德利',walsall:'沃尔索尔',wolverhampton:'伍尔弗汉普顿',coalbrookdale:'柯尔布鲁德尔',kidderminster:'基德明斯特',worcester:'伍斯特',redditch:'雷迪奇',cannock:'坎诺克',tamworth:'谭沃斯',stafford:'斯塔福德',burtonOnTrent:'特伦河畔伯顿',nuneaton:'纳尼顿',stone:'斯东',stokeOnTrent:'斯托克',uttoxeter:'尤托克西特',leek:'利克',belper:'贝尔珀',derby:'德比',northern:'北部农场',southern:'南部农场',shrewsbury:'什鲁斯伯里',gloucester:'格洛斯特',oxford:'牛津',warrington:'沃灵顿',nottingham:'诺丁汉'};
 export const cityName=id=>CITY_ZH[id]||id;
 export const clone=x=>structuredClone(x);
@@ -33,7 +33,7 @@ export function network(s,id){let set=new Set();for(let [k,t]of Object.entries(s
 export function distances(s,starts){let d=Object.fromEntries(starts.map(x=>[x,0])),q=[...starts];while(q.length){let x=q.shift();for(let k of Object.keys(s.links)){let e=ends(k);if(e.includes(x))for(let y of e)if(d[y]===undefined){d[y]=d[x]+1;q.push(y);}}}return d;}
 export const merchantConnected=(s,loc)=>Object.keys(distances(s,[loc])).some(x=>F.merchants[x]);
 function flip(s,t){if(t.flipped)return;t.flipped=true;let d=tileData(t);s.players[t.owner].income=Math.min(99,s.players[t.owner].income+d.income);}
-function spend(s,p,n){insist(p.money>=n,'现金不足，需要 £'+n);p.money-=n;p.spent+=n;}
+function spend(s,p,n,ctx){insist(p.money>=n,'现金不足，需要 £'+n);p.money-=n;p.spent+=n;if(ctx.activity)ctx.activity.spent+=n;}
 function choose(ctx,kind,options,explicit=false){
  insist(options.length,'没有可用的'+kind);if(options.length===1&&!explicit)return options[0];
  let i=ctx.index++,value=ctx.choices?.[i];if(value!==undefined){let found=options.find(o=>o.id===value);insist(found,'资源选择已失效');return found;}
@@ -48,15 +48,15 @@ function takeResource(s,id,resource,locations,ctx,merchant=null){
  if(!options.length&&resource!=='beer'){
   insist(resource==='iron'||locations.some(loc=>merchantConnected(s,loc)),'煤炭不可达：需要接通煤矿或任意商人地点');
   let cap=resource==='coal'?14:10,count=s[resource],price=count>0?Math.floor((cap-count)/2)+1:(resource==='coal'?8:6);
-  spend(s,p,price);s[resource]=Math.max(0,count-1);return;
+  spend(s,p,price,ctx);s[resource]=Math.max(0,count-1);return;
  }
  let pick=choose(ctx,{coal:'煤矿（必须最近）',iron:'铁厂',beer:'啤酒来源'}[resource],options,resource==='beer');
  if(pick.id.startsWith('merchant:')){merchant.beer=false;merchantBonus(s,p,merchant,ctx);return;}
  let tile=s.board[pick.id];tile.resource--;if(!tile.resource)flip(s,tile);
 }
-function developOne(s,p,type){let t=nextTile(s,p.id,type);insist(t&&t.canDevelop,'该产业当前最低等级不能研发');p.stacks[type].shift();}
+function developOne(s,p,type,ctx){let t=nextTile(s,p.id,type);insist(t&&t.canDevelop,'该产业当前最低等级不能研发');p.stacks[type].shift();ctx.activity?.developed.push({type,level:t.level});}
 function merchantBonus(s,p,m,ctx){let f=F.merchants[m.loc];if(f.bonusType==='vp')p.vp+=f.bonusAmount;if(f.bonusType==='money')p.money+=f.bonusAmount;if(f.bonusType==='income')p.income=Math.min(99,p.income+f.bonusAmount);if(f.bonusType==='develop'){
- let options=TYPES.filter(t=>nextTile(s,p.id,t)?.canDevelop).map(t=>({id:t,label:ZH[t],level:nextTile(s,p.id,t).level}));if(options.length){options.push({id:'skip',label:'放弃本次免费研发'});let t=choose(ctx,'商人奖励：免费研发',options).id;if(t!=='skip')developOne(s,p,t);}
+ let options=TYPES.filter(t=>nextTile(s,p.id,t)?.canDevelop).map(t=>({id:t,label:ZH[t],level:nextTile(s,p.id,t).level}));if(options.length){options.push({id:'skip',label:'放弃本次免费研发'});let t=choose(ctx,'商人奖励：免费研发',options).id;if(t!=='skip')developOne(s,p,t,ctx);}
  }}
 function discard(s,p,indices){let sorted=[...new Set(indices)].sort((a,b)=>b-a);insist(sorted.length===indices.length,'不能重复选择卡牌');for(let i of sorted){insist(Number.isInteger(i)&&p.hand[i],'请选择有效的手牌');let [c]=p.hand.splice(i,1);if(c.kind.startsWith('wild'))s.wild[c.kind==='wildLocation'?'location':'industry']++;else {s.seenCards??=[...s.discard];if(!s.seenCards.some(x=>x.id===c.id))s.seenCards.push(c);s.discard.push(c);}}}
 function matches(s,id,c,loc,type){let net=network(s,id),farm=!!F.farms[loc];if(c.kind==='location')return !farm&&c.loc===loc;if(c.kind==='wildLocation')return !farm;return (c.kind==='wildIndustry'||c.kind==='industry'&&c.types.includes(type))&&(net.size===0||net.has(loc));}
@@ -69,7 +69,7 @@ function build(s,p,a,ctx){
  if(old){insist(old.type===type&&d.level>old.level,'覆盖必须是同类更高等级产业');if(old.owner!==p.id){insist(['coalMine','ironWorks'].includes(type),'只能覆盖对手的煤矿或铁厂');let res=type==='coalMine'?'coal':'iron';insist(!s[res]&&!Object.values(s.board).some(t=>t.type===type&&t.resource>0),'覆盖对手前，市场和全图相应资源必须耗尽');}}
  else if(slots[index].length>1)insist(!slots.some((allowed,i)=>allowed.length===1&&allowed[0]===type&&!s.board[loc+':'+i]),'必须优先使用只有该产业图标的空位');
  // Existing overbuilt resources cannot supply their replacement.
- delete s.board[key];spend(s,p,d.cost);
+ delete s.board[key];spend(s,p,d.cost,ctx);
  for(let i=0;i<d.costCoal;i++)takeResource(s,p.id,'coal',[loc],ctx);
  for(let i=0;i<d.costIron;i++)takeResource(s,p.id,'iron',[loc],ctx);
  p.stacks[type].shift();let t={owner:p.id,type,level:d.level,flipped:false,resource:type==='brewery'?(s.era==='canal'?1:2):d.resourceCubes};s.board[key]=t;
@@ -139,8 +139,8 @@ function advance(s){
  if(s.turn>=s.order.length){endRound(s);return;}
  while(!s.players[s.order[s.turn]].hand.length){s.turn++;if(s.turn>=s.order.length){endRound(s);return;}}
 }
-export function applyAction(state,id,action,{auto=false}={}){
- let s=clone(state),a=clone(action),ctx={choices:a.choices,index:0,auto};
+export function applyAction(state,id,action,{auto=false,recordActivity=false}={}){
+ let s=clone(state),a=clone(action),ctx={choices:a.choices,index:0,auto,activity:recordActivity?{spent:0,developed:[]}:null};
  try{
   insist(!s.gameOver,'对局已结束');insist(Number.isInteger(id)&&id===current(s),'尚未轮到该玩家');let p=s.players[id],message;
   if(s.phase==='liquidation'){
@@ -150,17 +150,17 @@ export function applyAction(state,id,action,{auto=false}={}){
    if(a.type==='build')message=build(s,p,a,ctx);
    else if(a.type==='network'){
     insist(Array.isArray(a.edges)&&a.edges.length>=1&&a.edges.length<=(s.era==='canal'?1:2),'请选择1条运河，或1至2条铁路');
-    spend(s,p,s.era==='canal'?3:a.edges.length===2?15:5);for(let edge of a.edges)putLink(s,p,edge,ctx);if(a.edges.length===2)takeResource(s,id,'beer',ends(a.edges[1]),ctx);message='铺设'+a.edges.length+'条'+(s.era==='canal'?'运河':'铁路');
+    spend(s,p,s.era==='canal'?3:a.edges.length===2?15:5,ctx);for(let edge of a.edges)putLink(s,p,edge,ctx);if(a.edges.length===2)takeResource(s,id,'beer',ends(a.edges[1]),ctx);message='铺设'+a.edges.length+'条'+(s.era==='canal'?'运河':'铁路');
    }else if(a.type==='sell')message=sell(s,p,a,ctx);
    else if(a.type==='develop'){
-    insist(Array.isArray(a.industries)&&a.industries.length>=1&&a.industries.length<=2,'每次研发1至2个板块');for(let t of a.industries){developOne(s,p,t);takeResource(s,id,'iron',[],ctx);}message='研发 '+a.industries.map(t=>ZH[t]).join('、');
+    insist(Array.isArray(a.industries)&&a.industries.length>=1&&a.industries.length<=2,'每次研发1至2个板块');for(let t of a.industries){developOne(s,p,t,ctx);takeResource(s,id,'iron',[],ctx);}message='研发 '+a.industries.map(t=>ZH[t]).join('、');
    }else if(a.type==='loan'){let n=income(p.income)-3;insist(n>=-10,'贷款会使收入低于-10');p.income=incomeTop(n);p.money+=30;message='贷款 £30，收入降低3级';}
    else if(a.type==='scout'){
     insist(!p.hand.some(c=>c.kind.startsWith('wild')),'持有万能牌时不能侦察');insist(s.wild.location&&s.wild.industry,'万能牌供应不足');insist(Array.isArray(a.extra)&&a.extra.length===2,'侦察需要额外弃2张牌');discard(s,p,[a.card,...a.extra]);p.hand.push({kind:'wildLocation'},{kind:'wildIndustry'});s.wild.location--;s.wild.industry--;message='侦察，获得两张万能牌';
    }else if(a.type==='pass')message='跳过行动';else throw Error('未知行动');
    if(a.type!=='scout')discard(s,p,[a.card]);note(s,p.name+'：'+message);advance(s);
   }
-  if(a.type==='liquidate')note(s,p.name+'：'+message);s.rev++;return {ok:true,state:s};
+  if(a.type==='liquidate')note(s,p.name+'：'+message);s.rev++;return {ok:true,state:s,...(ctx.activity?{activity:ctx.activity}:{})};
  }catch(e){return {ok:false,error:e.message,choice:e.choice};}
 }
 export function legalActions(s,id=current(s),{allCards=false,doubleRails=true}={}){

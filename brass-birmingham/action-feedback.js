@@ -1,6 +1,6 @@
-import {F,cityName,ZH,income} from './engine.js?v=0.28';
+import {F,cityName,ZH,income} from './engine.js?v=0.32';
 
-export function makeActionFeedback(before,after,actor,action){
+export function makeActionFeedback(before,after,actor,action,activity=null){
  const p=before.players[actor],next=after.players[actor],a=action,targets=[],previews=[],exhausted=[];
  let description='';
  if(a.type==='build'){
@@ -23,8 +23,16 @@ export function makeActionFeedback(before,after,actor,action){
   }).join('、');
  }else if(a.type==='loan')description='贷款 £30，收入降低3级';
  else if(a.type==='scout')description='侦察，弃3张牌换取两张万能牌';
- else if(a.type==='liquidate')description=`变卖 ${cityName(a.key.split(':')[0])} 的产业以支付欠款`;
+ else if(a.type==='liquidate'){
+  const tile=before.board[a.key];
+  description=`变卖 ${cityName(a.key.split(':')[0])} 的产业以支付欠款`;
+  previews.push(tile);targets.push({kind:'tile',key:a.key,effect:'remove'});
+ }
  else description='弃牌跳过行动';
+ if(a.type==='sell')for(const tile of activity?.developed||[]) {
+  targets.push({kind:'mat',...tile,effect:'develop'});
+  previews.push({...tile,owner:actor});
+ }
  for(const [key,t] of Object.entries(before.board)){
   const n=after.board[key];
   if(n&&n.owner===t.owner&&n.type===t.type&&n.level===t.level&&n.resource<t.resource){targets.push({kind:'tile',key,effect:'resource'});if(!t.flipped&&n.flipped){targets.push({kind:'tile',key,effect:'flip'});exhausted.push(`${cityName(key.split(':')[0])}${ZH[t.type]}已耗尽并翻面`);}}
@@ -35,7 +43,15 @@ export function makeActionFeedback(before,after,actor,action){
  if(p.income!==next.income)details.push(`收入 ${income(p.income)} → ${income(next.income)}`);
  if(exhausted.length)details.push(exhausted.join('、'));
  if(before.era!==after.era)details.push('运河时代结算完成，进入铁路时代');else if(!before.gameOver&&after.gameOver)details.push('铁路时代结算完成，对局结束');
- return {rev:after.rev,actor,type:a.type,description,details,targets,previews};
+ const discarded=a.type==='liquidate'?0:a.type==='scout'?3:1;
+ const wild=a.type==='scout'?2:0;
+ const drawn=after.players.flatMap((player,id)=>{
+  const count=player.hand.length-before.players[id].hand.length+(id===actor?discarded-wild:0);
+  return count>0?[{player:id,count}]:[];
+ });
+ const spent=activity?.spent??Math.max(0,next.spent-p.spent);
+ return {rev:after.rev,actor,type:a.type,description,details,targets,previews,
+  movement:{discarded,wild,drawn,spent,cashChange:next.money-p.money}};
 }
 
 // The composition is fixed by player count, independent of cards drawn or discarded.

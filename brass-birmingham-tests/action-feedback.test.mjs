@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,applyAction,publicView,cityName} from '../brass-birmingham/engine.js?v=0.28';
+import {configure,createGame,applyAction,publicView,cityName} from '../brass-birmingham/engine.js?v=0.32';
 import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from '../brass-birmingham/action-feedback.js';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));configure(facts);
 const fresh=(n=2)=>{const s=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),91);s.order=s.players.map(p=>p.id);s.players[0].money=100;s.round=2;return s;};
@@ -51,4 +51,16 @@ test('double connections deduplicate missing cities and share the game preferenc
  const action={type:'network',edges:['belper-derby','derby-uttoxeter']};
  for(const [n,expected] of [[2,['belper','derby','uttoxeter']],[3,['belper','derby']],[4,[]]])assert.deepEqual(missingCardCities({players:Array(n)},action,warningFacts),expected);
  assert.equal(missingCityPreferenceKey({gameId:'same-game'}),'brass-missing-city-warning:same-game');
+});
+
+
+test('movement records actual payment and replenishment at the round boundary without broadcasting card identities',()=>{
+ const s=fresh();s.turn=1;s.used=1;
+ const action={type:'network',edges:['birmingham-oxford'],card:0};
+ const result=applyAction(s,1,action,{recordActivity:true});
+ assert.ok(result.ok,result.error);
+ assert.equal(result.state.round,3);
+ assert.equal(result.state.players[1].spent,0);
+ const event=makeActionFeedback(s,result.state,1,action,result.activity);
+ assert.deepEqual(event.movement,{discarded:1,wild:0,drawn:[{player:1,count:1}],spent:3,cashChange:-3});
 });

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,publicView,applyAction} from '../brass-birmingham/engine.js?v=0.28';
+import {configure,createGame,publicView,applyAction} from '../brass-birmingham/engine.js?v=0.32';
 import {createSalePlan} from '../brass-birmingham/sale-plan.js';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 function fresh(){
@@ -17,7 +17,7 @@ test('iterated sales select beer before another industry and commit once, with s
  plan.choose('coalMine');assert.equal(plan.snapshot().sales.length,1);assert.ok(plan.available().includes('redditch:0'));
  plan.append('redditch:0');assert.ok(!plan.snapshot().options.some(o=>o.id==='merchant:0'));plan.choose('merchant:1');assert.equal(plan.snapshot().options.find(o=>o.id==='coalMine').level,2);plan.choose('coalMine');
  const draft=plan.snapshot();assert.equal(draft.pending,null);assert.equal(draft.sales.length,2);assert.deepEqual(draft.choices,['merchant:0','coalMine','merchant:1','coalMine']);assert.deepEqual(s,before);
- const result=applyAction(s,0,{type:'sell',card:0,sales:draft.sales,choices:draft.choices});assert.ok(result.ok,result.error);assert.equal(result.state.rev,1);assert.equal(result.state.used,1);assert.equal(result.state.players[0].hand.length,7);assert.equal(result.state.players[0].stacks.coalMine[0],3);assert.ok(result.state.board['worcester:0'].flipped&&result.state.board['redditch:0'].flipped);
+ const result=applyAction(s,0,{type:'sell',card:0,sales:draft.sales,choices:draft.choices},{recordActivity:true});assert.ok(result.ok,result.error);assert.deepEqual(result.activity.developed,[{type:'coalMine',level:1},{type:'coalMine',level:2}]);assert.equal(result.state.rev,1);assert.equal(result.state.used,1);assert.equal(result.state.players[0].hand.length,7);assert.equal(result.state.players[0].stacks.coalMine[0],3);assert.ok(result.state.board['worcester:0'].flipped&&result.state.board['redditch:0'].flipped);
 });
 test('reserving the only barrel removes other sales and undo releases the barrel',()=>{
  const s=fresh();s.merchants.forEach(m=>m.beer=false);const plan=createSalePlan(publicView(s,0),0);
