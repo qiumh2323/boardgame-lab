@@ -9,7 +9,7 @@ Rules reference: official Roxley Brass: Birmingham rulebook, v2018.11.
 https://roxley.com/products/brass-birmingham
 
 Artwork sources (originals and detailed manifests kept in the local asset pack):
-https://github.com/ikegami/tts_brass — night board texture
+https://github.com/ikegami/tts_brass — night board texture and white industry tile fronts
 https://www.ludex.dev/brass-birmingham/cards/ — card/component images
 https://github.com/npow/brass-birmingham — physical quantities and board
 measurements were cross-referenced as factual data. No upstream application

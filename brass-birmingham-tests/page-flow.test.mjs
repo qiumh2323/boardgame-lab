@@ -22,6 +22,7 @@ test('full page restores a game, develops from mat before discarding, and update
  assert.equal(requested.length,new Set(requested).size);
  assert.ok(requested[0].endsWith('piece-card-back.webp'));
  assert.equal(requested.filter(url=>url.startsWith('assets/tiles/')).length,232);
+ assert.equal(requested.filter(url=>/^assets\/tiles\/tile-gray-.*\.jpg$/.test(url)).length,29);
  assert.ok(requested.includes('assets/pieces/beer-white.svg'));
  for(const url of requested)assert.ok(fs.existsSync(new URL(url,root)),url);
  let $=q=>document.querySelector(q);

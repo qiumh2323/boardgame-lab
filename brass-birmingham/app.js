@@ -29,7 +29,12 @@ function positionHint(anchor,text){
 }
 function showDialog(title,content){$('#modal-title').textContent=title;$('#modal-content').innerHTML=content;if(!modal.open)modal.showModal();}
 $('#modal-close').onclick=closeModal;modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
-function tileUrl(type,level,flipped=false,owner=seat){return `assets/tiles/tile-${COLOR_NAMES[owner]}-${STEM[type]}-${level}${flipped?'-flipped':''}.webp`;}
+function tileUrl(type,level,flipped=false,owner=seat){
+ const color=COLOR_NAMES[owner];
+ const suffix=flipped?'-flipped':'';
+ const extension=color==='gray'&&!flipped?'jpg':'webp';
+ return `assets/tiles/tile-${color}-${STEM[type]}-${level}${suffix}.${extension}`;
+}
 function cardUrl(c){let key=c.kind==='location'?c.loc.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()):c.kind==='wildLocation'?'wild-location':c.kind==='wildIndustry'?'wild-industry':c.types.length>1?'cotton-manufacture':({ironWorks:'iron',coalMine:'coal',cottonMill:'cotton-manufacture',manufacturer:'cotton-manufacture',brewery:'brewery',pottery:'pottery'}[c.types[0]]);return `assets/cards/card-${key}.webp`;}
 function preloadTableAssets() {
  const tileAssets = flipped => COLOR_NAMES.map((_, owner) =>

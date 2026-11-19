@@ -127,14 +127,3 @@
  #action-motion {display:none}
  #game .event-flight.event-build > img,#game .event-flight.event-link > img,#game #action-buttons .event-committed {animation:none}
 }
-
-/* Some white-player fronts include the next tile at the left and lower edges. */
-img[src*="/tile-gray-"]:not([src*="-flipped"]) {
- clip-path:inset(1% 2% 8% 9% round 5%);
-}
-@supports(object-view-box:inset(1%)){
- img[src*="/tile-gray-"]:not([src*="-flipped"]) {
-  object-view-box:inset(1% 2% 8% 9%);
-  clip-path:inset(0 round 5%);
- }
-}
