@@ -103,4 +103,17 @@ test('full page restores a game, develops from mat before discarding, and update
  const sold=JSON.parse(store.get('brass-night-save-v1'));assert.equal(sold.rev,1);assert.ok(sold.board['worcester:0'].flipped&&sold.board['redditch:0'].flipped);assert.equal(sold.board['southern:0'].resource,0);assert.equal(sold.players[0].stacks.coalMine.length,saleGame.players[0].stacks.coalMine.length-1);assert.equal(sold.players[0].hand.length,7);
  $('#menu-btn').onclick();$('#back-btn').onclick();
 
+ const shared=createGame(['You','AI'],[false,true],111);shared.gameId='shared-slot';shared.order=[0,1];shared.round=2;shared.players[0].money=100;
+ shared.players[0].hand[0]={id:998,kind:'location',loc:'birmingham'};
+ shared.links['birmingham-oxford']={owner:1};
+ for(const i of [1,3])shared.board[`birmingham:${i}`]={owner:1,type:'manufacturer',level:1,flipped:false,resource:0};
+ restore(shared);
+ $('#action-buttons [data-type="build"]').onclick();$('[data-loc="birmingham"][data-slot="0"]').onclick();
+ const picker=$('#industry-picker');assert.equal(picker.hidden,false);assert.equal(picker.getAttribute('aria-label'),'伯明翰可建产业');
+ assert.deepEqual([...picker.querySelectorAll('button')].map(b=>b.dataset.industryOption),['cottonMill','manufacturer']);
+ assert.equal(picker.querySelectorAll('img').length,2);assert.equal($('#flow-options').children.length,0);
+ $('[data-industry-option="manufacturer"]').onclick();assert.equal(picker.hidden,true);assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));
+ $('[data-card="0"]').onclick();$('#flow-finish').onclick();assert.equal(JSON.parse(store.get('brass-night-save-v1')).board['birmingham:0'].type,'manufacturer');
+ $('#menu-btn').onclick();$('#back-btn').onclick();
+
 });

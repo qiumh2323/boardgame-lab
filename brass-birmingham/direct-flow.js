@@ -2,16 +2,16 @@ import {createSalePlan} from './sale-plan.js?v=0.32';
 import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.32';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createDirectFlow(api){
- let draft=null,stage='idle',variants=[],resource=null,salePlan=null,lastRevision=null,selectedCard=null;
+ let draft=null,stage='idle',variants=[],resource=null,salePlan=null,lastRevision=null,selectedCard=null,industryChoice=null;
  const $=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)];
- function reset(){draft=null;variants=[];stage='idle';resource=null;salePlan=null;selectedCard=null;paint();}
+ function reset(){industryChoice=null;draft=null;variants=[];stage='idle';resource=null;salePlan=null;selectedCard=null;paint();}
  function bar(text,options=[],finish=false){
   api.hint?.(text);$('#flow-text').textContent=text;$('#flow-options').innerHTML=options.map((o,i)=>`<button data-flow-option="${i}">${esc(o.label)}</button>`).join('');
   all('[data-flow-option]').forEach(b=>b.onclick=options[+b.dataset.flowOption].click);
   $('#flow-finish').hidden=!finish;$('#flow-cancel').hidden=stage==='idle';
  }
  function begin(type){
-  if(!api.myTurn())return;api.showMyMat();draft={type};stage='target';resource=null;variants=[];selectedCard=null;
+  if(!api.myTurn())return;industryChoice=null;api.showMyMat();draft={type};stage='target';resource=null;variants=[];selectedCard=null;
   if(type==='develop')draft.industries=[];
   if(type==='network')draft.edges=[];
   if(type==='sell'){draft.sales=[];salePlan=createSalePlan(api.view(),api.seat());}
@@ -44,10 +44,60 @@ export function createDirectFlow(api){
   if(draft.type==='build'&&!variants.some(a=>a.card===index))return;
   selectedCard=selectedCard===index?null:index;paint();
  }
+ function buildSlot(loc,slot){return $(`[data-loc="${loc}"][data-slot="${slot}"]`);}
+ function positionIndustryPicker(){
+  const picker=$('#industry-picker');
+  if(!industryChoice||picker.hidden)return;
+  const anchor=buildSlot(industryChoice.loc,industryChoice.slot)?.getBoundingClientRect?.();
+  if(!anchor)return;
+  const viewport=document.documentElement;
+  const boardViewport=document.body.classList.contains('board-focus')?$('.board-column')?.getBoundingClientRect():null;
+  const visibleTop=Math.max(0,boardViewport?.top??0),visibleBottom=Math.min(viewport.clientHeight,boardViewport?.bottom??viewport.clientHeight);
+  picker.style.visibility=anchor.bottom>visibleTop&&anchor.top<visibleBottom&&anchor.right>0&&anchor.left<viewport.clientWidth?'visible':'hidden';
+  const width=picker.offsetWidth,height=picker.offsetHeight,gap=8;
+  const maxX=viewport.clientWidth-width-gap,maxY=viewport.clientHeight-height-gap;
+  const above=anchor.top-height-gap;
+  picker.style.left=`${Math.max(gap,Math.min(maxX,anchor.left+(anchor.width-width)/2))}px`;
+  picker.style.top=`${Math.max(gap,Math.min(maxY,above>=gap?above:anchor.bottom+gap))}px`;
+ }
+ function dismissIndustry(){
+  if(stage!=='industry'||!industryChoice)return false;
+  const {loc,slot}=industryChoice;
+  industryChoice=null;stage='target';paint();buildSlot(loc,slot)?.focus();return true;
+ }
+ document.addEventListener('scroll',positionIndustryPicker,true);
+ document.defaultView?.addEventListener('resize',positionIndustryPicker);
  function selectBuild(loc,slot){
-  let list=candidates('build').filter(a=>a.loc===loc&&a.slot===slot),types=[...new Set(list.map(a=>a.industry))];if(!list.length)return;
-  const pick=industry=>{draft={type:'build',loc,slot,industry};variants=list.filter(a=>a.industry===industry);discard();};
-  if(types.length===1)pick(types[0]);else{stage='industry';bar(`${cityName(loc)}：选择要建造的产业`,types.map(t=>({label:ZH[t],click:()=>pick(t)})));}
+  const list=candidates('build').filter(a=>a.loc===loc&&a.slot===slot);
+  const types=[...new Set(list.map(a=>a.industry))];
+  if(!types.length)return;
+  const pick=industry=>{
+   industryChoice=null;draft={type:'build',loc,slot,industry};
+   variants=list.filter(a=>a.industry===industry);discard();
+   $('[data-card].discard-allowed')?.focus();
+  };
+  if(types.length===1){pick(types[0]);return;}
+  industryChoice={loc,slot,types,pick};stage='industry';paint();
+  $('#industry-picker [data-industry-option]')?.focus();
+ }
+ function paintIndustryPicker(){
+  const picker=$('#industry-picker'),{loc,slot,types,pick}=industryChoice;
+  const anchor=buildSlot(loc,slot);
+  for(const candidate of candidates('build')){
+   const target=buildSlot(candidate.loc,candidate.slot);
+   if(target&&target!==anchor){mark(target);target.onclick=()=>selectBuild(candidate.loc,candidate.slot);}
+  }
+  mark(anchor,true);if(anchor)anchor.onclick=dismissIndustry;
+  picker.setAttribute('aria-label',`${cityName(loc)}可建产业`);
+  picker.innerHTML=types.map(type=>{
+   const level=nextTile(api.view(),api.seat(),type)?.level;
+   const image=api.industryImage?.(type,level);
+   const label=`${ZH[type]}${level?` ${level}级`:''}`;
+   return `<button type="button" data-industry-option="${type}" title="${esc(label)}">${image?`<img src="${esc(image)}" alt="">`:''}<span>${esc(label)}</span></button>`;
+  }).join('');
+  picker.querySelectorAll('button').forEach(button=>button.onclick=()=>pick(button.dataset.industryOption));
+  picker.hidden=false;positionIndustryPicker();
+  bar(`${cityName(loc)}：点击地图旁的板块选择产业。`);
  }
  function selectRoute(key){
   if(draft.edges.at(-1)===key){draft.edges.pop();paint();return;}
@@ -80,10 +130,11 @@ export function createDirectFlow(api){
  function mark(el,selected=false){el?.classList.add(selected?'flow-selected':'flow-target');}
  function paint(){
   if(!$('#flow-bar'))return;
+  const picker=$('#industry-picker');if(picker)picker.hidden=true;
   all('.flow-target,.flow-selected').forEach(e=>e.classList.remove('flow-target','flow-selected'));
   let v=api.view();$('#hand-float').hidden=!v;$('#flow-bar').hidden=!v;
   if(!v){api.hint?.('');return;}
-  if(lastRevision!==v.rev){draft=null;variants=[];resource=null;stage='idle';selectedCard=null;lastRevision=v.rev;}
+  if(lastRevision!==v.rev){industryChoice=null;draft=null;variants=[];resource=null;stage='idle';selectedCard=null;lastRevision=v.rev;}
   all('[data-loc],[data-route],[data-merchant],[data-mat-type]').forEach(e=>e.onclick=()=>{});
   all('[data-loc],[data-route]').forEach(el=>el.onclick=()=>{
    if(!api.myTurn()){api.explain?.(el,{});return;}
@@ -100,7 +151,7 @@ export function createDirectFlow(api){
   if(!api.myTurn()){bar(v.gameOver?'对局已结束':'等待其他玩家行动');return;}
   if(stage==='idle'){bar('先选择行动，再点击地图或玩家面板上的高亮目标。');return;}
   if(stage==='waiting'){bar('正在核对行动与资源…');return;}
-  if(stage==='industry')return;
+  if(stage==='industry'){paintIndustryPicker();return;}
   $('#flow-finish').textContent=draft?.type==='scout'?'确认侦察':draft?.type==='sell'?'确认出售':'确认执行';
   if(stage==='discard'){
    let n=draft.type==='scout'?draft.extra.length:(selectedCard===null?0:1);
@@ -139,5 +190,5 @@ export function createDirectFlow(api){
    bar(`已选择${draft.sales.length}个产业。点击高亮产业，再选啤酒来源，重复即可继续出售；最后选一张弃牌，确认出售。${draft.sales.length?'点击已选产业可撤回该项及后续选择。':''}`,[],canConfirm());
   }
  }
- return {begin,paint,reset,requestChoice,failed:()=>{stage='target';resource=null;paint();}};
+ return {begin,paint,reset,requestChoice,dismissIndustry,failed:()=>{stage='target';resource=null;paint();}};
 }
