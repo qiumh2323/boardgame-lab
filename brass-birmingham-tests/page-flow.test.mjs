@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.20';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.21';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -41,7 +41,7 @@ test('full page restores a game, develops from mat before discarding, and update
  let before=$('[data-mat-type="coalMine"][data-level="1"]').dataset.count;$('[data-mat-type="coalMine"][data-level="1"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);
  assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));$('[data-card="0"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);$('#flow-finish').onclick();
  assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,'0');assert.equal(JSON.parse(store.get('brass-night-save-v1')).players[0].stacks.coalMine[0],2);assert.ok($('[data-mat-type="coalMine"][data-level="2"]').classList.contains('unlocked'));
- assert.ok(!$('#modal').open);assert.match($('#flow-text').textContent,/先选择行动/);assert.ok(document.querySelectorAll('.catalogue-card .seen').length>0);assert.equal($('#ai-hint'),null);assert.equal($('#action-history-btn').textContent,'行动记录');assert.ok($('link[href^="action-feedback.css"]'));assert.equal($('#action-announcement').hidden,false);assert.match($('#action-announcement').textContent,/研发/);assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('event-develop'));$('#action-history-btn').onclick();assert.equal($('#modal-title').textContent,'行动记录');assert.match($('#modal-content').textContent,/研发/);$('#modal-close').onclick();
+ assert.ok(!$('#modal').open);assert.match($('#flow-text').textContent,/先选择行动/);assert.ok(document.querySelectorAll('.catalogue-card .seen').length>0);assert.equal($('#ai-hint'),null);assert.equal($('#action-history-btn').textContent,'查看行动记录');assert.equal($('#action-history-btn').nextElementSibling.id,'latest-action');assert.equal($('#action-history-btn').getAttribute('aria-haspopup'),'dialog');assert.ok($('link[href^="action-feedback.css"]'));assert.equal($('#action-announcement').hidden,false);assert.match($('#action-announcement').textContent,/研发/);assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('event-develop'));$('#action-history-btn').onclick();assert.equal($('#modal-title').textContent,'行动记录');assert.match($('#modal-content').textContent,/研发/);$('#modal-close').onclick();
  for(const [n,draw,total] of [[3,27,54],[4,28,64]]){
   $('#menu-btn').onclick();$('#back-btn').onclick();
   let game=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),31);game.order=game.players.map(p=>p.id);store.set('brass-night-save-v1',JSON.stringify(game));$('#resume-btn').onclick();

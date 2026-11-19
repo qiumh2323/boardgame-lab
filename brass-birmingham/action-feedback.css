@@ -35,7 +35,7 @@
 @media(prefers-reduced-motion:reduce){.slot.event-resource,.merchant-tile.event-resource{animation:none}}
 
 /* A single top stack keeps turn instructions and completed-action feedback together. */
-#action-float-stack{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:70;width:max-content;max-width:min(640px,calc(100vw - 24px));display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:none}
+#action-float-stack{position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:70;width:max-content;max-width:calc(100vw - 24px);display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:none}
 #player-action-hint{max-width:100%;padding:8px 14px;background:#172b39f5;color:#f4e5bd;border:1px solid #a48d60;border-radius:6px;box-shadow:0 4px 15px #0007;font-size:14px;line-height:1.6;text-align:center}
 #action-float-stack .action-announcement{position:static;width:auto;max-width:100%;padding:10px 14px}
 #placement-hint{position:fixed;z-index:90;padding:11px 14px;border:1px solid #c7a266;border-radius:6px;background:#192c38fa;box-shadow:0 6px 20px #0009;color:#f3dfbd;font-size:14px;line-height:1.8;pointer-events:none}
@@ -44,3 +44,16 @@
 #game #action-buttons button.action-ready{animation:action-ready-breathe 2.6s ease-in-out infinite}
 @keyframes action-ready-breathe{0%,100%{box-shadow:0 0 0 1px #c7a26635,0 0 3px #c7a26615}50%{box-shadow:0 0 0 1px #e4c787a0,0 0 12px #d8b37460}}
 @media(prefers-reduced-motion:reduce){#game #action-buttons button.action-ready{animation:none;box-shadow:0 0 0 1px #d8b37480}}
+
+/* Grow to one line before wrapping at the viewport edge. */
+#player-action-hint{width:max-content;white-space:normal;overflow-wrap:anywhere;flex-shrink:1}
+#action-float-stack .action-announcement>div:last-child{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 14px;min-width:0}
+#action-float-stack .action-announcement p{margin:0}
+#game #action-history-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:3px 0 0;padding:8px 10px;border:1px solid #a68f63;border-radius:5px;background:#344936;color:#f4dfb2;font-size:14px;box-shadow:0 2px 4px #0003;cursor:pointer}
+#game #action-history-btn:hover{background:#455c44;border-color:#ead29b}
+#game #action-history-btn:focus-visible{outline:2px solid #f4dfb2;outline-offset:2px}
+#action-history-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.5;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#game .flow-target:not(.flow-selected),#game .card.discard-allowed:not(.discard-picked){animation:action-ready-breathe 2.6s ease-in-out infinite}
+/* Extend the mat glow around the entire physical stack, above its artwork. */
+#game .mat-tile.flow-target::after{content:'';position:absolute;left:-3px;top:-3px;right:calc(-3px - var(--stack-x,0px));bottom:calc(-3px - var(--stack-y,0px));border:2px solid #f6d26f;border-radius:4px;pointer-events:none;z-index:10;animation:action-ready-breathe 2.6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){#game .flow-target:not(.flow-selected),#game .card.discard-allowed:not(.discard-picked),#game .mat-tile.flow-target::after{animation:none;box-shadow:0 0 0 1px #d8b37480,0 0 7px #d8b37440}}
