@@ -30,3 +30,13 @@
 body.board-focus #game .board-column{position:fixed;inset:54px 0 0;width:100vw;height:calc(100dvh - 54px);z-index:40;display:flex;align-items:center;justify-content:center;background:#15212bf7;overflow:hidden}
 body.board-focus #game #board-wrap{width:min(calc(100vw - 20px),calc(100dvh - 74px));height:min(calc(100vw - 20px),calc(100dvh - 74px));max-width:none;max-height:none;aspect-ratio:1;flex:none}
 body.board-focus #game #zoom-btn{position:absolute;top:7px;right:7px;z-index:50}
+
+/* Locked levels stay legible; active development targets regain full colour. */
+.mat-board .mat-tile.unlocked{outline:none}
+.mat-board .mat-tile.locked:not(.flow-target):not(.flow-selected)>img{filter:grayscale(.4) saturate(.72) brightness(.83)}
+.mat-board .mat-tile.unlocked>img,.mat-board .mat-tile.flow-target>img,.mat-board .mat-tile.flow-selected>img{filter:none}
+.mat-board .mat-tile.locked:not(.flow-target):not(.flow-selected) .mat-count{color:#bac4c9;border-color:#8e9b9f}
+.mat-board .mat-tile:hover,.mat-board .mat-tile:focus-visible{z-index:40;outline:none}
+.mat-board .mat-tile:hover::after,.mat-board .mat-tile:focus-visible::after{content:'';position:absolute;left:-3px;top:-3px;right:calc(-3px - var(--stack-x,0px));bottom:calc(-3px - var(--stack-y,0px));border:2px solid #fff0bd;border-radius:4px;box-shadow:0 0 0 1px #493f2b,0 0 7px #f6d79588;pointer-events:none;z-index:10}
+.mat-board .mat-tile.flow-target:hover,.mat-board .mat-tile.flow-target:focus-visible{transform:translate(-50%,-50%)}
+.mat-board .mat-tile.flow-target:hover::after,.mat-board .mat-tile.flow-selected:hover::after{border-color:#fff5cf}

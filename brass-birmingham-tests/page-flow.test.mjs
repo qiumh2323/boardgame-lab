@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.11';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.12';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -16,7 +16,7 @@ test('full page restores a game, develops from mat before discarding, and update
 
 
  assert.equal($('#game > .game-status'),null);assert.ok($('.sidebar').firstElementChild.classList.contains('dock-status'));assert.ok($('link[href^="localization.css"]'));
- assert.equal($('#zoom-btn').parentElement.id,'board-wrap');assert.equal($('#mat-preview').parentElement.id,'mat-board');assert.equal(document.querySelectorAll('[data-city-label]').length,27);assert.equal($('[data-city-label="nuneaton"]').textContent,'纳尼顿');
+ assert.equal($('#zoom-btn').parentElement.id,'board-wrap');assert.equal($('#mat-preview').parentElement.id,'mat-board');assert.equal(document.querySelectorAll('[data-city-label]').length,25);assert.equal($('[data-city-label="nuneaton"]').textContent,'纳尼顿');assert.equal($('[data-city-label="northern"]'),null);assert.equal($('[data-city-label="southern"]'),null);assert.equal($('.mat-next'),null);assert.ok(!$('#mat-stacks').textContent.includes('下一块'));assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('unlocked'));assert.ok($('[data-mat-type="coalMine"][data-level="2"]').classList.contains('locked'));
  assert.equal($('[data-mat-player="0"]').textContent,'玩家面板（你）');assert.equal($('[data-mat-player="1"]').textContent,'玩家面板（AI 1）');
  $('#zoom-btn').onclick();assert.ok(document.body.classList.contains('board-focus'));assert.equal($('#zoom-btn').getAttribute('aria-pressed'),'true');assert.ok($('#zoom-btn svg'));$('#zoom-btn').onclick();assert.ok(!document.body.classList.contains('board-focus'));
  $('#mat-preview').onclick();assert.equal($('#modal').open,true);assert.ok($('#modal-content .mat-enlarged').innerHTML.includes('tile-yellow-'));assert.equal(document.querySelectorAll('#modal-content .mat-count').length,29);assert.equal($('#modal-content #mat-tokens'),null);$('#modal-close').onclick();
@@ -30,7 +30,7 @@ test('full page restores a game, develops from mat before discarding, and update
  $('#action-buttons [data-type="develop"]').onclick();assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('flow-target'));
  let before=$('[data-mat-type="coalMine"][data-level="1"]').dataset.count;$('[data-mat-type="coalMine"][data-level="1"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);
  assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));$('[data-card="0"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);$('#flow-finish').onclick();
- assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,'0');assert.equal(JSON.parse(store.get('brass-night-save-v1')).players[0].stacks.coalMine[0],2);
+ assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,'0');assert.equal(JSON.parse(store.get('brass-night-save-v1')).players[0].stacks.coalMine[0],2);assert.ok($('[data-mat-type="coalMine"][data-level="2"]').classList.contains('unlocked'));
  assert.equal($('#modal').open,false);assert.match($('#flow-text').textContent,/先选择行动/);assert.ok(document.querySelectorAll('.catalogue-card .seen').length>0);
  for(const [n,draw,total] of [[3,27,54],[4,28,64]]){
   $('#menu-btn').onclick();$('#back-btn').onclick();

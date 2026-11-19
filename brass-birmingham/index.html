@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#15212b"><title>工业革命：伯明翰 · 在线对战</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="table.css?v=0.5"><link rel="stylesheet" href="flow.css?v=0.4"><link rel="stylesheet" href="alignment.css?v=0.5"><link rel="stylesheet" href="workspace.css?v=0.11"><link rel="stylesheet" href="dock.css?v=0.11"><link rel="stylesheet" href="refinement.css?v=0.11"><link rel="stylesheet" href="tabletop.css?v=0.11"><link rel="stylesheet" href="localization.css?v=0.11"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#15212b"><title>工业革命：伯明翰 · 在线对战</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="table.css?v=0.5"><link rel="stylesheet" href="flow.css?v=0.4"><link rel="stylesheet" href="alignment.css?v=0.5"><link rel="stylesheet" href="workspace.css?v=0.12"><link rel="stylesheet" href="dock.css?v=0.12"><link rel="stylesheet" href="refinement.css?v=0.12"><link rel="stylesheet" href="tabletop.css?v=0.12"><link rel="stylesheet" href="localization.css?v=0.12"></head>
 <body>
-<header class="topbar"><a class="brand" href="./"><span class="seal">B</span><span>工业革命：伯明翰<small>在线对战 · 测试版 0.11</small></span></a><nav><span id="connection-status" role="status">本地对局</span><details class="journal" id="journal-dropdown"><summary>对局记录</summary><ol id="log"></ol></details><button id="help-btn" class="quiet">玩法与规则</button><button id="menu-btn" class="quiet">对局菜单</button></nav></header>
+<header class="topbar"><a class="brand" href="./"><span class="seal">B</span><span>工业革命：伯明翰<small>在线对战 · 测试版 0.12</small></span></a><nav><span id="connection-status" role="status">本地对局</span><details class="journal" id="journal-dropdown"><summary>对局记录</summary><ol id="log"></ol></details><button id="help-btn" class="quiet">玩法与规则</button><button id="menu-btn" class="quiet">对局菜单</button></nav></header>
 <section id="lobby" class="lobby">
  <div class="lobby-copy"><p class="period">黑乡，1770—1870</p><h1>点亮你的<br>工业版图。</h1><p class="intro">沿运河铺路，让煤炭与啤酒流动。<br>从第一座工厂，走向铁路时代。</p>
  <div class="setup-controls"><label>你的名字<input id="player-name" maxlength="18" value="玩家" autocomplete="nickname"></label><label>对局人数<select id="player-count"><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option></select></label></div>
@@ -22,5 +22,5 @@
 <section id="flow-bar" hidden aria-live="polite"><p id="flow-text"></p><div id="flow-options"></div><div class="flow-controls"><button id="flow-finish" class="primary" hidden>确认执行</button><button id="flow-cancel" hidden>取消行动</button></div></section>
 <section id="card-catalogue" class="card-catalogue" hidden aria-label="牌组构成"><div class="catalogue-toolbar"><h2 id="catalogue-heading"></h2><button id="catalogue-close" aria-label="关闭牌组清单">✕</button></div><p>展示牌组构成；标记自己手牌和公开出现的牌，不显示牌序或他人手牌。</p><div id="catalogue-cards"></div></section>
 <div id="toast" role="status" hidden></div>
-<script src="vendor/peerjs.min.js"></script><script type="module" src="app.js?v=0.11"></script>
+<script src="vendor/peerjs.min.js"></script><script type="module" src="app.js?v=0.12"></script>
 </body></html>

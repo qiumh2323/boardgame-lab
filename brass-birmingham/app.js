@@ -1,9 +1,9 @@
-import {cardCatalogue} from './card-library.js?v=0.11';
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.11';
-import {selectAI} from './ai.js?v=0.11';
+import {cardCatalogue} from './card-library.js?v=0.12';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.12';
+import {selectAI} from './ai.js?v=0.12';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.11';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.11';
+import {createDirectFlow} from './direct-flow.js?v=0.12';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.12';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -95,12 +95,12 @@ function renderMat(){
  $('#mat-player').innerHTML=view.players.map(p=>`<button type="button" data-mat-player="${p.id}" aria-pressed="${p.id===id}" class="${p.id===id?'selected':''}" style="--owner:${COLORS[p.id]}" title="查看${esc(p.name)}的面板">玩家面板（${p.id===seat?'你':p.ai?'AI '+(view.players.filter(x=>x.ai).findIndex(x=>x.id===p.id)+1):esc(p.name)}）</button>`).join('');
  $('#mat-player').querySelectorAll('[data-mat-player]').forEach(b=>b.onclick=()=>{matSeat=Number(b.dataset.matPlayer);renderMat();directFlow.paint();});
  let html='';for(let type of TYPES)for(let d of F.industries[type]){let [x,y]=layout.playerMat.slots[type][d.level-1],count=p.stacks[type].filter(n=>n===d.level).length,isNext=nextTile(view,id,type)?.level===d.level&&count>0;
-  html+=`<button class="mat-tile ${count?'':'depleted'} ${isNext?'next-tile':''}" data-mat-type="${type}" data-level="${d.level}" data-count="${count}" style="left:${x*100}%;top:${y*100}%;--owner:${COLORS[id]}" title="${esc(p.name)} ${ZH[type]} ${d.level}级，剩余${count}块；建造 £${d.cost}${d.costCoal?' 煤'+d.costCoal:''}${d.costIron?' 铁'+d.costIron:''}；${d.vp}VP，收入+${d.income}" aria-label="${ZH[type]}${d.level}级剩余${count}块">${count?`${Array.from({length:count-1},(_,i)=>`<img class="mat-under" style="--depth:${count-1-i}" src="${tileUrl(type,d.level,false,id)}" alt="">`).join('')}<img src="${tileUrl(type,d.level,false,id)}" alt="">`:''}<span class="mat-count">${count}</span>${isNext?'<span class="mat-next">下一块</span>':''}</button>`;
+  html+=`<button class="mat-tile ${count?'':'depleted'} ${count?(isNext?'unlocked':'locked'):''}" data-mat-type="${type}" data-level="${d.level}" data-count="${count}" style="left:${x*100}%;top:${y*100}%;--owner:${COLORS[id]};--stack-x:${Math.max(0,count-1)*2}px;--stack-y:${Math.max(0,count-1)*3}px" title="${esc(p.name)} ${ZH[type]} ${d.level}级，剩余${count}块；建造 £${d.cost}${d.costCoal?' 煤'+d.costCoal:''}${d.costIron?' 铁'+d.costIron:''}；${d.vp}VP，收入+${d.income}" aria-label="${ZH[type]}${d.level}级剩余${count}块">${count?`${Array.from({length:count-1},(_,i)=>`<img class="mat-under" style="--depth:${count-1-i}" src="${tileUrl(type,d.level,false,id)}" alt="">`).join('')}<img src="${tileUrl(type,d.level,false,id)}" alt="">`:''}<span class="mat-count">${count}</span></button>`;
  }
  $('#mat-tokens').innerHTML=html;
  $('#player-reserve').innerHTML=playerReserve(p,view.era);
  $('#mat-tokens').querySelectorAll('button').forEach(b=>b.onclick=()=>{let type=b.dataset.matType;if(id===seat&&myTurn()&&Number(b.dataset.level)===nextTile(view,id,type)?.level)openActions('build',null,null,null,type);else toast(b.title);});
- $('#mat-stacks').innerHTML=TYPES.map(type=>{let d=nextTile(view,id,type),n=p.stacks[type].length;return `<div class="stack-summary"><strong>${ZH[type]}</strong><span>${d?`下一块 ${d.level}级 · 共余${n}块`:'已用完'}</span></div>`;}).join('');
+ $('#mat-stacks').innerHTML=TYPES.map(type=>{let d=nextTile(view,id,type),n=p.stacks[type].length;return `<div class="stack-summary"><strong>${ZH[type]}</strong><span>${d?`${d.level}级 · 共余${n}块`:'已用完'}</span></div>`;}).join('');
 }
 function available(type,loc=null,slot=null,edge=null){
  return actions.filter(a=>a.type===type&&(a.type!=='build'||a.card===cardIndex)&&(!loc||a.type==='build'&&a.loc===loc&&(slot===null||a.slot===slot)||a.type==='sell'&&a.sales.some(x=>tileLocation(x.key)===loc))&&(!edge||a.edges.includes(edge)));
@@ -165,7 +165,7 @@ $('#mat-preview').onclick=()=>{
 $('#ai-hint').onclick=()=>{if(!state||!myTurn())return;toast('正在计算建议…');setTimeout(()=>{let a=selectAI(state,seat);if(a){showDialog('规则 AI 建议',`<p>${esc(actionLabel(a))}</p><p class="modal-note">按可得分产业、收入、运输网络与现金评估；建议不保证最优。</p><button id="use-hint" class="primary wide">采用建议</button>`);$('#use-hint').onclick=()=>{cardIndex=a.card||0;submit(a);};}},20);};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.11').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.12').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 $('#catalogue-close').onclick=()=>$('#card-catalogue').hidden=true;$('#card-catalogue').onmouseenter=()=>clearTimeout(catalogueTimer);$('#card-catalogue').onmouseleave=queueCatalogueClose;$('#card-catalogue').onfocusin=()=>clearTimeout(catalogueTimer);$('#card-catalogue').onfocusout=queueCatalogueClose;

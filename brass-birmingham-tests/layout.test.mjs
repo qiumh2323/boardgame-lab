@@ -31,13 +31,18 @@ test('placed connection pieces do not cover another connection in either era',()
  }
 });
 test('Chinese labels cover every region and avoid board targets, names, connections and other Chinese labels',()=>{
- assert.deepEqual(Object.keys(layout.cityLabels).sort(),Object.keys(layout.anchors).sort());
+ assert.deepEqual(Object.keys(layout.cityLabels).sort(),Object.keys(layout.anchors).filter(k=>!['northern','southern'].includes(k)).sort());
  const obstacles=[];
- for(const [groups,size] of [[layout.slots,.0425],[layout.merchants,.0425],[layout.markets,.0148],[layout.merchantBeer,.031]])
+ for(const [groups,size] of [[layout.slots,.0465],[layout.merchants,.0445],[layout.markets,.0168],[layout.merchantBeer,.033]])
   for(const [key,positions] of Object.entries(groups))positions.forEach((pos,i)=>obstacles.push({name:`${key}:${i}`,shape:rect(pos,size,size)}));
  for(const [key,[x1,y1,x2,y2]] of Object.entries(layout.routeKeepouts))obstacles.push({name:'English:'+key,shape:rect([(x1+x2)/2,(y1+y2)/2],x2-x1,y2-y1)});
  for(const [key,route] of Object.entries(layout.routes))for(const [era,p] of Object.entries(route.eras))obstacles.push({name:`${key}:${era}`,shape:rect(p.center,(p.width||5.4)/100,(p.width||5.4)/180,p.angle)});
+ for(const [key,pos] of Object.entries(layout.track))obstacles.push({name:'track:'+key,shape:rect(pos,.0215,.0215)});
+ for(const [key,pos] of layout.turnOrder.entries())obstacles.push({name:'portrait:'+key,shape:rect(pos,.074,.074)});
+ for(const [key,pos] of layout.turnSpend.entries())obstacles.push({name:'spent:'+key,shape:rect(pos,.061,.061)});
+ for(const pile of layout.decks)obstacles.push({name:'pile:'+pile.kind,shape:rect(pile.center,...pile.size)});
  for(const [key,p] of Object.entries(layout.cityLabels)){
+  assert.ok(p.font>=17,`${key} Chinese name must remain enlarged`);
   const shape=rect(p.center,p.width,p.height);
   for(const obstacle of obstacles)assert.equal(overlaps(shape,obstacle.shape),false,`${key} label overlaps ${obstacle.name}`);
   obstacles.push({name:'Chinese:'+key,shape});
