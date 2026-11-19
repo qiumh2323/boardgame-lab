@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.25';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.26';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -77,6 +77,16 @@ test('full page restores a game, develops from mat before discarding, and update
  proposeCover();$('#skip-overbuild-warning').checked=true;$('#continue-overbuild').onclick();assert.ok(!modal.open);assert.equal(JSON.parse(store.get('brass-night-save-v1')).board['birmingham:2'].level,2);assert.equal(store.get('brass-own-overbuild-warning:own-cover'),'1');
  $('#menu-btn').onclick();$('#back-btn').onclick();restore(over);proposeCover();assert.ok(!modal.open);assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,1);
  $('#menu-btn').onclick();$('#back-btn').onclick();restore({...over,gameId:'another-cover'});proposeCover();assert.equal($('#modal-title').textContent,'确认覆盖自己的产业');$('#modal-close').onclick();assert.match($('#flow-text').textContent,/先选择行动/);
+ $('#menu-btn').onclick();$('#back-btn').onclick();
+
+ const saleGame=createGame(['You','AI'],[false,true],81);saleGame.gameId='sale-loop';saleGame.order=[0,1];saleGame.round=2;saleGame.era='rail';saleGame.players[0].stacks.coalMine=saleGame.players[0].stacks.coalMine.filter(level=>level>1);
+ saleGame.board={'worcester:0':{owner:0,type:'cottonMill',level:2,resource:0,flipped:false},'redditch:0':{owner:0,type:'cottonMill',level:2,resource:0,flipped:false},'southern:0':{owner:0,type:'brewery',level:2,resource:1,flipped:false}};
+ saleGame.links={'gloucester-worcester':{owner:0},'gloucester-redditch':{owner:0}};saleGame.merchants=[{id:0,loc:'gloucester',buys:'any',beer:true}];restore(saleGame);
+ $('#action-buttons [data-type="sell"]').onclick();$('[data-loc="worcester"][data-slot="0"]').onclick();assert.ok($('[data-merchant="0"]').classList.contains('flow-target'));assert.equal(document.querySelectorAll('[data-flow-option]').length,0);
+ $('[data-merchant="0"]').onclick();assert.match($('#flow-text').textContent,/免费研发/);assert.ok(!$('[data-mat-type="coalMine"][data-level="1"]').classList.contains('flow-target'));assert.ok($('[data-mat-type="coalMine"][data-level="2"]').classList.contains('flow-target'));assert.equal(document.querySelectorAll('[data-flow-option]').length,1);
+ $('[data-mat-type="coalMine"][data-level="2"]').onclick();assert.ok($('[data-loc="worcester"][data-slot="0"]').classList.contains('flow-selected'));assert.ok($('[data-loc="redditch"][data-slot="0"]').classList.contains('flow-target'));
+ $('[data-loc="redditch"][data-slot="0"]').onclick();$('[data-loc="southern"][data-slot="0"]').onclick();assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,0);assert.ok(!modal.open);$('[data-card="0"]').onclick();assert.equal($('#flow-finish').textContent,'确认出售');$('#flow-finish').onclick();
+ const sold=JSON.parse(store.get('brass-night-save-v1'));assert.equal(sold.rev,1);assert.ok(sold.board['worcester:0'].flipped&&sold.board['redditch:0'].flipped);assert.equal(sold.board['southern:0'].resource,0);assert.equal(sold.players[0].stacks.coalMine.length,saleGame.players[0].stacks.coalMine.length-1);assert.equal(sold.players[0].hand.length,7);
  $('#menu-btn').onclick();$('#back-btn').onclick();
 
 });

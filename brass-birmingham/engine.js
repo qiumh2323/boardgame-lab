@@ -56,7 +56,7 @@ function takeResource(s,id,resource,locations,ctx,merchant=null){
 }
 function developOne(s,p,type){let t=nextTile(s,p.id,type);insist(t&&t.canDevelop,'该产业当前最低等级不能研发');p.stacks[type].shift();}
 function merchantBonus(s,p,m,ctx){let f=F.merchants[m.loc];if(f.bonusType==='vp')p.vp+=f.bonusAmount;if(f.bonusType==='money')p.money+=f.bonusAmount;if(f.bonusType==='income')p.income=Math.min(99,p.income+f.bonusAmount);if(f.bonusType==='develop'){
- let options=TYPES.filter(t=>nextTile(s,p.id,t)?.canDevelop).map(t=>({id:t,label:ZH[t]}));if(options.length){options.push({id:'skip',label:'放弃本次免费研发'});let t=choose(ctx,'商人奖励：免费研发',options).id;if(t!=='skip')developOne(s,p,t);}
+ let options=TYPES.filter(t=>nextTile(s,p.id,t)?.canDevelop).map(t=>({id:t,label:ZH[t],level:nextTile(s,p.id,t).level}));if(options.length){options.push({id:'skip',label:'放弃本次免费研发'});let t=choose(ctx,'商人奖励：免费研发',options).id;if(t!=='skip')developOne(s,p,t);}
  }}
 function discard(s,p,indices){let sorted=[...new Set(indices)].sort((a,b)=>b-a);insist(sorted.length===indices.length,'不能重复选择卡牌');for(let i of sorted){insist(Number.isInteger(i)&&p.hand[i],'请选择有效的手牌');let [c]=p.hand.splice(i,1);if(c.kind.startsWith('wild'))s.wild[c.kind==='wildLocation'?'location':'industry']++;else {s.seenCards??=[...s.discard];if(!s.seenCards.some(x=>x.id===c.id))s.seenCards.push(c);s.discard.push(c);}}}
 function matches(s,id,c,loc,type){let net=network(s,id),farm=!!F.farms[loc];if(c.kind==='location')return !farm&&c.loc===loc;if(c.kind==='wildLocation')return !farm;return (c.kind==='wildIndustry'||c.kind==='industry'&&c.types.includes(type))&&(net.size===0||net.has(loc));}
@@ -92,6 +92,12 @@ function sell(s,p,a,ctx){
   for(let i=0;i<tileData(t).beersToSell;i++)takeResource(s,p.id,'beer',[loc],ctx,m);flip(s,t);
  }
  return `出售 ${a.sales.length}个产业`;
+}
+// A sale draft resolves resources and rewards without discarding, advancing or touching the live game.
+export function previewSales(state,id,sales,choices=[]){
+ const s=clone(state),ctx={choices,index:0,auto:false};
+ try{sell(s,s.players[id],{sales},ctx);return {ok:true,state:s};}
+ catch(e){return {ok:false,error:e.message,choice:e.choice};}
 }
 export function estimateEraScore(s){
  if(s.gameOver)return s.players.map(()=>({industry:0,links:0}));

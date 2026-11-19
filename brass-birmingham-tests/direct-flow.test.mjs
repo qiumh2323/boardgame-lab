@@ -2,12 +2,13 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {parseHTML} from 'linkedom';
 import {createDirectFlow} from '../brass-birmingham/direct-flow.js';
-import {configure} from '../brass-birmingham/engine.js?v=0.25';
-configure({connections:[{id:'a',from:'birmingham',to:'coventry'},{id:'b',from:'coventry',to:'nuneaton'}]});
+import fs from 'node:fs';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.26';
+const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));facts.connections.push({id:'a',from:'birmingham',to:'coventry'},{id:'b',from:'coventry',to:'nuneaton'});configure(facts);
 function setup(){
  const {document,window}=parseHTML(`<html><body><section id="hand-float"><button id="hand-toggle"></button>${[0,1,2,3].map(i=>`<button data-card="${i}"></button>`).join('')}</section><div id="flow-bar"><p id="flow-text"></p><div id="flow-options"></div><button id="flow-finish"></button><button id="flow-cancel"></button></div><div id="action-buttons">${['build','network','develop','sell','scout'].map(t=>`<button data-type="${t}"></button>`).join('')}</div><div id="mat-board"></div><button data-loc="birmingham" data-slot="0"></button><button data-loc="coventry" data-slot="0"></button><button data-loc="northern" data-slot="0"></button><button data-merchant="0"></button><button data-mat-type="coalMine" data-level="1"></button><button data-mat-type="coalMine" data-level="2"></button><button data-route="a"></button><button data-route="b"></button></body></html>`);
  globalThis.document=document;document.querySelector('#mat-board').scrollIntoView=()=>{};
- let view={rev:0,era:'rail',phase:'play',players:[{id:0,stacks:{coalMine:[1,2]}}],merchants:[{id:0,loc:'oxford'}]},sent=[],acts=[
+ let view=createGame(['You','AI'],[false,true],34);view.order=[0,1];view.era='rail';view.round=2;view.players[0].stacks.coalMine=[1,2];view.board={'birmingham:0':{owner:0,type:'cottonMill',level:2,resource:0,flipped:false},'northern:0':{owner:0,type:'brewery',level:2,resource:2,flipped:false}};view.links={'birmingham-oxford':{owner:0}};view.merchants=[{id:0,loc:'oxford',buys:'any',beer:false}];let sent=[],acts=[
  {type:'build',loc:'birmingham',slot:0,industry:'cottonMill',card:1},{type:'build',loc:'coventry',slot:0,industry:'pottery',card:2},
  {type:'develop',industries:['coalMine'],card:0},{type:'develop',industries:['coalMine','coalMine'],card:0},
  {type:'network',edges:['a'],card:0},{type:'network',edges:['a','b'],card:0},
@@ -28,10 +29,17 @@ test('develop selects consecutive lowest tiles on the player mat then discards o
 test('network reveals second railway only after selecting its valid first railway',()=>{
  let {flow,$,click,sent}=setup();flow.begin('network');assert.ok($('[data-route="a"]').classList.contains('flow-target'));assert.ok(!$('[data-route="b"]').classList.contains('flow-target'));click('[data-route="a"]');assert.ok($('[data-route="b"]').classList.contains('flow-target'));click('[data-route="b"]');click('[data-card="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'network',edges:['a','b'],card:2});
 });
-test('selling picks the board industry and connected merchant, then beer on the map',()=>{
- let {flow,$,click,sent}=setup();flow.begin('sell');click('[data-loc="birmingham"]');assert.ok($('[data-merchant="0"]').classList.contains('flow-target'));click('[data-merchant="0"]');click('[data-card="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'sell',sales:[{key:'birmingham:0',merchant:0}],card:2});
- flow.requestChoice(sent[0],{index:0,kind:'啤酒来源',options:[{id:'northern:0',label:'北部农场'}]});assert.ok($('[data-loc="northern"]').classList.contains('flow-target'));click('[data-loc="northern"]');assert.equal(sent.length,1);click('#flow-finish');assert.deepEqual(sent[1].choices,['northern:0']);
+test('selling chooses an industry then beer directly, with no destination step or early submit',()=>{
+ let {flow,$,click,sent}=setup();flow.begin('sell');click('[data-loc="birmingham"]');assert.ok($('[data-loc="northern"]').classList.contains('flow-target'));assert.ok(!$('[data-merchant="0"]').classList.contains('flow-target'));assert.equal(document.querySelectorAll('[data-flow-option]').length,0);
+ click('[data-loc="northern"]');assert.ok($('[data-loc="birmingham"]').classList.contains('flow-selected'));click('[data-card="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'sell',sales:[{key:'birmingham:0',merchant:0}],choices:['northern:0'],card:2});
 });
+test('free development targets its exact level on the mat with no type list',()=>{
+ const {flow,$,click,sent}=setup();
+ flow.requestChoice({type:'sell',sales:[{key:'birmingham:0',merchant:0}],card:0,choices:['merchant:0']},{index:1,kind:'商人奖励：免费研发',options:[{id:'coalMine',level:2,label:'煤矿'},{id:'skip',label:'放弃本次免费研发'}]});
+ assert.ok(!$('[data-level="1"]').classList.contains('flow-target'));assert.ok($('[data-level="2"]').classList.contains('flow-target'));assert.equal(document.querySelectorAll('[data-flow-option]').length,1);
+ click('[data-level="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0].choices,['merchant:0','coalMine']);
+});
+
 test('cancelling is non-mutating and newer snapshots clear draft highlights',()=>{
  let {flow,$,click,sent,view}=setup();flow.begin('network');click('[data-route="a"]');click('#flow-cancel');assert.equal(sent.length,0);assert.ok(!$('[data-route="a"]').classList.contains('flow-selected'));flow.begin('build');view.rev++;flow.paint();assert.ok(!$('[data-loc="birmingham"]').classList.contains('flow-target'));
 });

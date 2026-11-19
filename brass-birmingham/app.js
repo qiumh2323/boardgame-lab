@@ -1,12 +1,12 @@
-import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.25';
-import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.25';
-import {zoomButton,installDragPan} from './table-zoom.js?v=0.25';
-import {cardCatalogue} from './card-library.js?v=0.25';
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.25';
-import {selectAI} from './ai.js?v=0.25';
+import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.26';
+import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.26';
+import {zoomButton,installDragPan} from './table-zoom.js?v=0.26';
+import {cardCatalogue} from './card-library.js?v=0.26';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.26';
+import {selectAI} from './ai.js?v=0.26';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.25';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.25';
+import {createDirectFlow} from './direct-flow.js?v=0.26';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.26';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -149,6 +149,7 @@ function available(type,loc=null,slot=null,edge=null){
  return actions.filter(a=>a.type===type&&(a.type!=='build'||a.card===cardIndex)&&(!loc||a.type==='build'&&a.loc===loc&&(slot===null||a.slot===slot)||a.type==='sell'&&a.sales.some(x=>tileLocation(x.key)===loc))&&(!edge||a.edges.includes(edge)));
 }
 function openActions(type,loc=null,slot=null,edge=null,industry=null){
+ if(type==='sell'){directFlow.begin('sell');return;}
  if(!myTurn())return;let list=available(view.phase==='liquidation'?'liquidate':type,loc,slot,edge).filter(a=>!industry||a.industry===industry);
  if(!list.length){toast(type==='build'?'这里没有匹配当前手牌、网络、时代与资源条件的建造。请选择其他手牌或产业位。':'当前没有合法的此类行动。');return;}
  if(['loan','pass','scout'].includes(type)){let a={...list[0],card:cardIndex};if(type==='scout'){scoutDialog(a);return;}confirmAction(a);return;}
@@ -237,7 +238,7 @@ setTableZoom(null);
 $('#action-history-btn').onclick=()=>{showDialog('行动记录','');renderActionHistory();};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.25').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.26').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 $('#card-catalogue').onmouseenter=()=>{catalogueHovered=true;clearTimeout(catalogueTimer);};$('#card-catalogue').onmouseleave=()=>{catalogueHovered=false;queueCatalogueClose();};
