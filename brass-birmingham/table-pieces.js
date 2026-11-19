@@ -33,5 +33,5 @@ export function routePieces(view,layout,connections){
 }
 export function playerReserve(p,era){
  let left=14-p.linkCount;
- return `<div class="reserve-links" aria-label="剩余${left}枚${era==='canal'?'运河':'铁路'}连接板块"><strong>${era==='canal'?'运河':'铁路'}连接板块 · 剩余 ${left}/14</strong><div class="link-reserve-pieces">${Array.from({length:left},(_,i)=>`<img style="--reserve-i:${i}" src="assets/pieces/piece-link-${colors[p.id]}-${era}.webp" alt="备用连接板块">`).join('')}</div></div><div class="player-purse"><strong>现金</strong><div class="cash-amount">£${p.money}</div><div class="cash-coins">${coins(p.money).map(v=>coinPiece(v)).join('')}</div></div>`;
+ return `<div class="reserve-links" aria-label="剩余${left}枚${era==='canal'?'运河':'铁路'}连接板块"><strong>${era==='canal'?'运河':'铁路'}板块<br><span class="reserve-count">${left}/14</span></strong><div class="link-reserve-pieces">${Array.from({length:left},(_,i)=>`<img style="--reserve-i:${i}" src="assets/pieces/piece-link-${colors[p.id]}-${era}.webp" alt="备用连接板块">`).join('')}</div></div><div class="player-purse"><strong>现金</strong><div class="cash-amount">£${p.money}</div><div class="cash-coins">${coins(p.money).map(v=>coinPiece(v)).join('')}</div></div>`;
 }

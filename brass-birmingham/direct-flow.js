@@ -1,4 +1,4 @@
-import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.13';
+import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.14';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createDirectFlow(api){
  let draft=null,stage='idle',variants=[],resource=null,pendingSale=null,lastRevision=null,selectedCard=null;
@@ -10,8 +10,8 @@ export function createDirectFlow(api){
   $('#flow-finish').hidden=!finish;$('#flow-cancel').hidden=stage==='idle';
  }
  function begin(type){
-  if(!api.myTurn())return;draft={type};stage='target';resource=null;pendingSale=null;variants=[];selectedCard=null;
-  if(type==='develop'){draft.industries=[];api.showMyMat();}
+  if(!api.myTurn())return;api.showMyMat();draft={type};stage='target';resource=null;pendingSale=null;variants=[];selectedCard=null;
+  if(type==='develop')draft.industries=[];
   if(type==='network')draft.edges=[];
   if(type==='sell')draft.sales=[];
   if(['loan','pass','scout'].includes(type)){draft.extra=[];discard();return;}
