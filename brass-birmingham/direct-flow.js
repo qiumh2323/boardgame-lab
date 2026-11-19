@@ -1,5 +1,5 @@
-import {createSalePlan} from './sale-plan.js?v=0.27';
-import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.27';
+import {createSalePlan} from './sale-plan.js?v=0.28';
+import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.28';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createDirectFlow(api){
  let draft=null,stage='idle',variants=[],resource=null,salePlan=null,lastRevision=null,selectedCard=null;

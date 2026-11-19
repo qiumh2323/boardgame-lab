@@ -1,4 +1,4 @@
-import {previewSales,isGoods,distances,tileLocation} from './engine.js?v=0.27';
+import {previewSales,isGoods,distances,tileLocation} from './engine.js?v=0.28';
 // Resolve each selected industry locally; commit the full transaction only on final confirmation.
 export function createSalePlan(view,seat){
  let sales=[],choices=[],checkpoints=[],pending=null;

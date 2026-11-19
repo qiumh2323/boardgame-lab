@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.27';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.28';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -10,7 +10,20 @@ test('full page restores a game, develops from mat before discarding, and update
  const store=new Map([['brass-night-save-v1',JSON.stringify(s)]]);globalThis.localStorage={getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)};
  globalThis.fetch=async url=>({json:async()=>JSON.parse(fs.readFileSync(new URL(url.split('?')[0],root),'utf8'))});
  window.HTMLElement.prototype.scrollIntoView=()=>{};let modal=document.querySelector('#modal');modal.close=()=>modal.open=false;modal.showModal=()=>modal.open=true;
+ const requested=[];
+ globalThis.Image=class {
+  set src(url){
+   requested.push(url);
+   queueMicrotask(()=>url.endsWith('piece-card-back.webp')?this.onerror():this.onload());
+  }
+ };
  await import('../brass-birmingham/app.js?integration');await new Promise(r=>setImmediate(r));
+ delete globalThis.Image;
+ assert.equal(requested.length,new Set(requested).size);
+ assert.ok(requested[0].endsWith('piece-card-back.webp'));
+ assert.equal(requested.filter(url=>url.startsWith('assets/tiles/')).length,232);
+ assert.ok(requested.includes('assets/pieces/beer-white.svg'));
+ for(const url of requested)assert.ok(fs.existsSync(new URL(url,root)),url);
  let $=q=>document.querySelector(q);
  assert.equal($('link[href^="lobby.css"]'),null);assert.ok($('#lobby .lobby-copy'));assert.ok($('#lobby .lobby-board'));assert.ok($('#player-count'));
  for(const image of document.querySelectorAll('#lobby img'))assert.ok(fs.existsSync(new URL(image.getAttribute('src'),root)),image.getAttribute('src'));

@@ -1,6 +1,25 @@
 // Public tabletop pieces, rendered from the authoritative game view.
 const colors=['yellow','purple','red','gray'];
 const portraits=['watt','brunel','arkwright','bessemer'];
+export const merchantTileStem = {
+  blank:'2_nothing', any:'2_manufacturecottonpottery',
+  cottonMill:'2_cotton', manufacturer:'2_manufacture', pottery:'3_pottery'
+};
+
+export function tablePieceAssets() {
+  return [
+    'assets/pieces/beer-white.svg',
+    ...Object.values(merchantTileStem).map(stem => `assets/pieces/piece-merchant-${stem}.webp`),
+    ...portraits.map(name => `assets/pieces/piece-character-${name}.webp`),
+    ...[1,5,15].map(value => `assets/pieces/piece-coin-${value}.webp`),
+    ...colors.flatMap(color => [
+      `assets/pieces/piece-vp-${color}.webp`,
+      `assets/pieces/piece-income-${color}.webp`,
+      `assets/pieces/piece-link-${color}-canal.webp`,
+      `assets/pieces/piece-link-${color}-rail.webp`
+    ])
+  ];
+}
 const safe=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const at=([x,y])=>`left:${x*100}%;top:${y*100}%`;
 export function coins(amount){let n=Math.max(0,Math.floor(amount)),list=[];for(let value of [15,5,1])while(n>=value){list.push(value);n-=value;}return list;}
