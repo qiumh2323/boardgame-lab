@@ -33,3 +33,14 @@ test('rail reserve and placed railway use the reverse artwork',()=>{
  let s=createGame(['A','B'],[false,false],43);s.era='rail';s.links['birmingham-oxford']={owner:0};s.players[0].linkCount=1;
  let html=routePieces(s,layout,facts.connections)+playerReserve(s.players[0],'rail');assert.ok(html.includes('piece-link-yellow-rail.webp'));checkArt(html);
 });
+test('era placements follow measured tangents and separate canal and rail tracks',()=>{
+ for(let c of facts.connections)for(let era of ['canal','rail'])if(c[era]){
+  let pose=layout.routes[c.id].eras[era];assert.ok(pose,c.id+' '+era);let [a,b]=pose.tangent,angle=Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI;assert.ok(Math.abs(angle-pose.angle)<.01);
+ }
+ let poses=layout.routes['birmingham-coventry'].eras;assert.notDeepEqual(poses.canal.center,poses.rail.center);
+});
+test('round expenditure has an independent position to the right of each portrait',()=>{
+ for(let i=0;i<4;i++){assert.ok(layout.turnSpend[i][0]>layout.turnOrder[i][0]);assert.equal(layout.turnSpend[i][1],layout.turnOrder[i][1]);}
+ let s=createGame(['A','B'],[false,false],43);s.players[0].spent=6;let html=boardPieces(s,layout);
+ let characters=[...html.matchAll(/<div class="turn-character[^]*?<\/div>/g)].map(m=>m[0]);assert.ok(characters.every(s=>!s.includes('coin-')));assert.ok(html.includes('class="turn-payment"'));checkArt(html);
+});

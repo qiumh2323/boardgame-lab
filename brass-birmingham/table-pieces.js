@@ -8,7 +8,8 @@ export function boardPieces(view,layout){
  let html='';
  view.order.forEach((id,index)=>{
   let p=view.players[id],pos=layout.turnOrder[index],label=`第${index+1}位 ${p.name}，本轮花费 £${p.spent}`;
-  html+=`<div class="turn-character ${view.order[view.turn]===id&&!view.gameOver?'current':''}" style="${at(pos)};--piece-color:var(--${colors[id]})" title="${safe(label)}" aria-label="${safe(label)}"><img class="character-face" src="assets/pieces/piece-character-${portraits[id]}.webp" alt="${safe(p.name)}的行动顺序头像"><span class="turn-spend">£${p.spent}</span>${coins(p.spent).map((v,i)=>`<img class="spent-coin" style="--coin-i:${i};--coin-x:${i%3}" src="assets/pieces/piece-coin-${v}.webp" alt="本轮花费 £${v}">`).join('')}</div>`;
+  html+=`<div class="turn-character ${view.order[view.turn]===id&&!view.gameOver?'current':''}" style="${at(pos)};--piece-color:var(--${colors[id]})" title="${safe(label)}" aria-label="${safe(label)}"><img class="character-face" src="assets/pieces/piece-character-${portraits[id]}.webp" alt="${safe(p.name)}的行动顺序头像"></div>`;
+  html+=`<div class="turn-payment" style="${at(layout.turnSpend[index])}" data-spent="${p.spent}" title="${safe(label)}">${coins(p.spent).map((v,i)=>`<img class="payment-coin" style="--coin-x:${i%3};--coin-y:${Math.floor(i/3)}" src="assets/pieces/piece-coin-${v}.webp" alt="本轮花费 £${v}">`).join('')}<span class="payment-total">£${p.spent}</span></div>`;
  });
  let groups=new Map();for(let p of view.players)for(let kind of ['vp','income']){
   let value=kind==='vp'?p.vp:p.income,space=kind==='vp'?((value%100)+100)%100:Math.min(99,Math.max(0,value)),pos=layout.track[String(space)];if(!pos)continue;
@@ -21,9 +22,10 @@ export function boardPieces(view,layout){
 }
 export function routePieces(view,layout,connections){
  return connections.filter(c=>c[view.era]).map(c=>{
-  let loc=layout.routes[c.id];if(!loc)return '';let owner=view.links[c.id]?.owner;
+  let loc=layout.routes[c.id]?.eras?.[view.era]||layout.routes[c.id];if(!loc)return '';let owner=view.links[c.id]?.owner;
+  const tangent=loc.tangent,angle=tangent?Math.atan2(tangent[1][1]-tangent[0][1],tangent[1][0]-tangent[0][0])*180/Math.PI:loc.angle;
   let label=`${c.from}—${c.to}${owner!==undefined?'：'+view.players[owner].name:''}`;
-  return `<button class="route-piece ${owner===undefined?'route-empty':'route-placed'}" data-route="${c.id}" style="${at(loc.center)};--angle:${loc.angle}deg" title="${safe(label)}" aria-label="${safe(label)}">${owner!==undefined?`<img src="assets/pieces/piece-link-${colors[owner]}-${view.era}.webp" alt="${view.era==='canal'?'运河':'铁路'}连接板块">`:'<span></span>'}</button>`;
+  return `<button class="route-piece ${owner===undefined?'route-empty':'route-placed'}" data-route="${c.id}" data-route-era="${view.era}" style="${at(loc.center)};--angle:${angle}deg" title="${safe(label)}" aria-label="${safe(label)}">${owner!==undefined?`<img src="assets/pieces/piece-link-${colors[owner]}-${view.era}.webp" alt="${view.era==='canal'?'运河':'铁路'}连接板块">`:'<span></span>'}</button>`;
  }).join('');
 }
 export function playerReserve(p,era){

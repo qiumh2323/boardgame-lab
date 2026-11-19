@@ -2,7 +2,7 @@ import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,a
 import {selectAI} from './ai.js';
 import {Room} from './room.js';
 import {createDirectFlow} from './direct-flow.js?v=0.4';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.3';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.5';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -142,7 +142,7 @@ $('#mat-preview').onclick=()=>showDialog('夜间玩家面板','<img class="modal
 $('#ai-hint').onclick=()=>{if(!state||!myTurn())return;toast('正在计算建议…');setTimeout(()=>{let a=selectAI(state,seat);if(a){showDialog('规则 AI 建议',`<p>${esc(actionLabel(a))}</p><p class="modal-note">按可得分产业、收入、运输网络与现金评估；建议不保证最优。</p><button id="use-hint" class="primary wide">采用建议</button>`);$('#use-hint').onclick=()=>{cardIndex=a.card||0;submit(a);};}},20);};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.4').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.5').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 const directFlow=createDirectFlow({view:()=>view,seat:()=>seat,myTurn,actions:()=>actions,submit,showMyMat:()=>{matSeat=seat;renderMat();}});
 $('#hand-toggle').onclick=()=>{let panel=$('#hand-float');panel.classList.toggle('collapsed');$('#hand-toggle').textContent=panel.classList.contains('collapsed')?'展开手牌':'收起手牌';};
