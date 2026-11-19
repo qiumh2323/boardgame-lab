@@ -6,7 +6,7 @@ const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
 const STEM={cottonMill:'cotton',coalMine:'coal',ironWorks:'iron',manufacturer:'manufacture',pottery:'pottery',brewery:'beer'};
 let state=null,view=null,seat=0,mode='local',room=null,layout,actions=[],cardIndex=0,selectedType='build',selectedLocation=null,aiTimer=null,aiBusy=false,lobby=null,waiting=false;
-let choiceAction=null,choiceSeat=0,saveAvailable=false;
+let choiceAction=null,choiceSeat=0,saveAvailable=false,matSeat=null;
 const SAVE='brass-night-save-v1';
 const modal=$('#modal');
 function toast(t){$('#toast').textContent=t;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,5500);}
@@ -18,7 +18,7 @@ function assetFallback(e){e.target.style.opacity='.2';}
 document.addEventListener('error',assetFallback,true);
 function save(){if(!state)return;try{localStorage.setItem(SAVE,JSON.stringify(state));saveAvailable=true;}catch{toast('本地存档空间不足，请导出存档。');}}
 function myTurn(){return view&&!view.gameOver&&current(view)===seat&&!view.players[seat].ai;}
-function startLocal(n){room?.destroy();room=null;mode='local';seat=0;state=createGame([name(),...Array.from({length:n-1},(_,i)=>'规则 AI '+(i+1))],[false,...Array(n-1).fill(true)]);selectedType='build';selectedLocation=null;cardIndex=0;modal.close();update();}
+function startLocal(n){room?.destroy();room=null;mode='local';seat=0;matSeat=null;state=createGame([name(),...Array.from({length:n-1},(_,i)=>'规则 AI '+(i+1))],[false,...Array(n-1).fill(true)]);selectedType='build';selectedLocation=null;cardIndex=0;modal.close();update();}
 function name(){return $('#player-name')?.value?.trim()||$('#player-count').parentElement.previousElementSibling.querySelector('input').value.trim()||'你';}
 function count(){return Number($('#player-count').value);}
 function update(){
@@ -46,27 +46,44 @@ function render(){
  $('#log').innerHTML=[...view.log].reverse().slice(0,35).map(t=>`<li>${esc(t)}</li>`).join('');
  renderBoard();renderMat();if(view.gameOver&&render.endShown!==view.rev){render.endShown=view.rev;showResults();}
 }
-function slots(loc){let anchor=layout.anchors[loc],rows=layout.rows[loc];if(!anchor||!rows)return [];return rows.flatMap((n,row)=>Array.from({length:n},(_,i)=>[anchor[0]+(i-(n-1)/2)*41.6/900,anchor[1]-(rows.length-1-row)*39.6/850]));}
+function slots(loc){return layout.slots[loc]||[];}
 function renderBoard(){
  let html='';for(let [loc,city]of Object.entries({...F.cities,...Object.fromEntries(Object.keys(F.farms).map(k=>[k,{slots:[['brewery']]}]))}))slots(loc).forEach(([x,y],i)=>{
   let key=loc+':'+i,t=view.board[key],label=t?`${cityName(loc)} ${view.players[t.owner].name} ${ZH[t.type]}${t.level}级${t.flipped?'（已翻面）':''}`:`${cityName(loc)} ${city.slots[i]?.map(t=>ZH[t]).join('/')} 空位`;
-  html+=`<button class="slot" style="left:${x*100}%;top:${y*100}%;${t?'border:2px solid '+COLORS[t.owner]:''}" data-loc="${loc}" data-slot="${i}" title="${esc(label)}" aria-label="${esc(label)}">${t?`<img style="width:100%;height:100%" src="${tileUrl(t.type,t.level,t.flipped,t.owner)}" alt="">${t.resource?`<span class="resource-count">${t.resource}</span>`:''}`:''}</button>`;
+  html+=`<button class="slot" style="left:${x*100}%;top:${y*100}%;${t?'border:2px solid '+COLORS[t.owner]:''}" data-loc="${loc}" data-slot="${i}" title="${esc(label)}" aria-label="${esc(label)}">${t?`<img style="width:100%;height:100%" src="${tileUrl(t.type,t.level,t.flipped,t.owner)}" alt="">${t.resource?`<span class="industry-resources ${t.type==='brewery'?'beer':''}">${Array.from({length:t.resource},()=>t.type==='brewery'?'<img src="assets/pieces/piece-beer.webp" alt="啤酒">':`<i class="industry-cube ${t.type==='coalMine'?'coal':'iron'}"></i>`).join('')}</span><span class="resource-count">${t.resource}</span>`:''}`:''}</button>`;
  });
- for(let m of view.merchants){let a=layout.anchors[m.loc];if(!a)continue;let siblings=view.merchants.filter(x=>x.loc===m.loc),idx=siblings.indexOf(m),x=a[0]+(idx-(siblings.length-1)/2)*.047;
-  let label=m.buys==='blank'?'空':m.buys==='any'?'全品':ZH[m.buys]?.replace('厂','');html+=`<button class="merchant-dot ${m.beer?'has-beer':''}" style="left:${x*100}%;top:${(a[1]+.042)*100}%" data-merchant="${m.id}" title="${cityName(m.loc)}商人${m.beer?'，有啤酒':''}">${label}${m.beer?' ▪':''}</button>`;
+ for(let m of view.merchants){let siblings=view.merchants.filter(x=>x.loc===m.loc),idx=siblings.indexOf(m),pos=layout.merchants[m.loc]?.[idx],beer=layout.merchantBeer[m.loc]?.[idx];if(!pos)continue;
+  let label=m.buys==='blank'?'空白商人':m.buys==='any'?'接收全部商品':ZH[m.buys];let stem={blank:'2_nothing',any:'2_manufacturecottonpottery',cottonMill:'2_cotton',manufacturer:'2_manufacture',pottery:'3_pottery'}[m.buys];
+  html+=`<button class="merchant-tile" style="left:${pos[0]*100}%;top:${pos[1]*100}%" data-merchant="${m.id}" title="${cityName(m.loc)}：${label}${m.beer?'，有啤酒':''}" aria-label="${cityName(m.loc)}${label}"><img src="assets/pieces/piece-merchant-${stem}.webp" alt="${label}"></button>`;
+  if(m.beer&&beer)html+=`<img class="merchant-beer" style="left:${beer[0]*100}%;top:${beer[1]*100}%" src="assets/pieces/piece-beer.webp" alt="${cityName(m.loc)}商人啤酒">`;
  }
+ for(let pile of layout.decks){let qty=pile.kind==='draw'?view.deckCount:view.wild[pile.kind==='wildLocation'?'location':'industry'];let label=pile.kind==='draw'?'抽牌堆':pile.kind==='wildLocation'?'万能地点牌':'万能产业牌',url=pile.kind==='draw'?'assets/cards/piece-card-back.webp':cardUrl({kind:pile.kind});
+  html+=`<button class="board-pile ${qty?'':'pile-empty'}" data-pile="${pile.kind}" style="left:${pile.center[0]*100}%;top:${pile.center[1]*100}%;width:${pile.size[0]*100}%;height:${pile.size[1]*100}%" title="${label}：${qty}张" aria-label="${label}：${qty}张">${qty?`<img src="${url}" alt="${label}">`:''}<span>${label} ${qty}</span></button>`;
+ }
+ for(let resource of ['coal','iron']){let positions=layout.markets[resource],empty=positions.length-view[resource];for(let i=0;i<positions.length;i++){let [x,y]=positions[i];html+=`<span class="market-cube ${resource} ${i>=empty?'filled':'empty'}" style="left:${x*100}%;top:${y*100}%" title="${resource==='coal'?'煤':'铁'}市场 £${Math.floor(i/2)+1} ${i>=empty?'有货':'空位'}"></span>`;}}
  $('#board-tokens').innerHTML=html;
  $('#board-tokens').querySelectorAll('[data-loc]').forEach(b=>b.onclick=()=>{let loc=b.dataset.loc,i=Number(b.dataset.slot),t=view.board[loc+':'+i];if(view.phase==='liquidation'){if(myTurn()&&t?.owner===seat)confirmAction({type:'liquidate',key:loc+':'+i});return;}if(myTurn()){selectedLocation=loc;openActions(selectedType==='sell'&&t?.owner===seat?'sell':'build',loc,i);}else if(t)toast(`${view.players[t.owner].name} · ${ZH[t.type]} ${t.level}级 · ${t.flipped?'已翻面':'未翻面'}${t.resource?' · 资源'+t.resource:''}`);});
  $('#board-tokens').querySelectorAll('[data-merchant]').forEach(b=>b.onclick=()=>{let m=view.merchants.find(m=>m.id===Number(b.dataset.merchant));toast(`${cityName(m.loc)}：${m.buys==='blank'?'不收商品':m.buys==='any'?'接收所有商品':'接收'+ZH[m.buys]}，${m.beer?'有商人啤酒':'没有商人啤酒'}`);});
+ $('#board-tokens').querySelectorAll('[data-pile]').forEach(b=>b.onclick=()=>{if(b.dataset.pile!=='draw'&&myTurn())openActions('scout');else toast(b.title);});
  $('#route-layer').innerHTML=F.connections.filter(c=>c[view.era]).map(c=>{let a=layout.anchors[c.from],b=layout.anchors[c.to];if(!a||!b)return '';let t=view.links[c.id],x=(a[0]+b[0])/2,y=(a[1]+b[1])/2;return `<g data-route="${c.id}"><path d="M${a[0]*1000} ${a[1]*1000} L${b[0]*1000} ${b[1]*1000}" stroke="${t?COLORS[t.owner]:'transparent'}" fill="none" stroke-width="${t?5:16}" ${t?'class="route-drawn"':''}/><circle cx="${x*1000}" cy="${y*1000}" r="${t?5:7}" fill="${t?COLORS[t.owner]:selectedType==='network'&&myTurn()?'#d6c08b':'transparent'}" stroke="${t?'#fff':'transparent'}"/><title>${cityName(c.from)}—${cityName(c.to)}${t?' · '+view.players[t.owner].name:''}</title></g>`;}).join('');
  $('#route-layer').querySelectorAll('[data-route]').forEach(g=>g.onclick=()=>{if(myTurn()){let key=g.dataset.route;openActions('network',null,null,key);}});
 }
-function renderMat(){let p=view.players[seat];$('#mat-stacks').innerHTML=TYPES.map(type=>{let d=nextTile(view,seat,type),n=p.stacks[type].length;return `<div class="stack">${d?`<img src="${tileUrl(type,d.level)}" alt="${ZH[type]}${d.level}级">`:'<span>—</span>'}<div class="stack-info"><strong>${ZH[type]}</strong>${d?`${d.level}级 · 余${n}块<br>£${d.cost}${d.costCoal?' 煤'+d.costCoal:''}${d.costIron?' 铁'+d.costIron:''}<small>${d.vp}VP · 收入+${d.income}</small>`:'已用完'}</div></div>`;}).join('');}
+function renderMat(){
+ let id=matSeat!==null&&view.players[matSeat]?matSeat:seat,p=view.players[id];
+ $('#mat-player').innerHTML=view.players.map(p=>`<option value="${p.id}" ${p.id===id?'selected':''}>${esc(p.name)}${p.id===seat?'（你）':''}</option>`).join('');
+ $('#mat-player').onchange=e=>{matSeat=Number(e.target.value);renderMat();};
+ let html='';for(let type of TYPES)for(let d of F.industries[type]){let [x,y]=layout.playerMat.slots[type][d.level-1],count=p.stacks[type].filter(n=>n===d.level).length,isNext=nextTile(view,id,type)?.level===d.level&&count>0;
+  html+=`<button class="mat-tile ${count?'':'depleted'} ${isNext?'next-tile':''}" data-mat-type="${type}" data-level="${d.level}" data-count="${count}" style="left:${x*100}%;top:${y*100}%;--owner:${COLORS[id]}" title="${esc(p.name)} ${ZH[type]} ${d.level}级，剩余${count}块；建造 £${d.cost}${d.costCoal?' 煤'+d.costCoal:''}${d.costIron?' 铁'+d.costIron:''}；${d.vp}VP，收入+${d.income}" aria-label="${ZH[type]}${d.level}级剩余${count}块">${count?`${Array.from({length:count-1},(_,i)=>`<img class="mat-under" style="--depth:${count-1-i}" src="${tileUrl(type,d.level,false,id)}" alt="">`).join('')}<img src="${tileUrl(type,d.level,false,id)}" alt="">`:''}<span class="mat-count">${count}</span>${isNext?'<span class="mat-next">下一块</span>':''}</button>`;
+ }
+ $('#mat-tokens').innerHTML=html;
+ $('#mat-tokens').querySelectorAll('button').forEach(b=>b.onclick=()=>{let type=b.dataset.matType;if(id===seat&&myTurn()&&Number(b.dataset.level)===nextTile(view,id,type)?.level)openActions('build',null,null,null,type);else toast(b.title);});
+ $('#mat-stacks').innerHTML=TYPES.map(type=>{let d=nextTile(view,id,type),n=p.stacks[type].length;return `<div class="stack-summary"><strong>${ZH[type]}</strong><span>${d?`下一块 ${d.level}级 · 共余${n}块`:'已用完'}</span></div>`;}).join('');
+}
 function available(type,loc=null,slot=null,edge=null){
  return actions.filter(a=>a.type===type&&(a.type!=='build'||a.card===cardIndex)&&(!loc||a.type==='build'&&a.loc===loc&&(slot===null||a.slot===slot)||a.type==='sell'&&a.sales.some(x=>tileLocation(x.key)===loc))&&(!edge||a.edges.includes(edge)));
 }
-function openActions(type,loc=null,slot=null,edge=null){
- if(!myTurn())return;let list=available(view.phase==='liquidation'?'liquidate':type,loc,slot,edge);
+function openActions(type,loc=null,slot=null,edge=null,industry=null){
+ if(!myTurn())return;let list=available(view.phase==='liquidation'?'liquidate':type,loc,slot,edge).filter(a=>!industry||a.industry===industry);
  if(!list.length){toast(type==='build'?'这里没有匹配当前手牌、网络、时代与资源条件的建造。请选择其他手牌或产业位。':'当前没有合法的此类行动。');return;}
  if(['loan','pass','scout'].includes(type)){let a={...list[0],card:cardIndex};if(type==='scout'){scoutDialog(a);return;}confirmAction(a);return;}
  showDialog(({build:'建造产业',network:'铺设连接',develop:'研发产业',sell:'出售商品',liquidate:'支付欠款'})[type]||'选择行动',`<p class="modal-note">使用：${esc(cardName(view.players[seat].hand[cardIndex]||{kind:'wildLocation'}))}。${type==='develop'?'研发可移除1至2块，组合按顺序执行。':type==='network'?'单铁路 £5；双铁路 £15，另耗2煤和1啤酒。':type==='sell'?'可选择单个产业，或自行组合多个产业在同一行动出售。':''}</p><div class="option-list">${list.map((a,i)=>`<button data-option="${i}">${esc(actionLabel(a))}${a.type==='sell'?`<small>售往 ${cityName(view.merchants.find(m=>m.id===a.sales[0].merchant).loc)}</small>`:''}${a.type==='build'?`<small>基础 £${nextTile(view,seat,a.industry).cost}，另支付所需市场资源费用</small>`:''}</button>`).join('')}</div>${type==='sell'?'<button id="multi-sell" class="wide" style="margin-top:15px">组合出售多个产业</button>':''}`);
@@ -117,10 +134,10 @@ function renderLobby(){
 function menu(){showDialog('对局菜单',`<div class="option-list">${view?'<button id="export-btn">导出对局存档</button>':''}${mode==='guest'?'<button id="reconnect-btn">重新连接房主</button>':''}${view?.gameOver?'<button id="results-btn">查看最终结算</button>':''}<button id="back-btn">返回开局界面</button></div><p class="modal-note">本地及房主对局自动存档。联机客人不保存其他玩家的手牌。</p>`);if($('#export-btn'))$('#export-btn').onclick=()=>{let data=mode==='guest'?view:state,blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brass-night-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('存档已导出');};if($('#reconnect-btn'))$('#reconnect-btn').onclick=()=>{room.connect();modal.close();};if($('#results-btn'))$('#results-btn').onclick=showResults;$('#back-btn').onclick=()=>{clearTimeout(aiTimer);room?.destroy();room=null;state=null;view=null;mode='local';$('main').hidden=true;$('.lobby').hidden=false;$('#connection-status').textContent='本地对局';$('#resume-btn').hidden=!saveAvailable;modal.close();};}
 $('#ai-start').onclick=()=>startLocal(count());$('#host-btn').onclick=host;$('#join-btn').onclick=()=>joinDialog();$('#help-btn').onclick=help;$('#menu-btn').onclick=menu;
 $('#zoom-btn').onclick=()=>{let wrap=$('#board-wrap');wrap.classList.toggle('zoomed');$('#zoom-btn').textContent=wrap.classList.contains('zoomed')?'适应窗口':'放大棋盘';};
-$('#mat-preview').onclick=()=>showDialog('夜间玩家面板','<img class="modal-image" src="assets/player-mat-night.webp" alt="完整夜间玩家面板"><p class="modal-note">实际剩余板块以对局下方产业面板为准。</p>');
+$('#mat-preview').onclick=()=>showDialog('夜间玩家面板','<img class="modal-image" src="assets/player-mat-night.webp?v=0.2" alt="完整夜间玩家面板"><p class="modal-note">实际剩余板块以对局下方产业面板为准。</p>');
 $('#ai-hint').onclick=()=>{if(!state||!myTurn())return;toast('正在计算建议…');setTimeout(()=>{let a=selectAI(state,seat);if(a){showDialog('规则 AI 建议',`<p>${esc(actionLabel(a))}</p><p class="modal-note">按可得分产业、收入、运输网络与现金评估；建议不保证最优。</p><button id="use-hint" class="primary wide">采用建议</button>`);$('#use-hint').onclick=()=>{cardIndex=a.card||0;submit(a);};}},20);};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.2').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 init();
