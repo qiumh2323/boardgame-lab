@@ -1,6 +1,7 @@
 import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone} from './engine.js';
 import {selectAI} from './ai.js';
 import {Room} from './room.js';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.3';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -61,12 +62,13 @@ function renderBoard(){
   html+=`<button class="board-pile ${qty?'':'pile-empty'}" data-pile="${pile.kind}" style="left:${pile.center[0]*100}%;top:${pile.center[1]*100}%;width:${pile.size[0]*100}%;height:${pile.size[1]*100}%" title="${label}：${qty}张" aria-label="${label}：${qty}张">${qty?`<img src="${url}" alt="${label}">`:''}<span>${label} ${qty}</span></button>`;
  }
  for(let resource of ['coal','iron']){let positions=layout.markets[resource],empty=positions.length-view[resource];for(let i=0;i<positions.length;i++){let [x,y]=positions[i];html+=`<span class="market-cube ${resource} ${i>=empty?'filled':'empty'}" style="left:${x*100}%;top:${y*100}%" title="${resource==='coal'?'煤':'铁'}市场 £${Math.floor(i/2)+1} ${i>=empty?'有货':'空位'}"></span>`;}}
+ html+=boardPieces(view,layout)+routePieces(view,layout,F.connections);
  $('#board-tokens').innerHTML=html;
  $('#board-tokens').querySelectorAll('[data-loc]').forEach(b=>b.onclick=()=>{let loc=b.dataset.loc,i=Number(b.dataset.slot),t=view.board[loc+':'+i];if(view.phase==='liquidation'){if(myTurn()&&t?.owner===seat)confirmAction({type:'liquidate',key:loc+':'+i});return;}if(myTurn()){selectedLocation=loc;openActions(selectedType==='sell'&&t?.owner===seat?'sell':'build',loc,i);}else if(t)toast(`${view.players[t.owner].name} · ${ZH[t.type]} ${t.level}级 · ${t.flipped?'已翻面':'未翻面'}${t.resource?' · 资源'+t.resource:''}`);});
  $('#board-tokens').querySelectorAll('[data-merchant]').forEach(b=>b.onclick=()=>{let m=view.merchants.find(m=>m.id===Number(b.dataset.merchant));toast(`${cityName(m.loc)}：${m.buys==='blank'?'不收商品':m.buys==='any'?'接收所有商品':'接收'+ZH[m.buys]}，${m.beer?'有商人啤酒':'没有商人啤酒'}`);});
  $('#board-tokens').querySelectorAll('[data-pile]').forEach(b=>b.onclick=()=>{if(b.dataset.pile!=='draw'&&myTurn())openActions('scout');else toast(b.title);});
- $('#route-layer').innerHTML=F.connections.filter(c=>c[view.era]).map(c=>{let a=layout.anchors[c.from],b=layout.anchors[c.to];if(!a||!b)return '';let t=view.links[c.id],x=(a[0]+b[0])/2,y=(a[1]+b[1])/2;return `<g data-route="${c.id}"><path d="M${a[0]*1000} ${a[1]*1000} L${b[0]*1000} ${b[1]*1000}" stroke="${t?COLORS[t.owner]:'transparent'}" fill="none" stroke-width="${t?5:16}" ${t?'class="route-drawn"':''}/><circle cx="${x*1000}" cy="${y*1000}" r="${t?5:7}" fill="${t?COLORS[t.owner]:selectedType==='network'&&myTurn()?'#d6c08b':'transparent'}" stroke="${t?'#fff':'transparent'}"/><title>${cityName(c.from)}—${cityName(c.to)}${t?' · '+view.players[t.owner].name:''}</title></g>`;}).join('');
- $('#route-layer').querySelectorAll('[data-route]').forEach(g=>g.onclick=()=>{if(myTurn()){let key=g.dataset.route;openActions('network',null,null,key);}});
+ $('#route-layer').innerHTML='';
+ $('#board-tokens').querySelectorAll('[data-route]').forEach(b=>b.onclick=()=>{if(myTurn())openActions('network',null,null,b.dataset.route);else toast(b.title);});
 }
 function renderMat(){
  let id=matSeat!==null&&view.players[matSeat]?matSeat:seat,p=view.players[id];
@@ -76,6 +78,7 @@ function renderMat(){
   html+=`<button class="mat-tile ${count?'':'depleted'} ${isNext?'next-tile':''}" data-mat-type="${type}" data-level="${d.level}" data-count="${count}" style="left:${x*100}%;top:${y*100}%;--owner:${COLORS[id]}" title="${esc(p.name)} ${ZH[type]} ${d.level}级，剩余${count}块；建造 £${d.cost}${d.costCoal?' 煤'+d.costCoal:''}${d.costIron?' 铁'+d.costIron:''}；${d.vp}VP，收入+${d.income}" aria-label="${ZH[type]}${d.level}级剩余${count}块">${count?`${Array.from({length:count-1},(_,i)=>`<img class="mat-under" style="--depth:${count-1-i}" src="${tileUrl(type,d.level,false,id)}" alt="">`).join('')}<img src="${tileUrl(type,d.level,false,id)}" alt="">`:''}<span class="mat-count">${count}</span>${isNext?'<span class="mat-next">下一块</span>':''}</button>`;
  }
  $('#mat-tokens').innerHTML=html;
+ $('#player-reserve').innerHTML=playerReserve(p,view.era);
  $('#mat-tokens').querySelectorAll('button').forEach(b=>b.onclick=()=>{let type=b.dataset.matType;if(id===seat&&myTurn()&&Number(b.dataset.level)===nextTile(view,id,type)?.level)openActions('build',null,null,null,type);else toast(b.title);});
  $('#mat-stacks').innerHTML=TYPES.map(type=>{let d=nextTile(view,id,type),n=p.stacks[type].length;return `<div class="stack-summary"><strong>${ZH[type]}</strong><span>${d?`下一块 ${d.level}级 · 共余${n}块`:'已用完'}</span></div>`;}).join('');
 }
@@ -138,6 +141,6 @@ $('#mat-preview').onclick=()=>showDialog('夜间玩家面板','<img class="modal
 $('#ai-hint').onclick=()=>{if(!state||!myTurn())return;toast('正在计算建议…');setTimeout(()=>{let a=selectAI(state,seat);if(a){showDialog('规则 AI 建议',`<p>${esc(actionLabel(a))}</p><p class="modal-note">按可得分产业、收入、运输网络与现金评估；建议不保证最优。</p><button id="use-hint" class="primary wide">采用建议</button>`);$('#use-hint').onclick=()=>{cardIndex=a.card||0;submit(a);};}},20);};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.2').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.3').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 init();
