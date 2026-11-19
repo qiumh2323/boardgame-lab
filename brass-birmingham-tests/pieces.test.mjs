@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {boardPieces,routePieces,playerReserve,coins} from '../brass-birmingham/table-pieces.js';
-import {configure,createGame,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.15';
+import {configure,createGame,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.16';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));
 const layout=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/layout.json',import.meta.url)));
 configure(facts);
