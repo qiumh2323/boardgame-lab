@@ -10,13 +10,13 @@ export function income(n){return n<=10?n-10:n<=30?Math.ceil((n-10)/2):n<=60?10+M
 export function incomeTop(n){return n<=0?n+10:n<=10?10+2*n:n<=20?30+3*(n-10):n<=29?60+4*(n-20):99;}
 function rng(s){let x=s.seed|0;x^=x<<13;x^=x>>>17;x^=x<<5;s.seed=x>>>0;return (x>>>0)/4294967296;}
 function shuffle(s,a){for(let i=a.length-1;i>0;i--){let j=Math.floor(rng(s)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function deck(n){let d=[],k=0,f=F.cards[n];for(const [loc,count] of Object.entries(f.locations))for(let i=0;i<count;i++)d.push({id:++k,kind:'location',loc});for(const [type,count] of Object.entries(f.industries))for(let i=0;i<count;i++)d.push({id:++k,kind:'industry',types:[type]});for(let i=0;i<(f.dualCottonManufacturer||0);i++)d.push({id:++k,kind:'industry',types:['cottonMill','manufacturer']});return d;}
+export function createDeck(n){let d=[],k=0,f=F.cards[n];for(const [loc,count] of Object.entries(f.locations))for(let i=0;i<count;i++)d.push({id:++k,kind:'location',loc});for(const [type,count] of Object.entries(f.industries))for(let i=0;i<count;i++)d.push({id:++k,kind:'industry',types:[type]});for(let i=0;i<(f.dualCottonManufacturer||0);i++)d.push({id:++k,kind:'industry',types:['cottonMill','manufacturer']});return d;}
 function fill(s,p){while(p.hand.length<8&&s.deck.length)p.hand.push(s.deck.pop());}
 export function createGame(names=['你','规则 AI'],ai=[false,true],seed=Date.now()>>>0){
  if(!F)throw Error('游戏数据未加载');if(names.length<2||names.length>4)throw Error('需要2至4名玩家');
- let s={version:1,rev:0,seed:seed||1,era:'canal',round:1,turn:0,used:0,phase:'play',players:[],order:[],board:{},links:{},merchants:[],coal:13,iron:8,discard:[],wild:{location:4,industry:4},log:[],scores:[],gameOver:false};
+ let s={version:1,rev:0,seed:seed||1,era:'canal',round:1,turn:0,used:0,phase:'play',players:[],order:[],board:{},links:{},merchants:[],coal:13,iron:8,discard:[],seenCards:[],wild:{location:4,industry:4},log:[],scores:[],gameOver:false};
  s.players=names.map((name,id)=>({id,name:String(name).slice(0,18),ai:!!ai[id],money:17,income:10,vp:0,spent:0,hand:[],stacks:Object.fromEntries(TYPES.map(t=>[t,F.industries[t].flatMap(d=>Array(d.count).fill(d.level))])),linkCount:0}));
- s.order=shuffle(s,s.players.map(p=>p.id));s.deck=shuffle(s,deck(names.length));s.hiddenDiscard=[];for(let p of s.players){fill(s,p);s.hiddenDiscard.push(s.deck.pop());}
+ s.order=shuffle(s,s.players.map(p=>p.id));s.deck=shuffle(s,createDeck(names.length));s.hiddenDiscard=[];for(let p of s.players){fill(s,p);s.hiddenDiscard.push(s.deck.pop());}
  let mix=shuffle(s,[...F.merchantMix[names.length]]);for(let [loc,m] of Object.entries(F.merchants))if(m.minPlayers<=names.length)for(let i=0;i<m.slots;i++){let buys=mix.pop();s.merchants.push({id:s.merchants.length,loc,buys,beer:buys!=='blank'});}
  note(s,'开局：运河时代，每人首回合1次行动。');return s;
 }
@@ -58,7 +58,7 @@ function developOne(s,p,type){let t=nextTile(s,p.id,type);insist(t&&t.canDevelop
 function merchantBonus(s,p,m,ctx){let f=F.merchants[m.loc];if(f.bonusType==='vp')p.vp+=f.bonusAmount;if(f.bonusType==='money')p.money+=f.bonusAmount;if(f.bonusType==='income')p.income=Math.min(99,p.income+f.bonusAmount);if(f.bonusType==='develop'){
  let options=TYPES.filter(t=>nextTile(s,p.id,t)?.canDevelop).map(t=>({id:t,label:ZH[t]}));if(options.length){options.push({id:'skip',label:'放弃本次免费研发'});let t=choose(ctx,'商人奖励：免费研发',options).id;if(t!=='skip')developOne(s,p,t);}
  }}
-function discard(s,p,indices){let sorted=[...new Set(indices)].sort((a,b)=>b-a);insist(sorted.length===indices.length,'不能重复选择卡牌');for(let i of sorted){insist(Number.isInteger(i)&&p.hand[i],'请选择有效的手牌');let [c]=p.hand.splice(i,1);if(c.kind.startsWith('wild'))s.wild[c.kind==='wildLocation'?'location':'industry']++;else s.discard.push(c);}}
+function discard(s,p,indices){let sorted=[...new Set(indices)].sort((a,b)=>b-a);insist(sorted.length===indices.length,'不能重复选择卡牌');for(let i of sorted){insist(Number.isInteger(i)&&p.hand[i],'请选择有效的手牌');let [c]=p.hand.splice(i,1);if(c.kind.startsWith('wild'))s.wild[c.kind==='wildLocation'?'location':'industry']++;else {s.seenCards??=[...s.discard];if(!s.seenCards.some(x=>x.id===c.id))s.seenCards.push(c);s.discard.push(c);}}}
 function matches(s,id,c,loc,type){let net=network(s,id),farm=!!F.farms[loc];if(c.kind==='location')return !farm&&c.loc===loc;if(c.kind==='wildLocation')return !farm;return (c.kind==='wildIndustry'||c.kind==='industry'&&c.types.includes(type))&&(net.size===0||net.has(loc));}
 function build(s,p,a,ctx){
  let loc=a.loc,type=a.industry,index=a.slot,key=loc+':'+index,d=nextTile(s,p.id,type),old=s.board[key];
