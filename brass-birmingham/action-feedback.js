@@ -1,4 +1,4 @@
-import {F,cityName,ZH,income} from './engine.js?v=0.19';
+import {F,cityName,ZH,income} from './engine.js?v=0.20';
 
 export function makeActionFeedback(before,after,actor,action){
  const p=before.players[actor],next=after.players[actor],a=action,targets=[],previews=[],exhausted=[];

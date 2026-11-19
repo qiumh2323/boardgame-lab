@@ -1,26 +1,14 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#15212b"><title>工业革命：伯明翰 · 在线对战</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="table.css?v=0.5"><link rel="stylesheet" href="flow.css?v=0.4"><link rel="stylesheet" href="alignment.css?v=0.5"><link rel="stylesheet" href="workspace.css?v=0.19"><link rel="stylesheet" href="dock.css?v=0.19"><link rel="stylesheet" href="refinement.css?v=0.19"><link rel="stylesheet" href="tabletop.css?v=0.19"><link rel="stylesheet" href="localization.css?v=0.19"><link rel="stylesheet" href="legibility.css?v=0.19"><link rel="stylesheet" href="compact-table.css?v=0.19"><link rel="stylesheet" href="action-feedback.css?v=0.19"><link rel="stylesheet" href="lobby.css?v=0.19"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#15212b"><title>工业革命：伯明翰 · 在线对战</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="table.css?v=0.5"><link rel="stylesheet" href="flow.css?v=0.4"><link rel="stylesheet" href="alignment.css?v=0.5"><link rel="stylesheet" href="workspace.css?v=0.20"><link rel="stylesheet" href="dock.css?v=0.20"><link rel="stylesheet" href="refinement.css?v=0.20"><link rel="stylesheet" href="tabletop.css?v=0.20"><link rel="stylesheet" href="localization.css?v=0.20"><link rel="stylesheet" href="legibility.css?v=0.20"><link rel="stylesheet" href="compact-table.css?v=0.20"><link rel="stylesheet" href="action-feedback.css?v=0.20"></head>
 <body>
-<header class="topbar"><a class="lobby-home-link" href="https://qiumh2323.github.io/boardgame-lab/#experiments"><img src="assets/lab-mark.svg" alt=""><span>路克球的桌游实验室<small>← 返回桌游展架</small></span></a><div class="lobby-header-meta"><span>工业革命：伯明翰</span><span>测试版 0.19</span></div><a class="brand" href="./"><span class="seal">B</span><span>工业革命：伯明翰<small>在线对战 · 测试版 0.19</small></span></a><nav><span id="connection-status" role="status">本地对局</span><details class="journal" id="journal-dropdown"><summary>对局记录</summary><ol id="log"></ol></details><button id="help-btn" class="quiet">玩法与规则</button><button id="menu-btn" class="quiet">对局菜单</button></nav></header>
-<section id="lobby" class="lobby" aria-labelledby="lobby-title">
- <nav class="lobby-breadcrumb" aria-label="当前位置"><a href="https://qiumh2323.github.io/boardgame-lab/#experiments">桌游展架</a><span aria-hidden="true">/</span><span>工业革命：伯明翰</span></nav>
- <div class="lobby-layout"><section class="lobby-story">
-  <p class="lobby-kicker">BRASS / BIRMINGHAM</p><h1 id="lobby-title">工业革命：伯明翰</h1><p class="lobby-intro">铺设运河与铁路，建厂、出售、积累收益。<br>在两个时代里，经营你的工业版图。</p>
-  <div class="lobby-tags"><span>2–4人</span><span>完整双时代</span><span>规则AI与好友联机</span></div>
-  <div class="lobby-art" aria-label="伯明翰的城市、产业与配件"><span class="lobby-art-ring"></span><img class="lobby-card back" src="assets/cards/piece-card-back.webp" alt="卡牌背面"><img class="lobby-card front" src="assets/cards/card-birmingham.webp" alt="伯明翰地点牌"><img class="lobby-card rare" src="assets/cards/card-brewery.webp" alt="酿酒厂产业牌"><img class="lobby-coin" src="assets/pieces/piece-coin-15.webp" alt="15英镑金币"><img class="lobby-beer" src="assets/pieces/beer-white.svg" alt="啤酒桶"><span class="lobby-art-note">牌已备好，只差你入座。</span></div>
-  <details class="quick-guide"><summary>第一次玩？看一分钟开局提示 <span aria-hidden="true">＋</span></summary><ol><li><strong>先选行动，再点目标：</strong>地图和面板会高亮合法位置，选择弃牌后确认执行。</li><li><strong>让资源流动起来：</strong>煤需要运输连接；铁无需连接；自己的啤酒也无需连接。</li><li><strong>出售商品，让产业翻面：</strong>翻面提高收入，时代结束时结算产业和连接得分。</li><li><strong>经营两个时代：</strong>运河时代首轮每人一次行动，之后每回合两次；最终在铁路时代结束时决出胜负。</li></ol><button id="lobby-rules" class="text-button">查看完整玩法与规则</button></details>
- </section>
- <section id="lobby-settings" aria-label="对战准备"><div class="settings">
-  <p class="setup-eyebrow">SET YOUR TABLE</p><h2 id="setup-title">准备一局</h2><p class="setup-intro">选好人数，与规则AI切磋，或邀朋友同桌。</p>
-  <label for="player-name">你的名字</label><input id="player-name" maxlength="18" value="玩家" autocomplete="nickname">
-  <p id="player-count-label" class="setting-label">对局人数</p>
-  <div class="player-count-options" role="radiogroup" aria-labelledby="player-count-label"><button class="player-count-choice" data-player-count="2" role="radio" aria-checked="true"><img src="assets/pieces/piece-character-watt.webp" alt=""><span><strong>2人对局</strong><small>紧凑的双人对决</small></span><i class="choice-dot" aria-hidden="true"></i></button><button class="player-count-choice" data-player-count="3" role="radio" aria-checked="false"><img src="assets/pieces/piece-character-brunel.webp" alt=""><span><strong>3人对局</strong><small>多一位对手，多一种局面</small></span><i class="choice-dot" aria-hidden="true"></i></button><button class="player-count-choice" data-player-count="4" role="radio" aria-checked="false"><img src="assets/pieces/piece-character-arkwright.webp" alt=""><span><strong>4人对局</strong><small>四人同桌，展开产业竞争</small></span><i class="choice-dot" aria-hidden="true"></i></button></div>
-  <button id="ai-start" class="primary wide">与规则AI开始对局</button><button id="resume-btn" class="resume-link" hidden>继续上次本地对局</button>
-  <p id="setup-status" class="setup-status" role="status" data-state="loading">正在准备规则与棋盘…</p>
-  <div class="online-setup"><h3>与好友联机</h3><div class="lobby-actions"><button id="host-btn">创建房间</button><button id="join-btn">加入房间</button></div><p>房主保持页面开启；空位可由规则AI补齐。</p></div>
- </div></section></div>
- <p class="lobby-bottom-note">路克球的桌游实验室 · 保持好奇，认真开玩。</p>
+<header class="topbar"><a class="brand" href="./"><span class="seal">B</span><span>工业革命：伯明翰<small>在线对战 · 测试版 0.20</small></span></a><nav><span id="connection-status" role="status">本地对局</span><details class="journal" id="journal-dropdown"><summary>对局记录</summary><ol id="log"></ol></details><button id="help-btn" class="quiet">玩法与规则</button><button id="menu-btn" class="quiet">对局菜单</button></nav></header>
+<section id="lobby" class="lobby">
+ <div class="lobby-copy"><p class="period">黑乡，1770—1870</p><h1>点亮你的<br>工业版图。</h1><p class="intro">沿运河铺路，让煤炭与啤酒流动。<br>从第一座工厂，走向铁路时代。</p>
+ <div class="setup-controls"><label>你的名字<input id="player-name" maxlength="18" value="玩家" autocomplete="nickname"></label><label>对局人数<select id="player-count"><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option></select></label></div>
+ <button id="ai-start" class="primary wide">与规则 AI 开始对局</button><div class="lobby-actions"><button id="host-btn">创建联机房间</button><button id="join-btn">加入房间</button></div><button id="resume-btn" class="quiet wide" hidden>继续上次本地对局</button>
+ <p class="lobby-note">完整双时代 · 合法行动校验 · 2—4人<br>联机时请房主保持页面开启。</p></div>
+ <figure class="lobby-board"><img src="assets/board-night.webp" alt="伯明翰完整棋盘"><figcaption>运河时代 1770—1830 / 铁路时代 1830—1870</figcaption></figure>
 </section>
 <main id="game" hidden>
 
@@ -36,5 +24,5 @@
 <div id="action-float-stack"><aside id="player-action-hint" role="status" aria-live="polite" hidden></aside><aside id="action-announcement" class="action-announcement" role="status" aria-live="polite" hidden></aside></div>
 <aside id="placement-hint" role="status" hidden></aside>
 <div id="toast" role="status" hidden></div>
-<script src="vendor/peerjs.min.js"></script><script type="module" src="app.js?v=0.19"></script>
+<script src="vendor/peerjs.min.js"></script><script type="module" src="app.js?v=0.20"></script>
 </body></html>

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.19';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.20';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -12,11 +12,9 @@ test('full page restores a game, develops from mat before discarding, and update
  window.HTMLElement.prototype.scrollIntoView=()=>{};let modal=document.querySelector('#modal');modal.close=()=>modal.open=false;modal.showModal=()=>modal.open=true;
  await import('../brass-birmingham/app.js?integration');await new Promise(r=>setImmediate(r));
  let $=q=>document.querySelector(q);
- assert.ok($('link[href^="lobby.css"]'));assert.ok($('#lobby .lobby-layout'));assert.ok($('#lobby .settings'));assert.equal($('#setup-status').dataset.state,'ready');
- for(const n of [4,3,2]){$(`[data-player-count="${n}"]`).onclick();assert.equal(Number($('[data-player-count][aria-checked="true"]').dataset.playerCount),n);assert.equal(document.querySelectorAll('[data-player-count][aria-checked="true"]').length,1);assert.equal($(`[data-player-count="${n}"]`).getAttribute('aria-checked'),'true');}
- for(const image of document.querySelectorAll('#lobby img,.lobby-home-link img'))assert.ok(fs.existsSync(new URL(image.getAttribute('src'),root)),image.getAttribute('src'));
- $('#lobby-rules').onclick();assert.ok(modal.open);$('#modal-close').onclick();
- for(const n of [4,3,2]){$(`[data-player-count="${n}"]`).onclick();$('#ai-start').onclick();const started=JSON.parse(store.get('brass-night-save-v1'));assert.equal(started.players.length,n);assert.equal(started.players[0].name,'玩家');assert.equal($('#lobby').hidden,true);$('#menu-btn').onclick();$('#back-btn').onclick();assert.equal($('#lobby').hidden,false);}
+ assert.equal($('link[href^="lobby.css"]'),null);assert.ok($('#lobby .lobby-copy'));assert.ok($('#lobby .lobby-board'));assert.ok($('#player-count'));
+ for(const image of document.querySelectorAll('#lobby img'))assert.ok(fs.existsSync(new URL(image.getAttribute('src'),root)),image.getAttribute('src'));
+ for(const n of [4,3,2]){$(`#player-count option[value="${n}"]`).selected=true;assert.equal(Number($('#player-count').value),n);$('#ai-start').onclick();const started=JSON.parse(store.get('brass-night-save-v1'));assert.equal(started.players.length,n);assert.equal(started.players[0].name,'玩家');assert.equal($('#lobby').hidden,true);$('#menu-btn').onclick();$('#back-btn').onclick();assert.equal($('#lobby').hidden,false);}
  store.set('brass-night-save-v1',JSON.stringify(s));$('#resume-btn').onclick();
  const indices=[...document.querySelectorAll('#hand [data-card]')].map(el=>+el.dataset.card),hand=s.players[0].hand;let seenIndustry=false;
  for(const i of indices){if(hand[i].kind==='industry')seenIndustry=true;if(hand[i].kind==='location')assert.equal(seenIndustry,false);}

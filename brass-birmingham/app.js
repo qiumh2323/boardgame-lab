@@ -1,12 +1,12 @@
-import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.19';
-import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.19';
-import {zoomButton,installDragPan} from './table-zoom.js?v=0.19';
-import {cardCatalogue} from './card-library.js?v=0.19';
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.19';
-import {selectAI} from './ai.js?v=0.19';
+import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.20';
+import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.20';
+import {zoomButton,installDragPan} from './table-zoom.js?v=0.20';
+import {cardCatalogue} from './card-library.js?v=0.20';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.20';
+import {selectAI} from './ai.js?v=0.20';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.19';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.19';
+import {createDirectFlow} from './direct-flow.js?v=0.20';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.20';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -35,7 +35,7 @@ function save(){if(!state)return;try{localStorage.setItem(SAVE,JSON.stringify(st
 function myTurn(){return view&&!view.gameOver&&current(view)===seat&&!view.players[seat].ai;}
 function startLocal(n){room?.destroy();room=null;mode='local';seat=0;matSeat=null;state=createGame([name(),...Array.from({length:n-1},(_,i)=>'规则 AI '+(i+1))],[false,...Array(n-1).fill(true)]);selectedType='build';selectedLocation=null;cardIndex=0;modal.close();update();directFlow.reset();}
 function name(){return $('#player-name')?.value?.trim()||'你';}
-function count(){return Number($('[data-player-count][aria-checked="true"]').dataset.playerCount);}
+function count(){return Number($('#player-count').value);}
 function update(){
  if(mode!=='guest'){
   state.gameId ||= globalThis.crypto?.randomUUID?.()||`brass-${state.seed}-${Date.now()}`;
@@ -222,8 +222,7 @@ function renderLobby(){
  if($('#room-start'))$('#room-start').onclick=()=>{if(lobby.seats.some(s=>!s.online)){toast('请等待离线玩家重连后开始');return;}let names=[],ai=[];for(let i=0;i<lobby.count;i++){let s=lobby.seats.find(s=>s.seat===i);names.push(s?s.name:'规则 AI '+(i+1));ai.push(!s);}state=createGame(names,ai);seat=0;mode='host';room.started=true;room.broadcastLobby();modal.close();update();};
 }
 function menu(){showDialog('对局菜单',`<div class="option-list">${view?'<button id="export-btn">导出对局存档</button>':''}${myTurn()&&view.phase==='play'?'<button id="pass-menu-btn">弃1张牌跳过行动</button>':''}${mode==='guest'?'<button id="reconnect-btn">重新连接房主</button>':''}${view?.gameOver?'<button id="results-btn">查看最终结算</button>':''}<button id="back-btn">返回开局界面</button></div><p class="modal-note">本地及房主对局自动存档。联机客人不保存其他玩家的手牌。</p>`);if($('#pass-menu-btn'))$('#pass-menu-btn').onclick=()=>{modal.close();directFlow.begin('pass');};if($('#export-btn'))$('#export-btn').onclick=()=>{let data=mode==='guest'?view:state,blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brass-night-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('存档已导出');};if($('#reconnect-btn'))$('#reconnect-btn').onclick=()=>{room.connect();modal.close();};if($('#results-btn'))$('#results-btn').onclick=showResults;$('#back-btn').onclick=()=>{setTableZoom(null);closeCatalogue();clearTimeout(announcementTimer);$('#action-announcement').hidden=true;$('#placement-hint').hidden=true;feedbackGame=null;clearTimeout(aiTimer);room?.destroy();room=null;state=null;view=null;directFlow.reset();mode='local';$('main').hidden=true;$('.lobby').hidden=false;$('#connection-status').textContent='本地对局';$('#resume-btn').hidden=!saveAvailable;modal.close();};}
-document.querySelectorAll('[data-player-count]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-player-count]').forEach(n=>n.setAttribute('aria-checked',String(n===b)));});
-$('#ai-start').onclick=()=>startLocal(count());$('#host-btn').onclick=host;$('#join-btn').onclick=()=>joinDialog();$('#help-btn').onclick=help;$('#lobby-rules').onclick=help;$('#menu-btn').onclick=menu;
+$('#ai-start').onclick=()=>startLocal(count());$('#host-btn').onclick=host;$('#join-btn').onclick=()=>joinDialog();$('#help-btn').onclick=help;$('#menu-btn').onclick=menu;
 function setTableZoom(kind){
  document.body.classList.toggle('board-focus',kind==='board');document.body.classList.toggle('mat-focus',kind==='mat');
  (kind==='board'?$('.board-column'):$('#board-wrap')).appendChild($('#zoom-btn'));(kind==='mat'?$('.mat-panel'):$('#mat-board')).appendChild($('#mat-preview'));
@@ -238,7 +237,7 @@ setTableZoom(null);
 $('#action-history-btn').onclick=()=>{showDialog('行动记录','');renderActionHistory();};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;$('#setup-status').textContent='正在准备规则与棋盘…';$('#setup-status').dataset.state='loading';try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.19').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;$('#setup-status').textContent='规则与棋盘已就绪';$('#setup-status').dataset.state='ready';saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){$('#setup-status').textContent='加载未完成，请刷新页面重试';$('#setup-status').dataset.state='error';toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.20').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 $('#card-catalogue').onmouseenter=()=>{catalogueHovered=true;clearTimeout(catalogueTimer);};$('#card-catalogue').onmouseleave=()=>{catalogueHovered=false;queueCatalogueClose();};
