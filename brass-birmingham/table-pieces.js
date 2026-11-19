@@ -25,7 +25,7 @@ export function routePieces(view,layout,connections){
   let loc=layout.routes[c.id]?.eras?.[view.era]||layout.routes[c.id];if(!loc)return '';let owner=view.links[c.id]?.owner;
   const tangent=loc.tangent,angle=tangent?Math.atan2(tangent[1][1]-tangent[0][1],tangent[1][0]-tangent[0][0])*180/Math.PI:loc.angle;
   let label=`${c.from}—${c.to}${owner!==undefined?'：'+view.players[owner].name:''}`;
-  return `<button class="route-piece ${owner===undefined?'route-empty':'route-placed'}" data-route="${c.id}" data-route-era="${view.era}" style="${at(loc.center)};--angle:${angle}deg" title="${safe(label)}" aria-label="${safe(label)}">${owner!==undefined?`<img src="assets/pieces/piece-link-${colors[owner]}-${view.era}.webp" alt="${view.era==='canal'?'运河':'铁路'}连接板块">`:'<span></span>'}</button>`;
+  return `<button class="route-piece ${owner===undefined?'route-empty':'route-placed'}" data-route="${c.id}" data-route-era="${view.era}" style="${at(loc.center)};--angle:${angle}deg;${loc.width?'width:'+loc.width+'%;':''}" title="${safe(label)}" aria-label="${safe(label)}">${owner!==undefined?`<img src="assets/pieces/piece-link-${colors[owner]}-${view.era}.webp" alt="${view.era==='canal'?'运河':'铁路'}连接板块">`:'<span></span>'}</button>`;
  }).join('');
 }
 export function playerReserve(p,era){
