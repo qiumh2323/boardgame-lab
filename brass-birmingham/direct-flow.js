@@ -1,4 +1,4 @@
-import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js';
+import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.7';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createDirectFlow(api){
  let draft=null,stage='idle',variants=[],resource=null,pendingSale=null,lastRevision=null;

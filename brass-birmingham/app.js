@@ -1,8 +1,8 @@
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone} from './engine.js';
-import {selectAI} from './ai.js';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.7';
+import {selectAI} from './ai.js?v=0.7';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.4';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.6';
+import {createDirectFlow} from './direct-flow.js?v=0.7';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.7';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -35,7 +35,8 @@ function render(){
  const p=view.players[seat];if(!p)return;cardIndex=Math.min(cardIndex,Math.max(0,p.hand.length-1));
  $('#round-label').textContent=`第 ${view.round} 轮 · 牌库 ${view.deckCount}张`;$('#round-label').previousElementSibling.textContent=view.era==='canal'?'运河时代 1770–1830':'铁路时代 1830–1870';
  $('#turn-label').textContent=view.gameOver?'对局结束':view.phase==='liquidation'?`${view.players[current(view)].name} 需要变卖产业支付收入欠款`:`${view.players[current(view)].name} 的回合 · 第 ${view.used+1}/${view.era==='canal'&&view.round===1?1:2} 次行动`;
- $('#players').innerHTML=view.players.map(p=>`<article class="player ${!view.gameOver&&current(view)===p.id?'active':''}" style="--owner:${COLORS[p.id]}"><b>${esc(p.name)} ${p.id===seat?'<span class="you">你</span>':''}</b><span>${p.vp} VP</span><div class="stats"><span>现金 £${p.money}</span><span>收入 ${income(p.income)>=0?'+':''}${income(p.income)}</span><span>手牌 ${p.handCount}</span><span>${p.ai?'规则 AI':mode==='local'?'玩家':'在线玩家'}</span></div></article>`).join('');
+ const estimate=estimateEraScore(view);
+ $('#players').innerHTML=view.players.map(p=>`<article class="player ${!view.gameOver&&current(view)===p.id?'active':''}" style="--owner:${COLORS[p.id]}"><b>${esc(p.name)} ${p.id===seat?'<span class="you">你</span>':''}</b><span>${p.vp} VP</span><div class="score-estimate" data-player="${p.id}" title="若本时代现在结束：已得 ${p.vp} + 产业 ${estimate[p.id].industry} + 连接 ${estimate[p.id].links}。计分轨道仅在时代结束时结算。"><strong>预估 ${p.vp+estimate[p.id].industry+estimate[p.id].links} VP</strong><span>已得 ${p.vp} · 待计 ${estimate[p.id].industry+estimate[p.id].links}</span><small>产业 +${estimate[p.id].industry} / 连接 +${estimate[p.id].links}</small></div><div class="stats"><span>现金 £${p.money}</span><span>收入 ${income(p.income)>=0?'+':''}${income(p.income)}</span><span>手牌 ${p.handCount}</span><span>${p.ai?'规则 AI':mode==='local'?'玩家':'在线玩家'}</span></div></article>`).join('');
  $('#market-state').innerHTML=`<span>煤 ${view.coal}/14</span><span>铁 ${view.iron}/10</span><span>商人啤酒 ${view.merchants.filter(m=>m.beer).length}</span>`;
  $('#hand-count').textContent=`${p.hand.length}张 · 确定目标后选择弃牌`;
  $('#hand').innerHTML=p.hand.map((c,i)=>`<button class="card ${cardIndex===i?'selected':''}" data-card="${i}" aria-pressed="${cardIndex===i}" title="${esc(cardName(c))}"><img src="${cardUrl(c)}" alt="${esc(cardName(c))}"><span>${esc(cardName(c))}</span></button>`).join('');
@@ -142,7 +143,7 @@ $('#mat-preview').onclick=()=>showDialog('夜间玩家面板','<img class="modal
 $('#ai-hint').onclick=()=>{if(!state||!myTurn())return;toast('正在计算建议…');setTimeout(()=>{let a=selectAI(state,seat);if(a){showDialog('规则 AI 建议',`<p>${esc(actionLabel(a))}</p><p class="modal-note">按可得分产业、收入、运输网络与现金评估；建议不保证最优。</p><button id="use-hint" class="primary wide">采用建议</button>`);$('#use-hint').onclick=()=>{cardIndex=a.card||0;submit(a);};}},20);};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.6').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.7').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 const directFlow=createDirectFlow({view:()=>view,seat:()=>seat,myTurn,actions:()=>actions,submit,showMyMat:()=>{matSeat=seat;renderMat();}});

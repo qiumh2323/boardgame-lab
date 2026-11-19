@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,applyAction,legalActions,current,publicView,income,incomeTop,network,distances,F,clone,TYPES} from '../brass-birmingham/engine.js';
-import {selectAI} from '../brass-birmingham/ai.js';
+import {configure,createGame,applyAction,legalActions,current,publicView,income,incomeTop,network,distances,F,clone,TYPES,estimateEraScore} from '../brass-birmingham/engine.js?v=0.7';
+import {selectAI} from '../brass-birmingham/ai.js?v=0.7';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 function fresh(n=2){let s=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),87);s.order=s.players.map(p=>p.id);return s;}
 function play(s,a){let r=applyAction(s,current(s),a,{auto:true});assert.ok(r.ok,r.error);return r.state;}
@@ -90,4 +90,15 @@ test('last rail round awards no income, with flipped southern farm contributing 
 test('opponent overbuilding needs both board and market resource depletion',()=>{
  let s=fresh();s.players[0].stacks.coalMine=[2,2,3,3,4,4];s.players[0].hand[0]={kind:'location',loc:'dudley'};s.board['dudley:0']=tile(1,'coalMine',1,0,true);s.players[0].money=100;
  let a={type:'build',card:0,loc:'dudley',slot:0,industry:'coalMine'};assert.equal(applyAction(s,0,a).ok,false);s.coal=0;let t=play(s,a);assert.equal(t.board['dudley:0'].owner,0);assert.equal(t.board['dudley:0'].level,2);
+});
+
+test('live era estimate is non-mutating, includes opponent endpoints and equals actual settlement',()=>{
+ for(let era of ['canal','rail']){
+  let s=fresh();s.era=era;s.deck=[];s.players[0].hand=[s.players[0].hand[0]];s.players[1].hand=[];
+  s.players[0].vp=12;s.players[1].vp=7;s.board['worcester:0']=tile(0,'cottonMill',2,0,true);s.board['southern:0']=tile(1,'brewery',2,0,true);s.board['birmingham:0']=tile(1,'pottery',1,0,false);
+  s.links['kidderminster-worcester']={owner:0};s.links['gloucester-worcester']={owner:1};let before=JSON.stringify(s),pending=estimateEraScore(publicView(s,0));
+  assert.equal(JSON.stringify(s),before);assert.deepEqual(pending,[{industry:5,links:4},{industry:5,links:4}]);
+  let t=play(s,{type:'pass',card:0});assert.deepEqual(t.scores[0].points,pending);assert.equal(t.players[0].vp,21);assert.equal(t.players[1].vp,16);
+  if(t.gameOver)assert.deepEqual(estimateEraScore(t),[{industry:0,links:0},{industry:0,links:0}]);
+ }
 });

@@ -93,10 +93,15 @@ function sell(s,p,a,ctx){
  }
  return `出售 ${a.sales.length}个产业`;
 }
-function eraScore(s){
+export function estimateEraScore(s){
+ if(s.gameOver)return s.players.map(()=>({industry:0,links:0}));
  let pts=s.players.map(()=>({industry:0,links:0}));for(let t of Object.values(s.board))if(t.flipped)pts[t.owner].industry+=tileData(t).vp;
  const value=loc=>(F.merchants[loc]?2:0)+Object.entries(s.board).filter(([k,t])=>tileLocation(k)===loc&&t.flipped).reduce((sum,[,t])=>sum+tileData(t).linkVP,0);
  for(let [key,l]of Object.entries(s.links))pts[l.owner].links+=ends(key).reduce((n,loc)=>n+value(loc),0);
+ return pts;
+}
+function eraScore(s){
+ const pts=estimateEraScore(s);
  pts.forEach((p,i)=>s.players[i].vp+=p.industry+p.links);s.scores.push({era:s.era,points:pts});note(s,`${s.era==='canal'?'运河':'铁路'}时代计分：`+pts.map((p,i)=>s.players[i].name+' +'+(p.industry+p.links)).join('，'));
  s.links={};for(let p of s.players)p.linkCount=0;
  if(s.era==='rail'){s.gameOver=true;s.phase='finished';s.winners=[...s.players].sort((a,b)=>b.vp-a.vp||income(b.income)-income(a.income)||b.money-a.money).filter((p,i,all)=>p.vp===all[0].vp&&income(p.income)===income(all[0].income)&&p.money===all[0].money).map(p=>p.id);return;}

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {boardPieces,routePieces,playerReserve,coins} from '../brass-birmingham/table-pieces.js';
-import {configure,createGame,applyAction,current,publicView} from '../brass-birmingham/engine.js';
+import {configure,createGame,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.7';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));
 const layout=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/layout.json',import.meta.url)));
 configure(facts);
@@ -43,4 +43,8 @@ test('round expenditure has an independent position to the right of each portrai
  for(let i=0;i<4;i++){assert.ok(layout.turnSpend[i][0]>layout.turnOrder[i][0]);assert.equal(layout.turnSpend[i][1],layout.turnOrder[i][1]);}
  let s=createGame(['A','B'],[false,false],43);s.players[0].spent=6;let html=boardPieces(s,layout);
  let characters=[...html.matchAll(/<div class="turn-character[^]*?<\/div>/g)].map(m=>m[0]);assert.ok(characters.every(s=>!s.includes('coin-')));assert.ok(html.includes('class="turn-payment"'));checkArt(html);
+});
+
+test('southern fork link uses the vertical trunk in both eras',()=>{
+ for(let era of ['canal','rail']){let pose=layout.routes['kidderminster-worcester'].eras[era];assert.equal(pose.angle,90);assert.ok(pose.center[0]*1400>465&&pose.center[0]*1400<495);assert.ok(pose.center[1]*1400>1140&&pose.center[1]*1400<1190);assert.ok(!pose.width);}
 });

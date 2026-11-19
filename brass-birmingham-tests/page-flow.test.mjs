@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.7';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -12,7 +12,7 @@ test('full page restores a game, develops from mat before discarding, and update
  window.HTMLElement.prototype.scrollIntoView=()=>{};let modal=document.querySelector('#modal');modal.close=()=>modal.open=false;modal.showModal=()=>modal.open=true;
  await import('../brass-birmingham/app.js?integration');await new Promise(r=>setImmediate(r));
  let $=q=>document.querySelector(q);$('#resume-btn').onclick();
- assert.equal($('#hand-float').hidden,false);assert.equal(document.querySelectorAll('.mat-tile').length,29);
+ assert.equal($('#hand-float').hidden,false);assert.equal(document.querySelectorAll('#hand [data-card]').length,8);assert.equal(document.querySelectorAll('.score-estimate').length,2);assert.match($('.score-estimate').textContent,/预估 0 VP/);let trackBefore=$('.track-token.vp').getAttribute('data-track-space');$('#mat-player').onchange({target:{value:'1'}});assert.ok($('#mat-tokens').innerHTML.includes('tile-purple-'));$('#mat-player').onchange({target:{value:'0'}});assert.equal($('.track-token.vp').getAttribute('data-track-space'),trackBefore);assert.equal(document.querySelectorAll('.mat-tile').length,29);
  $('#action-buttons [data-type="develop"]').onclick();assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('flow-target'));
  let before=$('[data-mat-type="coalMine"][data-level="1"]').dataset.count;$('[data-mat-type="coalMine"][data-level="1"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);
  $('#flow-finish').onclick();assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));$('[data-card="0"]').onclick();
