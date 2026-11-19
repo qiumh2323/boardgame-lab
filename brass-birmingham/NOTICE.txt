@@ -1,0 +1,26 @@
+Brass: Birmingham — Night playtest v0.1
+
+Unofficial personal playtest. Game design: Martin Wallace, Gavan Brown, Matt Tolman.
+Publisher: Roxley Games. Original game artwork and component designs remain
+copyright their respective owners. Public download does not grant an open
+artwork license. No commercial license or publisher endorsement is claimed.
+
+Rules reference: official Roxley Brass: Birmingham rulebook, v2018.11.
+https://roxley.com/products/brass-birmingham
+
+Artwork sources (originals and detailed manifests kept in the local asset pack):
+https://github.com/ikegami/tts_brass — night board texture
+https://www.ludex.dev/brass-birmingham/cards/ — card/component images
+https://github.com/npow/brass-birmingham — physical quantities and board
+measurements were cross-referenced as factual data. No upstream application
+source code is included in this implementation.
+
+PeerJS v1.5.5: MIT license, see vendor/PeerJS-LICENSE.txt.
+https://github.com/peers/peerjs
+
+This build uses the public PeerServer signaling service for room discovery
+and encrypted WebRTC data channels for game state. The host arbitrates all
+actions. Guests receive their own hand only; the host necessarily sees all
+private state. This is a trusted-host test game, not a ranked anti-cheat service.
+The host must keep the browser open. NAT/firewall restrictions may prevent a
+direct connection; the page shows connection errors instead of faking a room.

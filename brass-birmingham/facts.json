@@ -1,0 +1,1231 @@
+{
+  "industries": {
+    "brewery": [
+      {
+        "level": 1,
+        "count": 2,
+        "canalEra": true,
+        "railEra": false,
+        "cost": 5,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": null,
+        "vp": 4,
+        "income": 4,
+        "linkVP": 2,
+        "canDevelop": true,
+        "resourceCubes": 1
+      },
+      {
+        "level": 2,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 7,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": null,
+        "vp": 5,
+        "income": 5,
+        "linkVP": 2,
+        "canDevelop": true,
+        "resourceCubes": 1
+      },
+      {
+        "level": 3,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 9,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": null,
+        "vp": 7,
+        "income": 5,
+        "linkVP": 2,
+        "canDevelop": true,
+        "resourceCubes": 1
+      },
+      {
+        "level": 4,
+        "count": 1,
+        "canalEra": false,
+        "railEra": true,
+        "cost": 9,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": null,
+        "vp": 10,
+        "income": 5,
+        "linkVP": 2,
+        "canDevelop": true,
+        "resourceCubes": 2
+      }
+    ],
+    "coalMine": [
+      {
+        "level": 1,
+        "count": 1,
+        "canalEra": true,
+        "railEra": false,
+        "cost": 5,
+        "costCoal": 0,
+        "costIron": 0,
+        "beersToSell": null,
+        "vp": 1,
+        "income": 4,
+        "linkVP": 2,
+        "canDevelop": true,
+        "resourceCubes": 2
+      },
+      {
+        "level": 2,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 7,
+        "costCoal": 0,
+        "costIron": 0,
+        "beersToSell": null,
+        "vp": 2,
+        "income": 7,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 3
+      },
+      {
+        "level": 3,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 8,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": null,
+        "vp": 3,
+        "income": 6,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 4
+      },
+      {
+        "level": 4,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 10,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": null,
+        "vp": 4,
+        "income": 5,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 5
+      }
+    ],
+    "cottonMill": [
+      {
+        "level": 1,
+        "count": 3,
+        "canalEra": true,
+        "railEra": false,
+        "cost": 12,
+        "costCoal": 0,
+        "costIron": 0,
+        "beersToSell": 1,
+        "vp": 5,
+        "income": 5,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 2,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 14,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": 1,
+        "vp": 5,
+        "income": 4,
+        "linkVP": 2,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 3,
+        "count": 3,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 16,
+        "costCoal": 1,
+        "costIron": 1,
+        "beersToSell": 1,
+        "vp": 9,
+        "income": 3,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 4,
+        "count": 3,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 18,
+        "costCoal": 1,
+        "costIron": 1,
+        "beersToSell": 1,
+        "vp": 12,
+        "income": 2,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      }
+    ],
+    "ironWorks": [
+      {
+        "level": 1,
+        "count": 1,
+        "canalEra": true,
+        "railEra": false,
+        "cost": 5,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": null,
+        "vp": 3,
+        "income": 3,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 4
+      },
+      {
+        "level": 2,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 7,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": null,
+        "vp": 5,
+        "income": 3,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 4
+      },
+      {
+        "level": 3,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 9,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": null,
+        "vp": 7,
+        "income": 2,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 5
+      },
+      {
+        "level": 4,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 12,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": null,
+        "vp": 9,
+        "income": 1,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 6
+      }
+    ],
+    "manufacturer": [
+      {
+        "level": 1,
+        "count": 1,
+        "canalEra": true,
+        "railEra": false,
+        "cost": 8,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": 1,
+        "vp": 3,
+        "income": 5,
+        "linkVP": 2,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 2,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 10,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": 1,
+        "vp": 5,
+        "income": 1,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 3,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 12,
+        "costCoal": 2,
+        "costIron": 0,
+        "beersToSell": 0,
+        "vp": 4,
+        "income": 4,
+        "linkVP": 0,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 4,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 8,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": 1,
+        "vp": 3,
+        "income": 6,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 5,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 16,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": 2,
+        "vp": 8,
+        "income": 2,
+        "linkVP": 2,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 6,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 20,
+        "costCoal": 0,
+        "costIron": 0,
+        "beersToSell": 1,
+        "vp": 7,
+        "income": 6,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 7,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 16,
+        "costCoal": 1,
+        "costIron": 1,
+        "beersToSell": 0,
+        "vp": 9,
+        "income": 4,
+        "linkVP": 0,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 8,
+        "count": 2,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 20,
+        "costCoal": 0,
+        "costIron": 2,
+        "beersToSell": 1,
+        "vp": 11,
+        "income": 1,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      }
+    ],
+    "pottery": [
+      {
+        "level": 1,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 17,
+        "costCoal": 0,
+        "costIron": 1,
+        "beersToSell": 1,
+        "vp": 10,
+        "income": 5,
+        "linkVP": 1,
+        "canDevelop": false,
+        "resourceCubes": 0
+      },
+      {
+        "level": 2,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 0,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": 1,
+        "vp": 1,
+        "income": 1,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 3,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 22,
+        "costCoal": 2,
+        "costIron": 0,
+        "beersToSell": 2,
+        "vp": 11,
+        "income": 5,
+        "linkVP": 1,
+        "canDevelop": false,
+        "resourceCubes": 0
+      },
+      {
+        "level": 4,
+        "count": 1,
+        "canalEra": true,
+        "railEra": true,
+        "cost": 0,
+        "costCoal": 1,
+        "costIron": 0,
+        "beersToSell": 1,
+        "vp": 1,
+        "income": 1,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      },
+      {
+        "level": 5,
+        "count": 1,
+        "canalEra": false,
+        "railEra": true,
+        "cost": 24,
+        "costCoal": 2,
+        "costIron": 0,
+        "beersToSell": 2,
+        "vp": 20,
+        "income": 5,
+        "linkVP": 1,
+        "canDevelop": true,
+        "resourceCubes": 0
+      }
+    ]
+  },
+  "cities": {
+    "belper": {
+      "name": "Belper",
+      "region": "derbyshire",
+      "slots": [
+        [
+          "cottonMill",
+          "manufacturer"
+        ],
+        [
+          "coalMine"
+        ],
+        [
+          "pottery"
+        ]
+      ],
+      "x": 725,
+      "y": 55
+    },
+    "derby": {
+      "name": "Derby",
+      "region": "derbyshire",
+      "slots": [
+        [
+          "cottonMill",
+          "brewery"
+        ],
+        [
+          "cottonMill",
+          "manufacturer"
+        ],
+        [
+          "ironWorks"
+        ]
+      ],
+      "x": 745,
+      "y": 160
+    },
+    "leek": {
+      "name": "Leek",
+      "region": "staffordshire",
+      "slots": [
+        [
+          "cottonMill",
+          "manufacturer"
+        ],
+        [
+          "cottonMill",
+          "coalMine"
+        ]
+      ],
+      "x": 440,
+      "y": 45
+    },
+    "stokeOnTrent": {
+      "name": "Stoke-on-Trent",
+      "region": "staffordshire",
+      "slots": [
+        [
+          "cottonMill",
+          "manufacturer"
+        ],
+        [
+          "pottery",
+          "ironWorks"
+        ],
+        [
+          "manufacturer"
+        ]
+      ],
+      "x": 310,
+      "y": 110
+    },
+    "stone": {
+      "name": "Stone",
+      "region": "staffordshire",
+      "slots": [
+        [
+          "cottonMill",
+          "brewery"
+        ],
+        [
+          "manufacturer",
+          "coalMine"
+        ]
+      ],
+      "x": 195,
+      "y": 185
+    },
+    "uttoxeter": {
+      "name": "Uttoxeter",
+      "region": "staffordshire",
+      "slots": [
+        [
+          "manufacturer",
+          "brewery"
+        ],
+        [
+          "cottonMill",
+          "brewery"
+        ]
+      ],
+      "x": 475,
+      "y": 160
+    },
+    "stafford": {
+      "name": "Stafford",
+      "region": "midlands",
+      "slots": [
+        [
+          "manufacturer",
+          "brewery"
+        ],
+        [
+          "pottery"
+        ]
+      ],
+      "x": 260,
+      "y": 270
+    },
+    "burtonOnTrent": {
+      "name": "Burton-on-Trent",
+      "region": "midlands",
+      "slots": [
+        [
+          "manufacturer",
+          "coalMine"
+        ],
+        [
+          "brewery"
+        ]
+      ],
+      "x": 620,
+      "y": 280
+    },
+    "cannock": {
+      "name": "Cannock",
+      "region": "midlands",
+      "slots": [
+        [
+          "manufacturer",
+          "coalMine"
+        ],
+        [
+          "coalMine"
+        ]
+      ],
+      "x": 350,
+      "y": 355
+    },
+    "tamworth": {
+      "name": "Tamworth",
+      "region": "midlands",
+      "slots": [
+        [
+          "cottonMill",
+          "coalMine"
+        ],
+        [
+          "cottonMill",
+          "coalMine"
+        ]
+      ],
+      "x": 635,
+      "y": 380
+    },
+    "walsall": {
+      "name": "Walsall",
+      "region": "midlands",
+      "slots": [
+        [
+          "ironWorks",
+          "manufacturer"
+        ],
+        [
+          "manufacturer",
+          "brewery"
+        ]
+      ],
+      "x": 430,
+      "y": 430
+    },
+    "wolverhampton": {
+      "name": "Wolverhampton",
+      "region": "blackCountry",
+      "slots": [
+        [
+          "manufacturer"
+        ],
+        [
+          "manufacturer",
+          "coalMine"
+        ]
+      ],
+      "x": 255,
+      "y": 425
+    },
+    "coalbrookdale": {
+      "name": "Coalbrookdale",
+      "region": "blackCountry",
+      "slots": [
+        [
+          "ironWorks",
+          "brewery"
+        ],
+        [
+          "ironWorks"
+        ],
+        [
+          "coalMine"
+        ]
+      ],
+      "x": 110,
+      "y": 455
+    },
+    "dudley": {
+      "name": "Dudley",
+      "region": "blackCountry",
+      "slots": [
+        [
+          "coalMine"
+        ],
+        [
+          "ironWorks"
+        ]
+      ],
+      "x": 295,
+      "y": 510
+    },
+    "kidderminster": {
+      "name": "Kidderminster",
+      "region": "blackCountry",
+      "slots": [
+        [
+          "cottonMill",
+          "coalMine"
+        ],
+        [
+          "cottonMill"
+        ]
+      ],
+      "x": 195,
+      "y": 600
+    },
+    "worcester": {
+      "name": "Worcester",
+      "region": "blackCountry",
+      "slots": [
+        [
+          "cottonMill"
+        ],
+        [
+          "cottonMill"
+        ]
+      ],
+      "x": 210,
+      "y": 720
+    },
+    "birmingham": {
+      "name": "Birmingham",
+      "region": "birmingham",
+      "slots": [
+        [
+          "cottonMill",
+          "manufacturer"
+        ],
+        [
+          "manufacturer"
+        ],
+        [
+          "ironWorks"
+        ],
+        [
+          "manufacturer"
+        ]
+      ],
+      "x": 530,
+      "y": 535
+    },
+    "coventry": {
+      "name": "Coventry",
+      "region": "birmingham",
+      "slots": [
+        [
+          "pottery"
+        ],
+        [
+          "manufacturer",
+          "coalMine"
+        ],
+        [
+          "ironWorks",
+          "manufacturer"
+        ]
+      ],
+      "x": 750,
+      "y": 565
+    },
+    "nuneaton": {
+      "name": "Nuneaton",
+      "region": "birmingham",
+      "slots": [
+        [
+          "manufacturer",
+          "brewery"
+        ],
+        [
+          "cottonMill",
+          "coalMine"
+        ]
+      ],
+      "x": 710,
+      "y": 460
+    },
+    "redditch": {
+      "name": "Redditch",
+      "region": "birmingham",
+      "slots": [
+        [
+          "manufacturer",
+          "coalMine"
+        ],
+        [
+          "ironWorks"
+        ]
+      ],
+      "x": 490,
+      "y": 640
+    }
+  },
+  "farms": {
+    "northern": {
+      "name": "Brewery (N)",
+      "x": 385,
+      "y": 390
+    },
+    "southern": {
+      "name": "Brewery (S)",
+      "x": 175,
+      "y": 660
+    }
+  },
+  "merchants": {
+    "shrewsbury": {
+      "name": "Shrewsbury",
+      "slots": 1,
+      "minPlayers": 2,
+      "bonusType": "vp",
+      "bonusAmount": 4,
+      "x": 25,
+      "y": 360
+    },
+    "gloucester": {
+      "name": "Gloucester",
+      "slots": 2,
+      "minPlayers": 2,
+      "bonusType": "develop",
+      "bonusAmount": 1,
+      "x": 75,
+      "y": 790
+    },
+    "oxford": {
+      "name": "Oxford",
+      "slots": 2,
+      "minPlayers": 2,
+      "bonusType": "income",
+      "bonusAmount": 2,
+      "x": 610,
+      "y": 740
+    },
+    "warrington": {
+      "name": "Warrington",
+      "slots": 2,
+      "minPlayers": 3,
+      "bonusType": "money",
+      "bonusAmount": 5,
+      "x": 180,
+      "y": 15
+    },
+    "nottingham": {
+      "name": "Nottingham",
+      "slots": 2,
+      "minPlayers": 4,
+      "bonusType": "vp",
+      "bonusAmount": 3,
+      "x": 835,
+      "y": 95
+    }
+  },
+  "merchantMix": {
+    "2": [
+      "blank",
+      "blank",
+      "any",
+      "cottonMill",
+      "manufacturer"
+    ],
+    "3": [
+      "blank",
+      "blank",
+      "any",
+      "cottonMill",
+      "manufacturer",
+      "pottery",
+      "manufacturer"
+    ],
+    "4": [
+      "blank",
+      "blank",
+      "any",
+      "cottonMill",
+      "manufacturer",
+      "pottery",
+      "manufacturer",
+      "any",
+      "cottonMill"
+    ]
+  },
+  "connections": [
+    {
+      "id": "belper-derby",
+      "canal": true,
+      "rail": true,
+      "from": "belper",
+      "to": "derby"
+    },
+    {
+      "id": "belper-leek",
+      "canal": false,
+      "rail": true,
+      "from": "belper",
+      "to": "leek"
+    },
+    {
+      "id": "birmingham-coventry",
+      "canal": true,
+      "rail": true,
+      "from": "birmingham",
+      "to": "coventry"
+    },
+    {
+      "id": "birmingham-dudley",
+      "canal": true,
+      "rail": true,
+      "from": "birmingham",
+      "to": "dudley"
+    },
+    {
+      "id": "birmingham-nuneaton",
+      "canal": false,
+      "rail": true,
+      "from": "birmingham",
+      "to": "nuneaton"
+    },
+    {
+      "id": "birmingham-oxford",
+      "canal": true,
+      "rail": true,
+      "from": "birmingham",
+      "to": "oxford"
+    },
+    {
+      "id": "birmingham-redditch",
+      "canal": false,
+      "rail": true,
+      "from": "birmingham",
+      "to": "redditch"
+    },
+    {
+      "id": "birmingham-tamworth",
+      "canal": true,
+      "rail": true,
+      "from": "birmingham",
+      "to": "tamworth"
+    },
+    {
+      "id": "birmingham-walsall",
+      "canal": true,
+      "rail": true,
+      "from": "birmingham",
+      "to": "walsall"
+    },
+    {
+      "id": "birmingham-worcester",
+      "canal": true,
+      "rail": true,
+      "from": "birmingham",
+      "to": "worcester"
+    },
+    {
+      "id": "burtonOnTrent-cannock",
+      "canal": false,
+      "rail": true,
+      "from": "burtonOnTrent",
+      "to": "cannock"
+    },
+    {
+      "id": "burtonOnTrent-derby",
+      "canal": true,
+      "rail": true,
+      "from": "burtonOnTrent",
+      "to": "derby"
+    },
+    {
+      "id": "burtonOnTrent-stone",
+      "canal": true,
+      "rail": true,
+      "from": "burtonOnTrent",
+      "to": "stone"
+    },
+    {
+      "id": "burtonOnTrent-tamworth",
+      "canal": true,
+      "rail": true,
+      "from": "burtonOnTrent",
+      "to": "tamworth"
+    },
+    {
+      "id": "burtonOnTrent-walsall",
+      "canal": true,
+      "rail": false,
+      "from": "burtonOnTrent",
+      "to": "walsall"
+    },
+    {
+      "id": "cannock-stafford",
+      "canal": true,
+      "rail": true,
+      "from": "cannock",
+      "to": "stafford"
+    },
+    {
+      "id": "cannock-northern",
+      "canal": true,
+      "rail": true,
+      "from": "cannock",
+      "to": "northern"
+    },
+    {
+      "id": "cannock-walsall",
+      "canal": true,
+      "rail": true,
+      "from": "cannock",
+      "to": "walsall"
+    },
+    {
+      "id": "cannock-wolverhampton",
+      "canal": true,
+      "rail": true,
+      "from": "cannock",
+      "to": "wolverhampton"
+    },
+    {
+      "id": "coalbrookdale-kidderminster",
+      "canal": true,
+      "rail": true,
+      "from": "coalbrookdale",
+      "to": "kidderminster"
+    },
+    {
+      "id": "coalbrookdale-shrewsbury",
+      "canal": true,
+      "rail": true,
+      "from": "coalbrookdale",
+      "to": "shrewsbury"
+    },
+    {
+      "id": "coalbrookdale-wolverhampton",
+      "canal": true,
+      "rail": true,
+      "from": "coalbrookdale",
+      "to": "wolverhampton"
+    },
+    {
+      "id": "coventry-nuneaton",
+      "canal": false,
+      "rail": true,
+      "from": "coventry",
+      "to": "nuneaton"
+    },
+    {
+      "id": "derby-nottingham",
+      "canal": true,
+      "rail": true,
+      "from": "derby",
+      "to": "nottingham"
+    },
+    {
+      "id": "derby-uttoxeter",
+      "canal": false,
+      "rail": true,
+      "from": "derby",
+      "to": "uttoxeter"
+    },
+    {
+      "id": "dudley-kidderminster",
+      "canal": true,
+      "rail": true,
+      "from": "dudley",
+      "to": "kidderminster"
+    },
+    {
+      "id": "dudley-wolverhampton",
+      "canal": true,
+      "rail": true,
+      "from": "dudley",
+      "to": "wolverhampton"
+    },
+    {
+      "id": "gloucester-redditch",
+      "canal": true,
+      "rail": true,
+      "from": "gloucester",
+      "to": "redditch"
+    },
+    {
+      "id": "gloucester-worcester",
+      "canal": true,
+      "rail": true,
+      "from": "gloucester",
+      "to": "worcester"
+    },
+    {
+      "id": "kidderminster-worcester",
+      "canal": true,
+      "rail": true,
+      "viaBrewery": "southern",
+      "from": "kidderminster",
+      "to": "worcester"
+    },
+    {
+      "id": "leek-stokeOnTrent",
+      "canal": true,
+      "rail": true,
+      "from": "leek",
+      "to": "stokeOnTrent"
+    },
+    {
+      "id": "nuneaton-tamworth",
+      "canal": true,
+      "rail": true,
+      "from": "nuneaton",
+      "to": "tamworth"
+    },
+    {
+      "id": "redditch-oxford",
+      "canal": true,
+      "rail": true,
+      "from": "redditch",
+      "to": "oxford"
+    },
+    {
+      "id": "stafford-stone",
+      "canal": true,
+      "rail": true,
+      "from": "stafford",
+      "to": "stone"
+    },
+    {
+      "id": "stokeOnTrent-stone",
+      "canal": true,
+      "rail": true,
+      "from": "stokeOnTrent",
+      "to": "stone"
+    },
+    {
+      "id": "stokeOnTrent-warrington",
+      "canal": true,
+      "rail": true,
+      "from": "stokeOnTrent",
+      "to": "warrington"
+    },
+    {
+      "id": "stone-uttoxeter",
+      "canal": false,
+      "rail": true,
+      "from": "stone",
+      "to": "uttoxeter"
+    },
+    {
+      "id": "tamworth-walsall",
+      "canal": false,
+      "rail": true,
+      "from": "tamworth",
+      "to": "walsall"
+    },
+    {
+      "id": "walsall-wolverhampton",
+      "canal": true,
+      "rail": true,
+      "from": "walsall",
+      "to": "wolverhampton"
+    }
+  ],
+  "cards": {
+    "2": {
+      "locations": {
+        "stafford": 2,
+        "burtonOnTrent": 2,
+        "cannock": 2,
+        "tamworth": 1,
+        "walsall": 1,
+        "coalbrookdale": 3,
+        "dudley": 2,
+        "kidderminster": 2,
+        "wolverhampton": 2,
+        "worcester": 2,
+        "birmingham": 3,
+        "coventry": 3,
+        "nuneaton": 1,
+        "redditch": 1
+      },
+      "industries": {
+        "ironWorks": 4,
+        "coalMine": 2,
+        "pottery": 2,
+        "brewery": 5
+      }
+    },
+    "3": {
+      "locations": {
+        "leek": 2,
+        "stokeOnTrent": 3,
+        "stone": 2,
+        "uttoxeter": 1,
+        "stafford": 2,
+        "burtonOnTrent": 2,
+        "cannock": 2,
+        "tamworth": 1,
+        "walsall": 1,
+        "coalbrookdale": 3,
+        "dudley": 2,
+        "kidderminster": 2,
+        "wolverhampton": 2,
+        "worcester": 2,
+        "birmingham": 3,
+        "coventry": 3,
+        "nuneaton": 1,
+        "redditch": 1
+      },
+      "industries": {
+        "ironWorks": 4,
+        "coalMine": 2,
+        "pottery": 2,
+        "brewery": 5
+      },
+      "dualCottonManufacturer": 6
+    },
+    "4": {
+      "locations": {
+        "belper": 2,
+        "derby": 3,
+        "leek": 2,
+        "stokeOnTrent": 3,
+        "stone": 2,
+        "uttoxeter": 2,
+        "stafford": 2,
+        "burtonOnTrent": 2,
+        "cannock": 2,
+        "tamworth": 1,
+        "walsall": 1,
+        "coalbrookdale": 3,
+        "dudley": 2,
+        "kidderminster": 2,
+        "wolverhampton": 2,
+        "worcester": 2,
+        "birmingham": 3,
+        "coventry": 3,
+        "nuneaton": 1,
+        "redditch": 1
+      },
+      "industries": {
+        "ironWorks": 4,
+        "coalMine": 3,
+        "pottery": 3,
+        "brewery": 5
+      },
+      "dualCottonManufacturer": 8
+    }
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "anchors": {
+    "warrington": [
+      0.2794,
+      0.1123
+    ],
+    "leek": [
+      0.5532,
+      0.0732
+    ],
+    "belper": [
+      0.7515,
+      0.0873
+    ],
+    "stokeOnTrent": [
+      0.4115,
+      0.145
+    ],
+    "uttoxeter": [
+      0.5651,
+      0.2308
+    ],
+    "stone": [
+      0.3056,
+      0.2515
+    ],
+    "derby": [
+      0.761,
+      0.2592
+    ],
+    "stafford": [
+      0.4003,
+      0.3455
+    ],
+    "burtonOnTrent": [
+      0.6826,
+      0.3729
+    ],
+    "cannock": [
+      0.4757,
+      0.4474
+    ],
+    "tamworth": [
+      0.6991,
+      0.4994
+    ],
+    "wolverhampton": [
+      0.3697,
+      0.5399
+    ],
+    "walsall": [
+      0.5313,
+      0.5633
+    ],
+    "coalbrookdale": [
+      0.2318,
+      0.5841
+    ],
+    "nuneaton": [
+      0.7894,
+      0.5994
+    ],
+    "dudley": [
+      0.417,
+      0.6627
+    ],
+    "birmingham": [
+      0.6299,
+      0.7015
+    ],
+    "coventry": [
+      0.8132,
+      0.7324
+    ],
+    "kidderminster": [
+      0.3476,
+      0.7666
+    ],
+    "redditch": [
+      0.5844,
+      0.8186
+    ],
+    "worcester": [
+      0.3592,
+      0.8965
+    ],
+    "shrewsbury": [
+      0.0892,
+      0.5721
+    ],
+    "nottingham": [
+      0.9044,
+      0.1879
+    ],
+    "oxford": [
+      0.8295,
+      0.8527
+    ],
+    "gloucester": [
+      0.603,
+      0.9259
+    ],
+    "northern": [
+      0.2989,
+      0.4341
+    ],
+    "southern": [
+      0.2597,
+      0.84
+    ]
+  },
+  "rows": {
+    "belper": [
+      3
+    ],
+    "derby": [
+      1,
+      2
+    ],
+    "leek": [
+      2
+    ],
+    "stokeOnTrent": [
+      1,
+      2
+    ],
+    "uttoxeter": [
+      2
+    ],
+    "stone": [
+      2
+    ],
+    "stafford": [
+      2
+    ],
+    "burtonOnTrent": [
+      2
+    ],
+    "cannock": [
+      2
+    ],
+    "tamworth": [
+      2
+    ],
+    "walsall": [
+      2
+    ],
+    "wolverhampton": [
+      2
+    ],
+    "coalbrookdale": [
+      1,
+      2
+    ],
+    "dudley": [
+      2
+    ],
+    "kidderminster": [
+      2
+    ],
+    "worcester": [
+      2
+    ],
+    "birmingham": [
+      2,
+      2
+    ],
+    "coventry": [
+      1,
+      2
+    ],
+    "nuneaton": [
+      2
+    ],
+    "redditch": [
+      2
+    ],
+    "warrington": [
+      2
+    ],
+    "nottingham": [
+      2
+    ],
+    "shrewsbury": [
+      1
+    ],
+    "oxford": [
+      2
+    ],
+    "gloucester": [
+      2
+    ],
+    "northern": [
+      1
+    ],
+    "southern": [
+      1
+    ]
+  }
+}
