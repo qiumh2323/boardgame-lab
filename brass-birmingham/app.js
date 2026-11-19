@@ -1,12 +1,12 @@
-import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.18';
-import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.18';
-import {zoomButton,installDragPan} from './table-zoom.js?v=0.18';
-import {cardCatalogue} from './card-library.js?v=0.18';
-import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.18';
-import {selectAI} from './ai.js?v=0.18';
+import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.19';
+import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.19';
+import {zoomButton,installDragPan} from './table-zoom.js?v=0.19';
+import {cardCatalogue} from './card-library.js?v=0.19';
+import {configure,F,TYPES,ZH,cityName,cardName,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.19';
+import {selectAI} from './ai.js?v=0.19';
 import {Room} from './room.js';
-import {createDirectFlow} from './direct-flow.js?v=0.18';
-import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.18';
+import {createDirectFlow} from './direct-flow.js?v=0.19';
+import {boardPieces,routePieces,playerReserve} from './table-pieces.js?v=0.19';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#e8bd55','#c284e6','#eb8678','#b3c7d1'],COLOR_NAMES=['yellow','purple','red','gray'];
@@ -22,7 +22,7 @@ function positionHint(anchor,text){
  const tip=$('#placement-hint');tip.textContent=text;tip.hidden=false;
  const box=anchor.getBoundingClientRect(),w=Math.min(360,(window.innerWidth||1024)-24);
  tip.style.width=w+'px';tip.style.left=Math.max(12,Math.min(box.left+box.width/2-w/2,(window.innerWidth||1024)-w-12))+'px';
- tip.style.top=Math.min((window.innerHeight||768)-120,Math.max(65,box.bottom+10))+'px';
+ tip.style.top=Math.max(8,Math.min((window.innerHeight||768)-120,(box.top??box.bottom)-tip.offsetHeight-12))+'px';
  clearTimeout(positionHint.timer);positionHint.timer=setTimeout(()=>tip.hidden=true,4500);positionHint.timer.unref?.();
 }
 function showDialog(title,content){$('#modal-title').textContent=title;$('#modal-content').innerHTML=content;if(!modal.open)modal.showModal();}
@@ -56,7 +56,6 @@ function render(){
  const names={build:'建造',network:'铺路',develop:'研发',sell:'出售',loan:'贷款',scout:'侦察'};
  $('#action-buttons').innerHTML=Object.entries(names).map(([t,label])=>`<button data-type="${t}" ${!myTurn()||waiting?'disabled':''} class="${selectedType===t?'selected':''}">${label}</button>`).join('');
  $('#action-buttons').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectedType=b.dataset.type;selectedLocation=null;render();openActions(selectedType);});
- $('#action-hint').textContent=view.gameOver?'已完成两时代计分。':!myTurn()?(view.players[current(view)].ai?'规则 AI 正在思考…':'等待其他玩家行动。'):view.phase==='liquidation'?'点击自己的产业，变卖以补足欠款。':'请选择行动，地图和玩家面板会高亮合法目标。';
  $('#action-history-btn').disabled=false;
  $('#log').innerHTML=[...view.log].reverse().slice(0,35).map(t=>`<li>${esc(t)}</li>`).join('');
  renderBoard();renderMat();renderCatalogue();directFlow.paint();paintActionFeedback();if(modal.open&&$('#modal-title').textContent==='行动记录')renderActionHistory();if(view.gameOver&&render.endShown!==view.rev){render.endShown=view.rev;showResults();}
@@ -239,7 +238,7 @@ setTableZoom(null);
 $('#action-history-btn').onclick=()=>{showDialog('行动记录','');renderActionHistory();};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');state=s;mode='local';room?.destroy();room=null;seat=0;for(let p of state.players)if(p.id!==seat&&!p.ai)p.ai=true;update();}catch(e){toast(e.message);}};
 async function init(){
- $('main').hidden=true;$('#ai-start').disabled=true;$('#setup-status').textContent='正在准备规则与棋盘…';$('#setup-status').dataset.state='loading';try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.18').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;$('#setup-status').textContent='规则与棋盘已就绪';$('#setup-status').dataset.state='ready';saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){$('#setup-status').textContent='加载未完成，请刷新页面重试';$('#setup-status').dataset.state='error';toast('加载游戏失败，请刷新：'+e.message);}
+ $('main').hidden=true;$('#ai-start').disabled=true;$('#setup-status').textContent='正在准备规则与棋盘…';$('#setup-status').dataset.state='loading';try{let [f,l]=await Promise.all([fetch('facts.json').then(r=>r.json()),fetch('layout.json?v=0.19').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;$('#setup-status').textContent='规则与棋盘已就绪';$('#setup-status').dataset.state='ready';saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);}catch(e){$('#setup-status').textContent='加载未完成，请刷新页面重试';$('#setup-status').dataset.state='error';toast('加载游戏失败，请刷新：'+e.message);}
 }
 document.querySelector('.sidebar').appendChild($('#flow-bar'));
 $('#card-catalogue').onmouseenter=()=>{catalogueHovered=true;clearTimeout(catalogueTimer);};$('#card-catalogue').onmouseleave=()=>{catalogueHovered=false;queueCatalogueClose();};
