@@ -1,19 +1,22 @@
-import {createDeck} from './engine.js?v=0.40';
+import {createDeck} from './engine.js?v=0.41';
+import {sortedHand} from './interaction-help.js?v=0.41';
 
-export const cardKey=c=>c.kind==='location'?`location:${c.loc}`:c.kind==='industry'?`industry:${[...c.types].sort().join(',')}`:c.kind;
+export const cardKey = card => card.kind==='location' ? `location:${card.loc}`
+  : card.kind==='industry' ? `industry:${[...card.types].sort().join(',')}` : card.kind;
 
-// Build a catalogue from the fixed composition, never from the private draw pile.
-export function cardCatalogue(view,seat){
- const groups=new Map();
- for(const card of [...createDeck(view.players.length),{kind:'wildLocation'},{kind:'wildIndustry'}]){
-  const key=cardKey(card);
-  if(!groups.has(key))groups.set(key,{key,card,total:card.kind.startsWith('wild')?4:0,hand:0,seen:0,discarded:0});
-  if(!card.kind.startsWith('wild'))groups.get(key).total++;
- }
- const unique=cards=>[...new Map(cards.filter(c=>!c.kind.startsWith('wild')).map(c=>[c.id,c])).values()];
- for(const c of unique([...(view.seenCards||[]),...view.discard])){const row=groups.get(cardKey(c));if(row)row.seen++;}
- for(const c of unique(view.discard)){const row=groups.get(cardKey(c));if(row)row.discarded++;}
- for(const c of view.players[seat].hand){const row=groups.get(cardKey(c));if(row)row.hand++;}
- for(const row of groups.values())if(row.card.kind.startsWith('wild'))row.supply=view.wild[row.card.kind==='wildLocation'?'location':'industry'];
- return [...groups.values()];
+// Build from the fixed composition. Neither the draw order nor hidden discards are available here.
+export function cardCatalogue(view, seat) {
+  const hand = view.players[seat].hand;
+  const ownIds = new Set(hand.map(card=>card.id));
+  const seenIds = new Set([...(view.seenCards||[]),...view.discard].map(card=>card.id));
+  const wildCounts = new Map(['wildLocation','wildIndustry'].map(kind=>[kind,hand.filter(card=>card.kind===kind).length]));
+  const cards = [...createDeck(view.players.length)];
+  for (const kind of wildCounts.keys()) for (let copy=0;copy<4;copy++) cards.push({kind,copy});
+  const available = [], marked = [];
+  for (const {card} of sortedHand(cards)) {
+    const own = card.id===undefined ? card.copy<wildCounts.get(card.kind) : ownIds.has(card.id);
+    const status = own ? 'hand' : card.id!==undefined && seenIds.has(card.id) ? 'seen' : null;
+    (status ? marked : available).push({key:cardKey(card),card,status});
+  }
+  return [...available,...marked];
 }

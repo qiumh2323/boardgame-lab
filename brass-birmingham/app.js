@@ -1,14 +1,14 @@
 import {PLAYER_COLORS,COLOR_NAMES,playerColor} from './player-colors.js?v=0.40';
 import {playActionMotion,clearActionMotion} from './action-motion.js?v=0.40';
 import {preloadImages} from './preload.js?v=0.32';
-import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.40';
-import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.40';
+import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.41';
+import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.41';
 import {zoomButton,installDragPan} from './table-zoom.js?v=0.32';
-import {cardCatalogue} from './card-library.js?v=0.40';
-import {configure,F,TYPES,ZH,cityName,cardName,createDeck,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.40';
-import {selectAI} from './ai.js?v=0.40';
+import {cardCatalogue} from './card-library.js?v=0.41';
+import {configure,F,TYPES,ZH,cityName,cardName,createDeck,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.41';
+import {selectAI} from './ai.js?v=0.41';
 import {Room} from './room.js?v=0.40';
-import {createDirectFlow} from './direct-flow.js?v=0.40';
+import {createDirectFlow} from './direct-flow.js?v=0.41';
 import {boardPieces,routePieces,playerReserve,merchantTileStem,tablePieceAssets} from './table-pieces.js?v=0.40';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -66,20 +66,28 @@ function update(){
  }
  render();scheduleAI();
 }
+const CARD_BACK='assets/cards/piece-card-back.webp';
+function discardPreview(player){
+ const pile=player.discardPile;
+ if(!pile?.count)return '';
+ const top=pile.top;
+ const caption=`弃牌堆 ${pile.count} 张，${top?`顶牌 ${cardName(top)}`:'牌面朝下'}`;
+ return `<div class="player-discard" data-discard-player="${player.id}" ${top?'':'data-facedown'} title="${esc(caption)}" aria-label="${esc(caption)}"><img src="${top?cardUrl(top):CARD_BACK}" alt=""><span>${pile.count}</span></div>`;
+}
 function render(){
  if(!view)return;$('#placement-hint').hidden=true;$('#lobby-screen')?.remove();$('.lobby').hidden=true;$('main').hidden=false;$('.game-status').hidden=false;
  const p=view.players[seat];if(!p)return;cardIndex=Math.min(cardIndex,Math.max(0,p.hand.length-1));
  $('#round-label').textContent=`第 ${view.round} 轮`;$('#round-label').previousElementSibling.textContent=view.era==='canal'?'运河时代 1770–1830':'铁路时代 1830–1870';
  $('#turn-label').textContent=view.gameOver?'对局结束':view.phase==='liquidation'?`${view.players[current(view)].name} 需要变卖产业支付收入欠款`:`${view.players[current(view)].name} 的回合 · 第 ${view.used+1}/${view.era==='canal'&&view.round===1?1:2} 次行动`;
  const estimate=estimateEraScore(view);
- $('#players').innerHTML=view.players.map(p=>`<article class="player ${!view.gameOver&&current(view)===p.id?'active':''}" style="--owner:${playerTint(p)}"><div class="player-summary"><b>${esc(p.name)} ${p.id===seat?'<span class="you">你</span>':''}</b><span class="summary-cash" title="现金">现金 £${p.money}</span><span class="summary-income">收入 ${income(p.income)>=0?'+':''}${income(p.income)}</span></div><div class="player-vp-row"><div class="score-current"><span>当前VP</span><strong>${p.vp}</strong></div><div class="score-estimate" data-player="${p.id}" tabindex="0" aria-label="预估 ${p.vp+estimate[p.id].industry+estimate[p.id].links} 分" title="若本时代现在结束：已得 ${p.vp} + 产业 ${estimate[p.id].industry} + 连接 ${estimate[p.id].links} = ${p.vp+estimate[p.id].industry+estimate[p.id].links}。计分轨道在时代结束时结算。"><span>预计VP</span><strong>${p.vp+estimate[p.id].industry+estimate[p.id].links}</strong></div></div></article>`).join('');
+ $('#players').innerHTML=view.players.map(p=>`<article class="player ${!view.gameOver&&current(view)===p.id?'active':''}" style="--owner:${playerTint(p)}"><div class="player-summary"><b>${esc(p.name)} ${p.id===seat?'<span class="you">你</span>':''}</b><span class="summary-cash" title="现金">现金 £${p.money}</span><span class="summary-income">收入 ${income(p.income)>=0?'+':''}${income(p.income)}</span></div><div class="player-vp-row"><div class="score-current"><span>当前VP</span><strong>${p.vp}</strong></div><div class="score-estimate" data-player="${p.id}" tabindex="0" aria-label="预估 ${p.vp+estimate[p.id].industry+estimate[p.id].links} 分" title="若本时代现在结束：已得 ${p.vp} + 产业 ${estimate[p.id].industry} + 连接 ${estimate[p.id].links} = ${p.vp+estimate[p.id].industry+estimate[p.id].links}。计分轨道在时代结束时结算。"><span>预计VP</span><strong>${p.vp+estimate[p.id].industry+estimate[p.id].links}</strong></div></div>${discardPreview(p)}</article>`).join('');
 
  renderHand();
  const names={build:'建造',network:'铺路',develop:'研发',sell:'出售',loan:'贷款',scout:'侦察'};
  $('#action-buttons').innerHTML=Object.entries(names).map(([t,label])=>`<button data-type="${t}" ${!myTurn()||waiting?'disabled':''} class="${selectedType===t?'selected':''}">${label}</button>`).join('');
  $('#action-buttons').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectedType=b.dataset.type;selectedLocation=null;render();openActions(selectedType);});
  $('#action-history-btn').disabled=false;
- $('#log').innerHTML=[...view.log].reverse().slice(0,35).map(t=>`<li>${esc(t)}</li>`).join('');
+ $('#log').innerHTML=historyItems(35);
  renderBoard();renderMat();renderCatalogue();directFlow.paint();paintActionFeedback();if(modal.open&&$('#modal-title').textContent==='行动记录')renderActionHistory();if(view.gameOver&&render.endShown!==view.rev){render.endShown=view.rev;showResults();}
 }
 
@@ -93,8 +101,30 @@ function renderHand(){
 
 
 let feedbackGame=null,feedbackRev=null,announcementTimer;
+function historyArt(event){
+ const color=playerColor(view.players[event.actor]);
+ const art=event.previews.map(t=>({src:tileUrl(t.type,t.level,!!t.flipped,t.owner),label:`${ZH[t.type]} ${t.level}级`}));
+ if(event.type==='network')for(const target of event.targets.filter(t=>t.kind==='route')){
+  art.push({src:`assets/pieces/piece-link-${color}-${event.era}.webp`,label:event.era==='rail'?'铁路':'运河',wide:true});
+ }
+ if(event.type==='scout')for(const kind of ['wildLocation','wildIndustry'])art.push({src:cardUrl({kind}),label:cardName({kind}),card:true});
+ if(event.movement?.discarded)art.push({src:CARD_BACK,label:`弃牌 ${event.movement.discarded} 张`,card:true});
+ const amount=event.movement?.spent||Math.max(0,event.movement?.cashChange||0);
+ if(amount)art.push({src:`assets/pieces/piece-coin-${amount>=15?15:amount>=5?5:1}.webp`,label:`${event.movement.spent?'花费':'获得'} £${amount}`});
+ return art;
+}
+function historyItems(limit=view.log.length){
+ const history=[...(view.actionHistory||[])];
+ return [...view.log].reverse().slice(0,limit).map(line=>{
+  const event=history.at(-1);
+  if(event?.logEntry!==line)return `<li class="history-note">${esc(line)}</li>`;
+  history.pop();
+  const images=historyArt(event).map(({src,label,wide,card})=>`<img loading="lazy" src="${esc(src)}" alt="${esc(label)}" title="${esc(label)}"${wide?' class="history-link"':card?' class="history-card-art"':''}>`).join('');
+  return `<li class="history-event" style="--owner:${playerTint(view.players[event.actor])}"><strong>${esc(view.players[event.actor].name)} · ${esc(event.description)}</strong><span>${event.era==='rail'?'铁路':'运河'}时代 · 第 ${event.round} 轮</span><div class="history-art">${images}</div><p>${event.details.map(esc).join(' · ')}</p></li>`;
+ }).join('');
+}
 function renderActionHistory(){
- $('#modal-content').innerHTML=`<p class="modal-note">最新行动在前</p><ol class="action-history-list">${[...view.log].reverse().map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`;
+ $('#modal-content').innerHTML=`<ol class="action-history-list">${historyItems()}</ol>`;
 }
 function paintActionFeedback(){
  const e=view.lastAction,game=view.gameId;
@@ -129,10 +159,14 @@ function closeCatalogue(){clearTimeout(catalogueTimer);catalogueAnchorHovered=fa
 function queueCatalogueClose(){clearTimeout(catalogueTimer);catalogueTimer=setTimeout(()=>{if(!cataloguePinned&&!catalogueAnchorHovered&&!catalogueHovered)closeCatalogue();},100);}
 
 function renderCatalogue(){
- const rows=cardCatalogue(view,seat),total=rows.filter(r=>!r.card.kind.startsWith('wild')).reduce((n,r)=>n+r.total,0);
+ const cards=cardCatalogue(view,seat),total=cards.filter(({card})=>!card.kind.startsWith('wild')).length;
  $('#catalogue-heading').textContent=`${view.players.length}人牌组 · 普通牌 ${total}张 · 抽牌堆 ${view.deckCount}张`;
- $('#catalogue-cards').innerHTML=rows.map(r=>`<article class="catalogue-card" data-catalogue-key="${esc(r.key)}"><img loading="lazy" src="${cardUrl(r.card)}" alt="${esc(cardName(r.card))}"><strong>${esc(cardName(r.card))} ×${r.total}</strong><div>${r.hand?`<span class="in-hand">手中 ${r.hand}</span>`:''}${r.seen?`<span class="seen">已出现 ${r.seen}</span>`:''}${r.discarded?`<span>本时代已弃 ${r.discarded}</span>`:''}${r.supply!==undefined?`<span>供应 ${r.supply}</span>`:''}</div></article>`).join('');
+ $('#catalogue-cards').innerHTML=cards.map(({key,card,status})=>{
+  const name=cardName(card),mark=status==='hand'?'手中':status==='seen'?'已打出':'';
+  return `<article class="catalogue-card${mark?' catalogue-muted':''}" data-catalogue-key="${esc(key)}" title="${esc(mark?`${name} · ${mark}`:name)}"><img loading="lazy" src="${cardUrl(card)}" alt="${esc(name)}"><strong class="card-face-name" aria-hidden="true">${esc(name)}</strong>${mark?`<span class="catalogue-badge ${status==='hand'?'in-hand':'seen'}">${mark}</span>`:''}</article>`;
+ }).join('');
 }
+
 
 function slots(loc){return layout.slots[loc]||[];}
 function renderBoard(){
@@ -219,7 +253,7 @@ function execute(id,a){
  let result=applyAction(state,id,a,{auto:state.players[id]?.ai,recordActivity:true});
  if(!result.ok){if(result.choice){if(id===seat)choiceDialog(a,result.choice);else room?.send(id,'choice',{action:a,choice:result.choice});}else if(id===seat){toast(result.error);directFlow.failed();}else room?.error(id,result.error);return;}
  const feedback=makeActionFeedback(state,result.state,id,a,result.activity);
- state=result.state;state.lastAction=feedback;cardIndex=0;selectedLocation=null;if(id===seat)modal.close();update();
+ state=result.state;state.lastAction=feedback;state.actionHistory=[...(state.actionHistory||[]),feedback].slice(-180);cardIndex=0;selectedLocation=null;if(id===seat)modal.close();update();
 }
 function choiceDialog(a,choice){modal.close();waiting=false;directFlow.requestChoice(a,choice);}
 function scheduleAI(){

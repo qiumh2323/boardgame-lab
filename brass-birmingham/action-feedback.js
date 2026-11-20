@@ -1,4 +1,4 @@
-import {F,cityName,ZH,income} from './engine.js?v=0.40';
+import {F,cityName,ZH,income} from './engine.js?v=0.41';
 
 export function makeActionFeedback(before,after,actor,action,activity=null){
  const p=before.players[actor],next=after.players[actor],a=action,targets=[],previews=[],exhausted=[];
@@ -50,7 +50,7 @@ export function makeActionFeedback(before,after,actor,action,activity=null){
   return count>0?[{player:id,count}]:[];
  });
  const spent=activity?.spent??Math.max(0,next.spent-p.spent);
- return {rev:after.rev,actor,type:a.type,description,details,targets,previews,
+ return {rev:after.rev,actor,era:before.era,round:before.round,type:a.type,description,details,targets,previews,logEntry:activity?.logEntry,
   movement:{discarded,wild,drawn,spent,cashChange:next.money-p.money}};
 }
 
