@@ -199,23 +199,6 @@
  #game #zoom-btn,#game .mat-panel #mat-preview {display:none}
 }
 
-#catalogue-opening-discards {
- display:flex;
- align-items:center;
- justify-content:space-between;
- gap:10px;
- padding:7px 9px;
- margin:0 0 9px;
- border:1px solid #536473;
- border-radius:5px;
- background:#213541;
- color:#ece2ca;
-}
-#catalogue-opening-discards strong,#catalogue-opening-discards span {display:block;font-size:11px;line-height:1.5}
-#catalogue-opening-discards span {color:#b0c0ca}
-#catalogue-opening-backs {display:flex;gap:4px;flex:none}
-#catalogue-opening-backs img {display:block;width:23px;aspect-ratio:215 / 300;border:1px solid #83909b;border-radius:3px;object-fit:cover}
-
 #catalogue-cards {grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px}
 #catalogue-cards .catalogue-card {position:relative;overflow:hidden;min-width:0;border:1px solid #516677;border-radius:4px}
 #catalogue-cards .catalogue-card img {width:100%;aspect-ratio:215 / 300;object-fit:cover;border-radius:0}

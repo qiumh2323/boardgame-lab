@@ -153,11 +153,6 @@ function queueCatalogueClose(){clearTimeout(catalogueTimer);catalogueTimer=setTi
 
 function renderCatalogue(){
  const cards=cardCatalogue(view,seat),total=cards.filter(({card})=>!card.kind.startsWith('wild')).length;
- const hiddenCount=view.hiddenDiscardCount??(view.era==='canal'?view.players.length:0);
- const openingDiscards=$('#catalogue-opening-discards');
- openingDiscards.hidden=!hiddenCount;
- $('#catalogue-opening-count').textContent=`开局暗弃 ${hiddenCount} 张`;
- $('#catalogue-opening-backs').innerHTML=Array.from({length:hiddenCount},()=>`<img src="${CARD_BACK}" alt="牌面朝下">`).join('');
  $('#catalogue-heading').textContent=`${view.players.length}人牌组 · 普通牌 ${total}张 · 抽牌堆 ${view.deckCount}张`;
  $('#catalogue-cards').innerHTML=cards.map(({key,card,status})=>{
   const name=cardName(card),mark=status==='hand'?'手中':status==='discarded'?'已弃牌':'';
