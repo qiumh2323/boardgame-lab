@@ -158,3 +158,30 @@
 }
 #industry-picker button:hover,#industry-picker button:focus-visible {border-color:#ffe1a0;background:#405460}
 #industry-picker img {display:block;width:clamp(42px,5vw,65px);aspect-ratio:1;object-fit:contain;border-radius:3px}
+
+@media(max-width:700px),(max-width:999px) and (pointer:coarse){
+ #game {--table-text:12px;--table-caption:10px}
+ #game .table-layout {display:block}
+ #game .sidebar {position:static;width:100%;max-height:none;padding:0;overflow:visible}
+ #game .action-panel {margin-top:8px}
+ #game #flow-bar {position:static;width:100%;max-height:none;margin:6px 0 0;padding:8px;overflow:visible}
+ #game #hand-float {margin:8px 0 12px}
+ #game #board-caption {display:none}
+ #game #mobile-game-status {margin-bottom:8px}
+ #game #mobile-game-status .dock-status {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  padding:4px 0 6px;
+ }
+ #game #mobile-game-status .dock-status > div:first-child {grid-column:1 / -1}
+ #game #mobile-game-status .latest-action {grid-column:1 / -1}
+ #game #mobile-game-status #action-history-btn {width:auto;margin:0;padding:4px 6px}
+ #game #mobile-game-status #action-history-btn svg {width:15px;height:15px}
+ #game #players {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:5px 0 0}
+ #game #players .player {padding:4px 5px;margin:0}
+ #game .dock-status #era-label,#game .dock-status #round-label,
+ #game #action-history-btn,#game .player-summary b,#game .action-panel h2 {font-size:var(--table-text)}
+ #game .board-pile span,#game #hand .hand-card-name {font-size:var(--table-caption)}
+ #game .board-pile span {line-height:1.2;padding:1px 2px}
+}
