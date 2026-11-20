@@ -53,7 +53,7 @@ function takeResource(s,id,resource,locations,ctx,merchant=null){
   spend(s,p,price,ctx);s[resource]=Math.max(0,count-1);return;
  }
  let pick=choose(ctx,{coal:'煤矿（必须最近）',iron:'铁厂',beer:'啤酒来源'}[resource],options,resource==='beer');
- if(pick.id.startsWith('merchant:')){merchant.beer=false;merchantBonus(s,p,merchant,ctx);return;}
+ if(pick.id.startsWith('merchant:')){merchant.beer=false;return merchant;}
  let tile=s.board[pick.id];tile.resource--;if(!tile.resource)flip(s,tile);
 }
 function developOne(s,p,type,ctx){let t=nextTile(s,p.id,type);insist(t&&t.canDevelop,'该产业当前最低等级不能研发');p.stacks[type].shift();ctx.activity?.developed.push({type,level:t.level});}
@@ -101,18 +101,25 @@ function putLink(s,p,key,ctx){
  insist(!net.size||ends(key).some(x=>net.has(x)),'线路必须连接自己的网络');insist(p.linkCount<14,'本时代的14条连接板块已用完');
  s.links[key]={owner:p.id};p.linkCount++;if(s.era==='rail')takeResource(s,p.id,'coal',ends(key),ctx);
 }
-function sell(s,p,a,ctx){
- insist(Array.isArray(a.sales)&&a.sales.length,'请选择要出售的产业');let seen=new Set();for(let sale of a.sales){let t=s.board[sale.key],m=s.merchants.find(x=>x.id===sale.merchant),loc=tileLocation(sale.key);
+function sell(s,p,a,ctx,{settleRewards=true}={}){
+ insist(Array.isArray(a.sales)&&a.sales.length,'请选择要出售的产业');
+ const seen=new Set(),rewards=[];
+ for(const sale of a.sales){let t=s.board[sale.key],m=s.merchants.find(x=>x.id===sale.merchant),loc=tileLocation(sale.key);
   insist(!seen.has(sale.key)&&t?.owner===p.id&&!t.flipped&&isGoods(t.type),'只能出售自己尚未翻面的商品产业');seen.add(sale.key);
   insist(m&&(m.buys==='any'||m.buys===t.type)&&distances(s,[loc])[m.loc]!==undefined,'需要连接能接收此商品的商人');
-  for(let i=0;i<tileData(t).beersToSell;i++)takeResource(s,p.id,'beer',[loc],ctx,m);flip(s,t);
+  for(let i=0;i<tileData(t).beersToSell;i++){
+   const rewardedMerchant=takeResource(s,p.id,'beer',[loc],ctx,m);
+   if(rewardedMerchant)rewards.push(rewardedMerchant);
+  }
+  flip(s,t);
  }
+ if(settleRewards)for(const merchant of rewards)merchantBonus(s,p,merchant,ctx);
  return `出售 ${a.sales.length}个产业`;
 }
-// A sale draft resolves resources and rewards without discarding, advancing or touching the live game.
-export function previewSales(state,id,sales,choices=[]){
+// Preview the transaction without discarding, advancing or touching the live game.
+export function previewSales(state,id,sales,choices=[],options){
  const s=clone(state),ctx={choices,index:0,auto:false};
- try{sell(s,s.players[id],{sales},ctx);return {ok:true,state:s};}
+ try{sell(s,s.players[id],{sales},ctx,options);return {ok:true,state:s};}
  catch(e){return {ok:false,error:e.message,choice:e.choice};}
 }
 export function estimateEraScore(s){

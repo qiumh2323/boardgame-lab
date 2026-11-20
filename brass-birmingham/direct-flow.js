@@ -1,5 +1,5 @@
-import {createSalePlan} from './sale-plan.js?v=0.42';
-import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel} from './engine.js?v=0.42';
+import {createSalePlan} from './sale-plan.js?v=0.46';
+import {cardName,cityName,ZH,nextTile,tileLocation,actionLabel,previewSales} from './engine.js?v=0.46';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createDirectFlow(api){
  let draft=null,stage='idle',variants=[],resource=null,salePlan=null,lastRevision=null,selectedCard=null,previousSoleDiscard=null,industryChoice=null;
@@ -27,7 +27,7 @@ export function createDirectFlow(api){
   if(!draft||!['target','discard'].includes(stage))return false;
   if(draft.type==='network')return draft.edges.length>0&&prefix(candidates(),'edges').some(a=>a.edges.length===draft.edges.length);
   if(draft.type==='develop')return draft.industries.length>0&&prefix(candidates(),'industries').some(a=>a.industries.length===draft.industries.length);
-  if(draft.type==='sell')return draft.sales.length>0&&!salePlan?.snapshot().pending;
+  if(draft.type==='sell')return draft.sales.length>0;
   return stage==='discard';
  }
  function canConfirm(){return targetReady()&&(draft.type==='scout'?draft.extra.length===3:selectedCard!==null);}
@@ -37,10 +37,18 @@ export function createDirectFlow(api){
   return draft.type==='build'?indices.filter(i=>variants.some(a=>a.card===i)):indices;
  }
  function finish(){
-  if(stage==='resource'){if(resource?.selected)send(draft);return;}
+  if(stage==='resource'){
+   if(resource?.selected){if(draft.type==='sell')finishSale(draft);else send(draft);}
+   return;
+  }
   if(!canConfirm())return;
   if(draft.type==='scout'){let [card,...extra]=draft.extra;send({...draft,card,extra});}
+  else if(draft.type==='sell')finishSale({...draft,card:selectedCard});
   else send({...draft,card:selectedCard});
+ }
+ function finishSale(action){
+  const result=previewSales(api.view(),api.seat(),action.sales,action.choices);
+  if(result.choice)requestChoice(action,result.choice);else send(action);
  }
  function send(a){stage='waiting';draft=a;paint();api.submit(a);}
  function chooseCard(index){
@@ -114,7 +122,7 @@ export function createDirectFlow(api){
  }
  function syncSale(){
   const plan=salePlan.snapshot();draft.sales=plan.sales;draft.choices=plan.choices;stage=plan.pending?'sale-resource':'target';
-  if(plan.kind?.includes('免费研发'))api.showMyMat();paint();
+  paint();
  }
  function selectSale(key){salePlan.append(key);syncSale();}
  function selectSaleResource(id){salePlan.choose(id);syncSale();}
@@ -166,13 +174,14 @@ export function createDirectFlow(api){
   }
   if(stage==='resource'){
    const free=resource.choice.kind.includes('免费研发');
+   if(draft.type==='sell')$('#flow-finish').textContent='确认奖励';
    bar(free?'免费研发：直接点击玩家面板上高亮的板块，再确认。':`选择${resource.choice.kind}，再点击确认执行；尚未扣费。`,resource.choice.options.filter(o=>!free||o.id==='skip').map(o=>({label:o.label,click:()=>pickResource(o.id)})),!!resource.selected);
    for(let o of resource.choice.options){let el=resourceElement(o);mark(el,resource.selected===o.id);if(el)el.onclick=()=>pickResource(o.id);}
    return;
   }
   if(stage==='sale-resource'){
-   const plan=salePlan.snapshot(),free=plan.kind?.includes('免费研发');
-   bar(`${cityName(tileLocation(plan.pending))} · ${free?'商人奖励：点击玩家面板上高亮的板块免费研发。':'点击高亮的啤酒来源；选齐后可继续选择下一个待售产业。'}`,plan.options.filter(o=>o.id==='skip').map(o=>({label:o.label,click:()=>selectSaleResource(o.id)})));
+   const plan=salePlan.snapshot();
+   bar(`${cityName(tileLocation(plan.pending))} · 还需 ${plan.remaining} 桶啤酒。点击高亮来源，选齐后可继续出售其他产业。`);
    const industry=$(`[data-loc="${tileLocation(plan.pending)}"][data-slot="${plan.pending.split(':')[1]}"]`);mark(industry,true);if(industry)industry.onclick=()=>{salePlan.cancelPending();syncSale();};
    for(const o of plan.options){const el=resourceElement(o);mark(el);if(el)el.onclick=()=>selectSaleResource(o.id);}
    return;
@@ -192,9 +201,19 @@ export function createDirectFlow(api){
    bar(`在自己的玩家面板点击高亮板块，最多研发2块；${selectedCard===null?'选择弃牌后点确认。':'已选弃牌，可点确认。'}已选：${draft.industries.map(t=>ZH[t]).join('、')||'无'}`,[],canConfirm());
   }
   if(draft.type==='sell'){
-   const plan=salePlan.snapshot();
-   for(const key of [...salePlan.available(),...plan.sales.map(s=>s.key)]){const el=$(`[data-loc="${tileLocation(key)}"][data-slot="${key.split(':')[1]}"]`);mark(el,plan.sales.some(s=>s.key===key));if(el)el.onclick=()=>selectSale(key);}
-   bar(`已选择${draft.sales.length}个产业。点击高亮产业，再选啤酒来源，重复即可继续出售；${selectedCard===null?'最后选一张弃牌，确认出售。':'已选弃牌，可确认出售。'}${draft.sales.length?'点击已选产业可撤回该项及后续选择。':''}`,[],canConfirm());
+   const available=new Set(salePlan.available()),selected=new Set(draft.sales.map(s=>s.key));
+   for(const el of all('[data-loc]')){
+    const key=`${el.dataset.loc}:${el.dataset.slot}`;
+    if(available.has(key)||selected.has(key)){mark(el,selected.has(key));el.onclick=()=>selectSale(key);}
+    else el.onclick=()=>api.explain?.(el,{saleReason:salePlan.blockedReason(key)});
+   }
+   const count=selected.size;
+   let hint='选择高亮的待售产业，再选啤酒来源。';
+   if(count){
+    const next=available.size?'可继续选产业。':'没有其他可售产业。';
+    hint=`已选 ${count} 个产业。${next}${selectedCard===null?'选一张弃牌后确认出售。':'可确认出售。'}`;
+   }
+   bar(hint,[],canConfirm());
   }
  }
  return {begin,paint,reset,requestChoice,dismissIndustry,failed:()=>{stage='target';resource=null;paint();}};
