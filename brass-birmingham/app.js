@@ -1,14 +1,14 @@
 import {PLAYER_COLORS,COLOR_NAMES,playerColor} from './player-colors.js?v=0.40';
 import {playActionMotion,clearActionMotion} from './action-motion.js?v=0.40';
 import {preloadImages} from './preload.js?v=0.32';
-import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.41';
-import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.41';
+import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.42';
+import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.42';
 import {zoomButton,installDragPan} from './table-zoom.js?v=0.32';
-import {cardCatalogue} from './card-library.js?v=0.41';
-import {configure,F,TYPES,ZH,cityName,cardName,createDeck,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.41';
-import {selectAI} from './ai.js?v=0.41';
+import {cardCatalogue} from './card-library.js?v=0.42';
+import {configure,F,TYPES,ZH,cityName,cardName,createDeck,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.42';
+import {selectAI} from './ai.js?v=0.42';
 import {Room} from './room.js?v=0.40';
-import {createDirectFlow} from './direct-flow.js?v=0.41';
+import {createDirectFlow} from './direct-flow.js?v=0.42';
 import {boardPieces,routePieces,playerReserve,merchantTileStem,tablePieceAssets} from './table-pieces.js?v=0.40';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -67,20 +67,13 @@ function update(){
  render();scheduleAI();
 }
 const CARD_BACK='assets/cards/piece-card-back.webp';
-function discardPreview(player){
- const pile=player.discardPile;
- if(!pile?.count)return '';
- const top=pile.top;
- const caption=`弃牌堆 ${pile.count} 张，${top?`顶牌 ${cardName(top)}`:'牌面朝下'}`;
- return `<div class="player-discard" data-discard-player="${player.id}" ${top?'':'data-facedown'} title="${esc(caption)}" aria-label="${esc(caption)}"><img src="${top?cardUrl(top):CARD_BACK}" alt=""><span>${pile.count}</span></div>`;
-}
 function render(){
  if(!view)return;$('#placement-hint').hidden=true;$('#lobby-screen')?.remove();$('.lobby').hidden=true;$('main').hidden=false;$('.game-status').hidden=false;
  const p=view.players[seat];if(!p)return;cardIndex=Math.min(cardIndex,Math.max(0,p.hand.length-1));
  $('#round-label').textContent=`第 ${view.round} 轮`;$('#round-label').previousElementSibling.textContent=view.era==='canal'?'运河时代 1770–1830':'铁路时代 1830–1870';
  $('#turn-label').textContent=view.gameOver?'对局结束':view.phase==='liquidation'?`${view.players[current(view)].name} 需要变卖产业支付收入欠款`:`${view.players[current(view)].name} 的回合 · 第 ${view.used+1}/${view.era==='canal'&&view.round===1?1:2} 次行动`;
  const estimate=estimateEraScore(view);
- $('#players').innerHTML=view.players.map(p=>`<article class="player ${!view.gameOver&&current(view)===p.id?'active':''}" style="--owner:${playerTint(p)}"><div class="player-summary"><b>${esc(p.name)} ${p.id===seat?'<span class="you">你</span>':''}</b><span class="summary-cash" title="现金">现金 £${p.money}</span><span class="summary-income">收入 ${income(p.income)>=0?'+':''}${income(p.income)}</span></div><div class="player-vp-row"><div class="score-current"><span>当前VP</span><strong>${p.vp}</strong></div><div class="score-estimate" data-player="${p.id}" tabindex="0" aria-label="预估 ${p.vp+estimate[p.id].industry+estimate[p.id].links} 分" title="若本时代现在结束：已得 ${p.vp} + 产业 ${estimate[p.id].industry} + 连接 ${estimate[p.id].links} = ${p.vp+estimate[p.id].industry+estimate[p.id].links}。计分轨道在时代结束时结算。"><span>预计VP</span><strong>${p.vp+estimate[p.id].industry+estimate[p.id].links}</strong></div></div>${discardPreview(p)}</article>`).join('');
+ $('#players').innerHTML=view.players.map(p=>`<article class="player ${!view.gameOver&&current(view)===p.id?'active':''}" style="--owner:${playerTint(p)}"><div class="player-summary"><b>${esc(p.name)} ${p.id===seat?'<span class="you">你</span>':''}</b><span class="summary-cash" title="现金">现金 £${p.money}</span><span class="summary-income">收入 ${income(p.income)>=0?'+':''}${income(p.income)}</span></div><div class="player-vp-row"><div class="score-current"><span>当前VP</span><strong>${p.vp}</strong></div><div class="score-estimate" data-player="${p.id}" tabindex="0" aria-label="预估 ${p.vp+estimate[p.id].industry+estimate[p.id].links} 分" title="若本时代现在结束：已得 ${p.vp} + 产业 ${estimate[p.id].industry} + 连接 ${estimate[p.id].links} = ${p.vp+estimate[p.id].industry+estimate[p.id].links}。计分轨道在时代结束时结算。"><span>预计VP</span><strong>${p.vp+estimate[p.id].industry+estimate[p.id].links}</strong></div></div></article>`).join('');
 
  renderHand();
  const names={build:'建造',network:'铺路',develop:'研发',sell:'出售',loan:'贷款',scout:'侦察'};
@@ -160,10 +153,15 @@ function queueCatalogueClose(){clearTimeout(catalogueTimer);catalogueTimer=setTi
 
 function renderCatalogue(){
  const cards=cardCatalogue(view,seat),total=cards.filter(({card})=>!card.kind.startsWith('wild')).length;
+ const hiddenCount=view.hiddenDiscardCount??(view.era==='canal'?view.players.length:0);
+ const openingDiscards=$('#catalogue-opening-discards');
+ openingDiscards.hidden=!hiddenCount;
+ $('#catalogue-opening-count').textContent=`开局暗弃 ${hiddenCount} 张`;
+ $('#catalogue-opening-backs').innerHTML=Array.from({length:hiddenCount},()=>`<img src="${CARD_BACK}" alt="牌面朝下">`).join('');
  $('#catalogue-heading').textContent=`${view.players.length}人牌组 · 普通牌 ${total}张 · 抽牌堆 ${view.deckCount}张`;
  $('#catalogue-cards').innerHTML=cards.map(({key,card,status})=>{
-  const name=cardName(card),mark=status==='hand'?'手中':status==='seen'?'已打出':'';
-  return `<article class="catalogue-card${mark?' catalogue-muted':''}" data-catalogue-key="${esc(key)}" title="${esc(mark?`${name} · ${mark}`:name)}"><img loading="lazy" src="${cardUrl(card)}" alt="${esc(name)}"><strong class="card-face-name" aria-hidden="true">${esc(name)}</strong>${mark?`<span class="catalogue-badge ${status==='hand'?'in-hand':'seen'}">${mark}</span>`:''}</article>`;
+  const name=cardName(card),mark=status==='hand'?'手中':status==='discarded'?'已弃牌':'';
+  return `<article class="catalogue-card${mark?' catalogue-muted':''}" data-catalogue-key="${esc(key)}" title="${esc(mark?`${name} · ${mark}`:name)}"><img src="${cardUrl(card)}" alt="${esc(name)}"><strong class="card-face-name" aria-hidden="true">${esc(name)}</strong>${mark?`<span class="catalogue-badge ${status==='hand'?'in-hand':'discarded'}">${mark}</span>`:''}</article>`;
  }).join('');
 }
 

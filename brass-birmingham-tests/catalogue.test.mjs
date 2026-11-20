@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,createDeck,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.41';
+import {configure,createGame,createDeck,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.42';
 import {cardCatalogue,cardKey} from '../brass-birmingham/card-library.js';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 const fresh=n=>createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),142);
@@ -12,9 +12,9 @@ test('2/3/4 player setup has 22/27/28 draw cards, 8 in each hand, one hidden dis
   const s=fresh(n),cards=createDeck(n),rows=cardCatalogue(publicView(s,0),0);
   assert.equal(cards.length,total);assert.equal(s.deck.length,draw);assert.equal(s.hiddenDiscard.length,n);
   assert.ok(s.players.every(p=>p.hand.length===8));
-  assert.ok(publicView(s,0).players.every(p=>p.discardPile.count===1&&p.discardPile.top===null));assert.deepEqual(s.wild,{location:4,industry:4});
+  assert.equal(publicView(s,0).hiddenDiscardCount,n);assert.deepEqual(s.wild,{location:4,industry:4});
   assert.equal(rows.filter(r=>!r.card.kind.startsWith('wild')).length,total);
-  assert.equal(rows.filter(r=>r.status==='hand').length,8);assert.equal(rows.filter(r=>r.status==='seen').length,0);
+  assert.equal(rows.filter(r=>r.status==='hand').length,8);assert.equal(rows.filter(r=>r.status==='discarded').length,0);
   assert.equal(rows.filter(r=>r.card.kind.startsWith('wild')).length,8);
   assert.ok(!cards.some(c=>c.kind.startsWith('wild')));
   assert.equal(cards.filter(c=>c.kind==='industry'&&c.types.length===2).length,n===2?0:n===3?6:8);
@@ -42,8 +42,8 @@ test('catalogue marks physical copies individually and groups marked cards after
  const hiddenIds=new Set(s.hiddenDiscard.map(c=>c.id)),card=s.players[1].hand[0];
  s=play(s,{type:'pass',card:0});const v=publicView(s,0),rows=cardCatalogue(v,0);
  assert.equal(rows.filter(r=>r.key===cardKey(card)).length,createDeck(4).filter(c=>cardKey(c)===cardKey(card)).length);
- assert.equal(rows.find(r=>r.card.id===card.id).status,'seen');
- assert.deepEqual(v.players[1].discardPile,{count:2,top:card});
+ assert.equal(rows.find(r=>r.card.id===card.id).status,'discarded');
+ assert.equal(v.hiddenDiscardCount,4);assert.ok(v.players.every(p=>!('discardPile' in p)));
  assert.ok(v.seenCards.every(c=>!hiddenIds.has(c.id)));assert.equal(v.seenCards.length,1);
  assert.equal(v.hiddenDiscard,undefined);
  assert.equal(rows.findIndex(r=>r.status),rows.filter(r=>!r.status).length);
@@ -52,13 +52,13 @@ test('catalogue marks physical copies individually and groups marked cards after
  const catalogue=JSON.stringify(rows);v.players[1].hand=[{kind:'wildLocation'}];
  assert.equal(JSON.stringify(cardCatalogue(v,0)),catalogue);
  v.era='rail';v.discard=[];v.seenCards=[card,card];
- assert.equal(cardCatalogue(v,0).filter(r=>r.status==='seen').length,1);
+ assert.equal(cardCatalogue(v,0).filter(r=>r.status==='discarded').length,0);
 });
 
 test('old saves derive public seen cards from their discard pile and retain a face-down count',()=>{
- let s=fresh(2);delete s.seenCards;for(const p of s.players)delete p.discardPile;
+ let s=fresh(2);delete s.seenCards;for(const p of s.players)p.discardPile={count:1,top:null};
  s=play(s,{type:'pass',card:0});assert.equal(s.seenCards.length,1);
  const v=publicView(s,0);delete v.seenCards;
- assert.equal(cardCatalogue(v,0).filter(r=>r.status==='seen').length,1);
- assert.deepEqual(v.players.map(p=>p.discardPile.count).sort(),[1,2]);
+ assert.equal(cardCatalogue(v,0).filter(r=>r.status==='discarded').length,1);
+ assert.equal(v.hiddenDiscardCount,2);assert.ok(v.players.every(p=>!('discardPile' in p)));
 });

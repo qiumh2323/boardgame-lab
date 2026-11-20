@@ -17,7 +17,7 @@ export function createGame(names=['你','规则 AI'],ai=[false,true],seed=Date.n
  if(!F)throw Error('游戏数据未加载');if(names.length<2||names.length>4)throw Error('需要2至4名玩家');
  let s={version:1,rev:0,seed:seed||1,era:'canal',round:1,turn:0,used:0,phase:'play',players:[],order:[],board:{},links:{},merchants:[],coal:13,iron:8,discard:[],seenCards:[],wild:{location:4,industry:4},log:[],scores:[],gameOver:false};
  const colors=assignColors(names.length,colorPreferences);
- s.players=names.map((name,id)=>({id,color:colors[id],name:String(name).slice(0,18),ai:!!ai[id],money:17,income:10,vp:0,spent:0,hand:[],discardPile:{count:1,top:null},stacks:Object.fromEntries(TYPES.map(t=>[t,F.industries[t].flatMap(d=>Array(d.count).fill(d.level))])),linkCount:0}));
+ s.players=names.map((name,id)=>({id,color:colors[id],name:String(name).slice(0,18),ai:!!ai[id],money:17,income:10,vp:0,spent:0,hand:[],stacks:Object.fromEntries(TYPES.map(t=>[t,F.industries[t].flatMap(d=>Array(d.count).fill(d.level))])),linkCount:0}));
  s.order=shuffle(s,s.players.map(p=>p.id));s.deck=shuffle(s,createDeck(names.length));s.hiddenDiscard=[];for(let p of s.players){fill(s,p);s.hiddenDiscard.push(s.deck.pop());}
  let mix=shuffle(s,[...F.merchantMix[names.length]]);for(let [loc,m] of Object.entries(F.merchants))if(m.minPlayers<=names.length)for(let i=0;i<m.slots;i++){let buys=mix.pop();s.merchants.push({id:s.merchants.length,loc,buys,beer:buys!=='blank'});}
  note(s,'开局：运河时代，每人首回合1次行动。');return s;
@@ -60,9 +60,6 @@ function developOne(s,p,type,ctx){let t=nextTile(s,p.id,type);insist(t&&t.canDev
 function merchantBonus(s,p,m,ctx){let f=F.merchants[m.loc];if(f.bonusType==='vp')p.vp+=f.bonusAmount;if(f.bonusType==='money')p.money+=f.bonusAmount;if(f.bonusType==='income')p.income=Math.min(99,p.income+f.bonusAmount);if(f.bonusType==='develop'){
  let options=TYPES.filter(t=>nextTile(s,p.id,t)?.canDevelop).map(t=>({id:t,label:ZH[t],level:nextTile(s,p.id,t).level}));if(options.length){options.push({id:'skip',label:'放弃本次免费研发'});let t=choose(ctx,'商人奖励：免费研发',options).id;if(t!=='skip')developOne(s,p,t,ctx);}
  }}
-function discardPileOf(state,player) {
- return player.discardPile ?? {count:state.hiddenDiscard?.[player.id]?1:0,top:null};
-}
 function discard(s,p,indices){
  const sorted=[...new Set(indices)].sort((a,b)=>b-a);
  insist(sorted.length===indices.length,'不能重复选择卡牌');
@@ -75,8 +72,6 @@ function discard(s,p,indices){
    s.seenCards??=[...s.discard];
    if(!s.seenCards.some(c=>c.id===card.id))s.seenCards.push(card);
    s.discard.push(card);
-   const pile=discardPileOf(s,p);
-   p.discardPile={count:pile.count+1,top:card};
   }
  }
 }
@@ -133,7 +128,7 @@ function eraScore(s){
  s.links={};for(let p of s.players)p.linkCount=0;
  if(s.era==='rail'){s.gameOver=true;s.phase='finished';s.winners=[...s.players].sort((a,b)=>b.vp-a.vp||income(b.income)-income(a.income)||b.money-a.money).filter((p,i,all)=>p.vp===all[0].vp&&income(p.income)===income(all[0].income)&&p.money===all[0].money).map(p=>p.id);return;}
  for(let [k,t]of Object.entries(s.board))if(t.level===1)delete s.board[k];
- for(let m of s.merchants)m.beer=m.buys!=='blank';s.era='rail';s.round=1;s.used=0;s.deck=shuffle(s,[...s.discard,...s.hiddenDiscard]);s.discard=[];s.hiddenDiscard=[];for(let p of s.players){p.discardPile={count:0,top:null};fill(s,p);}note(s,'铁路时代开始：每回合2次行动，二级及以上产业保留。');
+ for(let m of s.merchants)m.beer=m.buys!=='blank';s.era='rail';s.round=1;s.used=0;s.deck=shuffle(s,[...s.discard,...s.hiddenDiscard]);s.discard=[];s.hiddenDiscard=[];for(let p of s.players)fill(s,p);note(s,'铁路时代开始：每回合2次行动，二级及以上产业保留。');
 }
 function afterUpkeep(s){
  s.order.sort((a,b)=>s.players[a].spent-s.players[b].spent);for(let p of s.players)p.spent=0;s.turn=0;s.used=0;
@@ -212,4 +207,15 @@ export function legalActions(s,id=current(s),{allCards=false,doubleRails=true}={
  if(p.hand.length>=3)test({type:'scout',card:0,extra:[1,2]});return result;
 }
 export function actionLabel(a){return a.type==='build'?`建造 ${cityName(a.loc)} · ${ZH[a.industry]} ${a.slot+1}号位`:a.type==='network'?`铺路 ${a.edges.map(e=>{let c=F.connections.find(x=>x.id===e);return cityName(c.from)+'—'+cityName(c.to);}).join(' / ')}`:a.type==='develop'?'研发 '+a.industries.map(x=>ZH[x]).join('、'):a.type==='sell'?'出售 '+a.sales.map(x=>cityName(tileLocation(x.key))).join('、'):a.type==='loan'?'贷款 £30':a.type==='scout'?'侦察万能牌':a.type==='liquidate'?'变卖 '+cityName(tileLocation(a.key)):'跳过';}
-export function publicView(s,id){let v=clone(s);v.deckCount=v.deck.length;delete v.deck;delete v.seed;delete v.hiddenDiscard;for(let p of v.players){p.discardPile=discardPileOf(s,p);p.handCount=p.hand.length;if(p.id!==id)p.hand=[];}return v;}
+export function publicView(s,id){
+ const v=clone(s);
+ v.deckCount=v.deck.length;
+ v.hiddenDiscardCount=v.hiddenDiscard?.length??0;
+ delete v.deck;delete v.seed;delete v.hiddenDiscard;
+ for(const p of v.players){
+  delete p.discardPile; // Discard ownership from older saves is not part of the public view.
+  p.handCount=p.hand.length;
+  if(p.id!==id)p.hand=[];
+ }
+ return v;
+}

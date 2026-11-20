@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,applyAction,legalActions,current,publicView,income,incomeTop,network,distances,F,clone,TYPES,estimateEraScore} from '../brass-birmingham/engine.js?v=0.41';
+import {configure,createGame,applyAction,legalActions,current,publicView,income,incomeTop,network,distances,F,clone,TYPES,estimateEraScore} from '../brass-birmingham/engine.js?v=0.42';
 import {selectAI} from '../brass-birmingham/ai.js?v=0.32';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 function fresh(n=2){let s=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),87);s.order=s.players.map(p=>p.id);return s;}
