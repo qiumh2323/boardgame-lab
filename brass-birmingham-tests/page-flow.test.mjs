@@ -112,8 +112,8 @@ test('full page restores a game, develops from mat before discarding, and update
  const picker=$('#industry-picker');assert.equal(picker.hidden,false);assert.equal(picker.getAttribute('aria-label'),'伯明翰可建产业');
  assert.deepEqual([...picker.querySelectorAll('button')].map(b=>b.dataset.industryOption),['cottonMill','manufacturer']);
  assert.equal(picker.querySelectorAll('img').length,2);assert.equal($('#flow-options').children.length,0);
- $('[data-industry-option="manufacturer"]').onclick();assert.equal(picker.hidden,true);assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));
- $('[data-card="0"]').onclick();$('#flow-finish').onclick();assert.equal(JSON.parse(store.get('brass-night-save-v1')).board['birmingham:0'].type,'manufacturer');
+ $('[data-industry-option="manufacturer"]').onclick();assert.equal(picker.hidden,true);assert.equal($('[data-card="0"]').getAttribute('aria-pressed'),'true');
+ $('#flow-finish').onclick();assert.equal(JSON.parse(store.get('brass-night-save-v1')).board['birmingham:0'].type,'manufacturer');
  $('#menu-btn').onclick();$('#back-btn').onclick();
 
 });

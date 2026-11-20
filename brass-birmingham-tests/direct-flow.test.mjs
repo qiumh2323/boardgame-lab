@@ -20,7 +20,7 @@ function setup(){
 }
 test('build highlights union of all hand-supported slots before asking for a matching discard',()=>{
  let {flow,$,click,sent}=setup();flow.begin('build');assert.ok($('[data-loc="birmingham"]').classList.contains('flow-target'));assert.ok($('[data-loc="coventry"]').classList.contains('flow-target'));
- click('[data-loc="birmingham"]');assert.equal($('#industry-picker').hidden,false);assert.equal($('#industry-picker').children.length,1);assert.ok(!$('[data-card="1"]').classList.contains('discard-allowed'));click('[data-industry-option="cottonMill"]');assert.ok($('[data-card="1"]').classList.contains('discard-allowed'));assert.ok(!$('[data-card="2"]').classList.contains('discard-allowed'));click('[data-card="2"]');assert.equal(sent.length,0);click('[data-card="1"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'build',loc:'birmingham',slot:0,industry:'cottonMill',card:1});
+ click('[data-loc="birmingham"]');assert.equal($('#industry-picker').hidden,false);assert.equal($('#industry-picker').children.length,1);assert.ok(!$('[data-card="1"]').classList.contains('discard-allowed'));click('[data-industry-option="cottonMill"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'true');assert.ok(!$('[data-card="2"]').classList.contains('discard-allowed'));click('[data-card="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'build',loc:'birmingham',slot:0,industry:'cottonMill',card:1});
 });
 test('develop selects consecutive lowest tiles on the player mat then discards one card',()=>{
  let {flow,$,click,sent}=setup();flow.begin('develop');assert.ok($('[data-level="1"]').classList.contains('flow-target'));assert.ok(!$('[data-level="2"]').classList.contains('flow-target'));
@@ -28,6 +28,12 @@ test('develop selects consecutive lowest tiles on the player mat then discards o
 });
 test('network reveals second railway only after selecting its valid first railway',()=>{
  let {flow,$,click,sent}=setup();flow.begin('network');assert.ok($('[data-route="a"]').classList.contains('flow-target'));assert.ok(!$('[data-route="b"]').classList.contains('flow-target'));click('[data-route="a"]');assert.ok($('[data-route="b"]').classList.contains('flow-target'));click('[data-route="b"]');click('[data-card="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'network',edges:['a','b'],card:2});
+});
+test('a single remaining card is selected once a network action is ready',()=>{
+ const {flow,$,click,sent,view}=setup();view.players[0].hand.splice(1);
+ flow.begin('network');assert.equal($('[data-card="0"]').getAttribute('aria-pressed'),'false');
+ click('[data-route="a"]');assert.equal($('[data-card="0"]').getAttribute('aria-pressed'),'true');assert.equal(sent.length,0);
+ click('#flow-finish');assert.deepEqual(sent[0],{type:'network',edges:['a'],card:0});
 });
 test('selling chooses an industry then beer directly, with no destination step or early submit',()=>{
  let {flow,$,click,sent}=setup();flow.begin('sell');click('[data-loc="birmingham"]');assert.ok($('[data-loc="northern"]').classList.contains('flow-target'));assert.ok(!$('[data-merchant="0"]').classList.contains('flow-target'));assert.equal(document.querySelectorAll('[data-flow-option]').length,0);
@@ -64,6 +70,8 @@ test('breathing guidance marks only available actions while choosing an action',
 
 test('deselecting a discard restores pending selection, hides confirm and resets accessibility state',()=>{
  const {flow,$,click,sent}=setup();flow.begin('build');click('[data-loc="birmingham"]');click('[data-industry-option="cottonMill"]');
+ assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'true');
+ click('[data-card="1"]');flow.paint();assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'false');assert.equal($('#flow-finish').hidden,true);
  for(let i=0;i<3;i++){
   click('[data-card="1"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'true');assert.equal($('#flow-finish').hidden,false);
   click('[data-card="1"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'false');assert.ok(!$('[data-card="1"]').classList.contains('discard-picked'));assert.ok($('[data-card="1"]').classList.contains('discard-allowed'));assert.equal($('#flow-finish').hidden,true);
