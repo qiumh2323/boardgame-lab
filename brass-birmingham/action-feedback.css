@@ -115,9 +115,14 @@
 }
 #game #hand .card.discard-picked::after {z-index:1}
 @media(min-width:1000px){
- #game .hand-panel .hand {height:auto;grid-template-rows:minmax(0,1fr)}
- #game #hand .card {min-height:0;container-type:size;align-items:end}
- #game #hand .hand-card-art {width:min(100%,calc(100cqh * 215 / 300))}
+ #game .hand-panel .hand {height:auto;grid-template-rows:minmax(0,1fr);container-type:size}
+ #game #hand .card {
+  width:min(100%,calc((100cqh - 2px) * 215 / 300 + 2px));
+  height:auto;
+  min-height:0;
+  align-self:end;
+  justify-self:center;
+ }
 }
 #action-motion {position:fixed;inset:0;pointer-events:none;z-index:69}
 .motion-piece {position:absolute;display:grid;justify-items:center;filter:drop-shadow(0 3px 7px #000b)}
