@@ -9,13 +9,9 @@ export function cardCatalogue(view, seat) {
   const hand = view.players[seat].hand;
   const ownIds = new Set(hand.map(card=>card.id));
   const discardedIds = new Set(view.discard.map(card=>card.id));
-  const wildCounts = new Map(['wildLocation','wildIndustry'].map(kind=>[kind,hand.filter(card=>card.kind===kind).length]));
-  const cards = [...createDeck(view.players.length)];
-  for (const kind of wildCounts.keys()) for (let copy=0;copy<4;copy++) cards.push({kind,copy});
   const available = [], marked = [];
-  for (const {card} of sortedHand(cards)) {
-    const own = card.id===undefined ? card.copy<wildCounts.get(card.kind) : ownIds.has(card.id);
-    const status = own ? 'hand' : card.id!==undefined && discardedIds.has(card.id) ? 'discarded' : null;
+  for (const {card} of sortedHand(createDeck(view.players.length))) {
+    const status = ownIds.has(card.id) ? 'hand' : discardedIds.has(card.id) ? 'discarded' : null;
     (status ? marked : available).push({key:cardKey(card),card,status});
   }
   return [...available,...marked];

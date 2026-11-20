@@ -13,9 +13,9 @@ test('2/3/4 player setup has 22/27/28 draw cards, 8 in each hand, one hidden dis
   assert.equal(cards.length,total);assert.equal(s.deck.length,draw);assert.equal(s.hiddenDiscard.length,n);
   assert.ok(s.players.every(p=>p.hand.length===8));
   assert.equal(publicView(s,0).hiddenDiscardCount,n);assert.deepEqual(s.wild,{location:4,industry:4});
-  assert.equal(rows.filter(r=>!r.card.kind.startsWith('wild')).length,total);
+  assert.equal(rows.length,total);
   assert.equal(rows.filter(r=>r.status==='hand').length,8);assert.equal(rows.filter(r=>r.status==='discarded').length,0);
-  assert.equal(rows.filter(r=>r.card.kind.startsWith('wild')).length,8);
+  assert.equal(rows.filter(r=>r.card.kind.startsWith('wild')).length,0);
   assert.ok(!cards.some(c=>c.kind.startsWith('wild')));
   assert.equal(cards.filter(c=>c.kind==='industry'&&c.types.length===2).length,n===2?0:n===3?6:8);
  }

@@ -4,7 +4,7 @@ import {preloadImages} from './preload.js?v=0.32';
 import {sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from './interaction-help.js?v=0.42';
 import {makeActionFeedback,needsMissingCityWarning,missingCardCities,missingCityPreferenceKey} from './action-feedback.js?v=0.42';
 import {zoomButton,installDragPan} from './table-zoom.js?v=0.32';
-import {cardCatalogue} from './card-library.js?v=0.42';
+import {cardCatalogue} from './card-library.js?v=0.44';
 import {configure,F,TYPES,ZH,cityName,cardName,createDeck,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.42';
 import {selectAI} from './ai.js?v=0.42';
 import {Room} from './room.js?v=0.40';
@@ -152,7 +152,7 @@ function closeCatalogue(){clearTimeout(catalogueTimer);catalogueAnchorHovered=fa
 function queueCatalogueClose(){clearTimeout(catalogueTimer);catalogueTimer=setTimeout(()=>{if(!cataloguePinned&&!catalogueAnchorHovered&&!catalogueHovered)closeCatalogue();},100);}
 
 function renderCatalogue(){
- const cards=cardCatalogue(view,seat),total=cards.filter(({card})=>!card.kind.startsWith('wild')).length;
+ const cards=cardCatalogue(view,seat),total=cards.length;
  $('#catalogue-heading').textContent=`${view.players.length}人牌组 · 普通牌 ${total}张 · 抽牌堆 ${view.deckCount}张`;
  $('#catalogue-cards').innerHTML=cards.map(({key,card,status})=>{
   const name=cardName(card),mark=status==='hand'?'手中':status==='discarded'?'已弃牌':'';
