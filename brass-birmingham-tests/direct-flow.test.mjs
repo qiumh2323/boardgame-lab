@@ -20,7 +20,13 @@ function setup(){
 }
 test('build highlights union of all hand-supported slots before asking for a matching discard',()=>{
  let {flow,$,click,sent}=setup();flow.begin('build');assert.ok($('[data-loc="birmingham"]').classList.contains('flow-target'));assert.ok($('[data-loc="coventry"]').classList.contains('flow-target'));
- click('[data-loc="birmingham"]');assert.equal($('#industry-picker').hidden,false);assert.equal($('#industry-picker').children.length,1);assert.ok(!$('[data-card="1"]').classList.contains('discard-allowed'));click('[data-industry-option="cottonMill"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'true');assert.ok(!$('[data-card="2"]').classList.contains('discard-allowed'));click('[data-card="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'build',loc:'birmingham',slot:0,industry:'cottonMill',card:1});
+ click('[data-loc="birmingham"]');assert.equal($('#industry-picker').hidden,false);assert.equal($('#industry-picker').children.length,1);assert.ok($('[data-card="1"]').classList.contains('discard-allowed'));click('[data-industry-option="cottonMill"]');assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'true');assert.ok(!$('[data-card="2"]').classList.contains('discard-allowed'));click('[data-card="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'build',loc:'birmingham',slot:0,industry:'cottonMill',card:1});
+});
+test('choosing the discard first filters build locations and clearing it restores them',()=>{
+ const {flow,$,click,sent}=setup();flow.begin('build');click('[data-card="2"]');
+ assert.ok(!$('[data-loc="birmingham"]').classList.contains('flow-target'));assert.ok($('[data-loc="coventry"]').classList.contains('flow-target'));assert.equal($('#flow-finish').hidden,true);
+ click('[data-card="2"]');assert.ok($('[data-loc="birmingham"]').classList.contains('flow-target'));
+ click('[data-card="2"]');click('[data-loc="coventry"]');click('[data-industry-option="pottery"]');click('#flow-finish');assert.equal(sent[0].card,2);
 });
 test('develop selects consecutive lowest tiles on the player mat then discards one card',()=>{
  let {flow,$,click,sent}=setup();flow.begin('develop');assert.ok($('[data-level="1"]').classList.contains('flow-target'));assert.ok(!$('[data-level="2"]').classList.contains('flow-target'));
@@ -78,8 +84,8 @@ test('deselecting a discard restores pending selection, hides confirm and resets
  }
  click('[data-card="1"]');click('#flow-cancel');assert.equal(sent.length,0);assert.equal($('#flow-finish').hidden,true);assert.equal($('[data-card="1"]').getAttribute('aria-pressed'),'false');assert.equal(document.querySelectorAll('.discard-allowed,.discard-picked,.flow-selected,.flow-target').length,0);
 });
-test('removing the last route clears a previously chosen discard before another route is chosen',()=>{
+test('removing the last route keeps the discard selected and prevents confirmation',()=>{
  const {flow,$,click,sent}=setup();flow.begin('network');click('[data-route="a"]');click('[data-card="2"]');click('[data-route="a"]');
- assert.equal($('[data-card="2"]').getAttribute('aria-pressed'),'false');assert.ok(!$('[data-card="2"]').classList.contains('discard-picked'));assert.equal($('#flow-finish').hidden,true);
- click('[data-route="a"]');assert.equal($('#flow-finish').hidden,true);click('[data-card="3"]');click('#flow-finish');assert.equal(sent[0].card,3);
+ assert.equal($('[data-card="2"]').getAttribute('aria-pressed'),'true');assert.equal($('#flow-finish').hidden,true);
+ click('[data-route="a"]');assert.equal($('#flow-finish').hidden,false);click('[data-card="3"]');click('#flow-finish');assert.equal(sent[0].card,3);
 });

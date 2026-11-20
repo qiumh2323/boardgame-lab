@@ -8,7 +8,7 @@ import {cardCatalogue} from './card-library.js?v=0.46';
 import {configure,F,TYPES,ZH,cityName,cardName,createDeck,createGame,current,legalActions,applyAction,publicView,nextTile,tileData,tileLocation,actionLabel,income,clone,estimateEraScore} from './engine.js?v=0.46';
 import {selectAI} from './ai.js?v=0.46';
 import {Room} from './room.js?v=0.40';
-import {createDirectFlow} from './direct-flow.js?v=0.46';
+import {createDirectFlow} from './direct-flow.js?v=0.47';
 import {boardPieces,routePieces,playerReserve,merchantTileStem,tablePieceAssets} from './table-pieces.js?v=0.40';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -326,6 +326,6 @@ $('#catalogue-close').onclick=()=>{closeCatalogue();$('[data-pile="draw"]')?.foc
 $('#card-catalogue').onmouseenter=()=>{catalogueHovered=true;clearTimeout(catalogueTimer);};$('#card-catalogue').onmouseleave=()=>{catalogueHovered=false;queueCatalogueClose();};
 document.addEventListener('pointerdown',e=>{if(!$('#card-catalogue').contains(e.target)&&!$('[data-pile="draw"]')?.contains(e.target))closeCatalogue();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCatalogue();});
-const directFlow=createDirectFlow({view:()=>view,seat:()=>seat,myTurn,actions:()=>actions,submit,industryImage:(type,level)=>tileUrl(type,level),showMyMat:()=>{matSeat=seat;renderMat();renderHand();},hint:text=>{const el=$('#player-action-hint');el.hidden=!text||!view;if(text&&view)el.textContent=`${view.players[current(view)].name} · ${view.gameOver?'对局结束':`第 ${view.used+1}/${view.era==='canal'&&view.round===1?1:2} 次行动`} · ${text}`;},explain:(el,target,edges)=>positionHint(el,!myTurn()?'尚未轮到你行动。':target.saleReason??placementReason(view,seat,target,edges))});
+const directFlow=createDirectFlow({view:()=>view,seat:()=>seat,myTurn,actions:()=>actions,submit,industryImage:(type,level)=>tileUrl(type,level),showMyMat:()=>{matSeat=seat;renderMat();renderHand();},hint:text=>{const el=$('#player-action-hint');el.hidden=!text||!view;if(text&&view)el.textContent=`${view.players[current(view)].name} · ${view.gameOver?'对局结束':`第 ${view.used+1}/${view.era==='canal'&&view.round===1?1:2} 次行动`} · ${text}`;},explain:(el,target,edges)=>positionHint(el,!myTurn()?'尚未轮到你行动。':target.reason??placementReason(view,seat,target,edges))});
 
 init();
