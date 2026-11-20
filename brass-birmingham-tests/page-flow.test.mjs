@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.32';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.40';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -49,7 +49,7 @@ test('full page restores a game, develops from mat before discarding, and update
  const beer=$('[data-beer-merchant]');assert.ok(beer);const merchant=$(`[data-merchant="${beer.dataset.beerMerchant}"]`),handler=merchant.onclick;let clicks=0;merchant.onclick=()=>clicks++;beer.click();assert.equal(clicks,1);beer.onkeydown({key:'Enter',preventDefault:()=>{}});assert.equal(clicks,2);merchant.onclick=handler;
  assert.equal($('#player-reserve').parentElement.className,'mat-workspace');assert.ok($('link[href^="refinement.css"]'));assert.ok($('link[href^="tabletop.css"]'));assert.equal($('#hand-toggle'),null);assert.ok(document.querySelectorAll('img[src*="piece-coin"]').length>0);assert.ok($('link[href^="legibility.css"]'));assert.ok(document.querySelectorAll('img[src*="beer-white.svg"]').length>0);
  $('[data-pile="draw"]').onmouseenter();assert.equal($('#card-catalogue').hidden,false);assert.match($('#catalogue-heading').textContent,/普通牌 40张/);
- assert.ok(document.querySelectorAll('.catalogue-card .in-hand').length>0);assert.equal($('#catalogue-close'),null);$('[data-pile="draw"]').onmouseleave();$('#card-catalogue').onmouseenter();await new Promise(r=>setTimeout(r,140));assert.equal($('#card-catalogue').hidden,false);$('#card-catalogue').onmouseleave();await new Promise(r=>setTimeout(r,140));assert.equal($('#card-catalogue').hidden,true);
+ assert.ok(document.querySelectorAll('.catalogue-card .in-hand').length>0);assert.equal($('#catalogue-close').hidden,true);$('[data-pile="draw"]').onmouseleave();$('#card-catalogue').onmouseenter();await new Promise(r=>setTimeout(r,140));assert.equal($('#card-catalogue').hidden,false);$('#card-catalogue').onmouseleave();await new Promise(r=>setTimeout(r,140));assert.equal($('#card-catalogue').hidden,true);
  $('#menu-btn').onclick();assert.ok($('#pass-menu-btn'));$('#pass-menu-btn').onclick();assert.ok(!$('#modal').open);assert.match($('#flow-text').textContent,/跳过/);$('#flow-cancel').onclick();
  $('[data-mat-player="1"]').onclick();assert.equal(document.querySelectorAll('#hand [data-card]').length,0);$('#action-buttons [data-type="develop"]').onclick();assert.equal(document.querySelectorAll('#hand [data-card]').length,8);assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('flow-target'));
  let before=$('[data-mat-type="coalMine"][data-level="1"]').dataset.count;$('[data-mat-type="coalMine"][data-level="1"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);

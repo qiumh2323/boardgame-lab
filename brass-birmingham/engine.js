@@ -1,3 +1,4 @@
+import {assignColors} from './player-colors.js?v=0.40';
 // Independent rules implementation. facts.json contains physical game quantities.
 export let F;
 export const TYPES=['cottonMill','coalMine','ironWorks','manufacturer','pottery','brewery'];
@@ -12,10 +13,11 @@ function rng(s){let x=s.seed|0;x^=x<<13;x^=x>>>17;x^=x<<5;s.seed=x>>>0;return (x
 function shuffle(s,a){for(let i=a.length-1;i>0;i--){let j=Math.floor(rng(s)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 export function createDeck(n){let d=[],k=0,f=F.cards[n];for(const [loc,count] of Object.entries(f.locations))for(let i=0;i<count;i++)d.push({id:++k,kind:'location',loc});for(const [type,count] of Object.entries(f.industries))for(let i=0;i<count;i++)d.push({id:++k,kind:'industry',types:[type]});for(let i=0;i<(f.dualCottonManufacturer||0);i++)d.push({id:++k,kind:'industry',types:['cottonMill','manufacturer']});return d;}
 function fill(s,p){while(p.hand.length<8&&s.deck.length)p.hand.push(s.deck.pop());}
-export function createGame(names=['你','规则 AI'],ai=[false,true],seed=Date.now()>>>0){
+export function createGame(names=['你','规则 AI'],ai=[false,true],seed=Date.now()>>>0,colorPreferences=[]){
  if(!F)throw Error('游戏数据未加载');if(names.length<2||names.length>4)throw Error('需要2至4名玩家');
  let s={version:1,rev:0,seed:seed||1,era:'canal',round:1,turn:0,used:0,phase:'play',players:[],order:[],board:{},links:{},merchants:[],coal:13,iron:8,discard:[],seenCards:[],wild:{location:4,industry:4},log:[],scores:[],gameOver:false};
- s.players=names.map((name,id)=>({id,name:String(name).slice(0,18),ai:!!ai[id],money:17,income:10,vp:0,spent:0,hand:[],stacks:Object.fromEntries(TYPES.map(t=>[t,F.industries[t].flatMap(d=>Array(d.count).fill(d.level))])),linkCount:0}));
+ const colors=assignColors(names.length,colorPreferences);
+ s.players=names.map((name,id)=>({id,color:colors[id],name:String(name).slice(0,18),ai:!!ai[id],money:17,income:10,vp:0,spent:0,hand:[],stacks:Object.fromEntries(TYPES.map(t=>[t,F.industries[t].flatMap(d=>Array(d.count).fill(d.level))])),linkCount:0}));
  s.order=shuffle(s,s.players.map(p=>p.id));s.deck=shuffle(s,createDeck(names.length));s.hiddenDiscard=[];for(let p of s.players){fill(s,p);s.hiddenDiscard.push(s.deck.pop());}
  let mix=shuffle(s,[...F.merchantMix[names.length]]);for(let [loc,m] of Object.entries(F.merchants))if(m.minPlayers<=names.length)for(let i=0;i<m.slots;i++){let buys=mix.pop();s.merchants.push({id:s.merchants.length,loc,buys,beer:buys!=='blank'});}
  note(s,'开局：运河时代，每人首回合1次行动。');return s;

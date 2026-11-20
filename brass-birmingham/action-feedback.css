@@ -185,3 +185,16 @@
  #game .board-pile span,#game #hand .hand-card-name {font-size:var(--table-caption)}
  #game .board-pile span {line-height:1.2;padding:1px 2px}
 }
+
+.setup-color {display:block;margin:0 0 12px;color:#c7d0d6;font-size:13px}
+.setup-color select {display:block;width:100%;margin-top:5px}
+#card-catalogue.catalogue-pinned {
+ inset: max(12px,env(safe-area-inset-top)) 8px auto;
+ width:auto;
+ max-height:calc(100dvh - 24px);
+ z-index:76;
+}
+#catalogue-close {min-height:36px;flex:none}
+@media(max-width:700px),(max-width:999px) and (pointer:coarse){
+ #game #zoom-btn,#game .mat-panel #mat-preview {display:none}
+}

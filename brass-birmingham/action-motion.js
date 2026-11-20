@@ -49,7 +49,7 @@ function fly(layer, {src,from,to,kind,delay=0,caption=''}) {
   return true;
 }
 
-export function playActionMotion(event, tileUrl) {
+export function playActionMotion(event, tileUrl, color) {
   const layer = q('#action-motion');
   if (!layer || typeof layer.animate!=='function' || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
   clearActionMotion();
@@ -85,7 +85,7 @@ export function playActionMotion(event, tileUrl) {
       const route = q(`[data-route="${target.key}"]`);
       const era = route?.dataset.routeEra;
       const source = viewed===actor && center(q('.reserve-links'));
-      if (era && action({src:`assets/pieces/piece-link-${['yellow','purple','red','gray'][actor]}-${era}.webp`,kind:'link',from:source||anchor,to:center(route),delay:220+index*95})) route.classList.add('event-flight');
+      if (era && action({src:`assets/pieces/piece-link-${color}-${era}.webp`,kind:'link',from:source||anchor,to:center(route),delay:220+index*95})) route.classList.add('event-flight');
     } else if (target.kind==='tile' && (target.effect==='build'||target.effect==='remove') && preview) {
       const [loc,slot] = target.key.split(':');
       const tile = q(`[data-loc="${loc}"][data-slot="${slot}"]`);

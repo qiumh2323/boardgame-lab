@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {boardPieces,routePieces,playerReserve,coins} from '../brass-birmingham/table-pieces.js';
-import {configure,createGame,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.32';
+import {configure,createGame,applyAction,current,publicView} from '../brass-birmingham/engine.js?v=0.40';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));
 const layout=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/layout.json',import.meta.url)));
 configure(facts);
@@ -65,4 +65,16 @@ test('every link renders at the same size across both eras',()=>{
   assert.equal(sizes.length,facts.connections.filter(route=>route[era]).length);
   assert.deepEqual([...new Set(sizes)],[`width:${layout.routePieceWidth}%;height:${layout.routePieceWidth*5/9}%`]);
  }
+});
+
+
+test('chosen colors follow their owners from the mat to the map and public score track',()=>{
+ const s=createGame(['A','B','C','D'],[false,false,false,false],43,['gray',undefined,'purple','gray']);
+ assert.deepEqual(s.players.map(p=>p.color),['gray','yellow','purple','red']);
+ const view=publicView(s,1);
+ view.links['birmingham-oxford']={owner:0};
+ assert.match(routePieces(view,layout,facts.connections),/piece-link-gray-canal.webp/);
+ assert.match(playerReserve(view.players[0],'canal'),/piece-link-gray-canal.webp/);
+ assert.match(boardPieces(view,layout),/data-player="0"[^>]+><img class="character-face" src="assets\/pieces\/piece-character-bessemer.webp"/);
+ assert.match(boardPieces(view,layout),/data-player="0"[^>]+><img src="assets\/pieces\/piece-vp-gray.webp"/);
 });
