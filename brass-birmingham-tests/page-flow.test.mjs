@@ -58,7 +58,7 @@ test('full page restores a game, develops from mat before discarding, and update
  let before=$('[data-mat-type="coalMine"][data-level="1"]').dataset.count;$('[data-mat-type="coalMine"][data-level="1"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);
  assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));$('[data-card="0"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);$('#flow-finish').onclick();
  assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,'0');assert.equal(JSON.parse(store.get('brass-night-save-v1')).players[0].stacks.coalMine[0],2);assert.ok($('[data-mat-type="coalMine"][data-level="2"]').classList.contains('unlocked'));
- assert.ok(!$('#modal').open);assert.match($('#flow-text').textContent,/先选择行动/);assert.ok(document.querySelectorAll('.catalogue-card .discarded').length>0);assert.equal($('#ai-hint'),null);assert.equal($('#action-history-btn').textContent,'查看行动记录');assert.equal($('#action-history-btn').nextElementSibling.id,'latest-action');assert.equal($('#action-history-btn').getAttribute('aria-haspopup'),'dialog');assert.ok($('link[href^="action-feedback.css"]'));assert.equal($('#action-announcement').hidden,false);assert.match($('#action-announcement').textContent,/研发/);assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('event-develop'));$('#action-history-btn').onclick();assert.equal($('#modal-title').textContent,'行动记录');assert.match($('#modal-content').textContent,/研发/);assert.ok($('#modal-content .history-art img'));assert.ok($('#log .history-art img'));$('#modal-close').onclick();
+ assert.ok(!$('#modal').open);assert.match($('#flow-text').textContent,/先选择行动/);assert.ok(document.querySelectorAll('.catalogue-card .discarded').length>0);assert.equal($('#ai-hint'),null);assert.equal($('#action-history-btn'),null);assert.equal($('#journal-dropdown summary').textContent,'对局记录');assert.equal($('#latest-action').hidden,true);assert.ok($('link[href^="action-feedback.css"]'));assert.equal($('#action-announcement').hidden,false);assert.match($('#action-announcement').textContent,/研发/);assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('event-develop'));assert.match($('#log').textContent,/研发/);assert.ok($('#log .history-art img'));
  for(const [n,draw,total] of [[3,27,54],[4,28,64]]){
   $('#menu-btn').onclick();$('#back-btn').onclick();
   let game=createGame(Array.from({length:n},(_,i)=>'P'+i),Array(n).fill(false),31);game.order=game.players.map(p=>p.id);store.set('brass-night-save-v1',JSON.stringify(game));$('#resume-btn').onclick();
@@ -126,13 +126,15 @@ test('full page restores a game, develops from mat before discarding, and update
  restore(review);
  const saved=()=>JSON.parse(store.get('brass-night-save-v1'));
  const pass=()=>{$('#menu-btn').onclick();$('#pass-menu-btn').onclick();$('[data-card="0"]').onclick();$('#flow-finish').onclick();};
- pass();assert.equal(saved().used,1);assert.equal($('#end-turn').hidden,true);
+ pass();assert.equal(saved().used,1);assert.equal($('#end-turn').hidden,true);assert.equal($('#latest-action').hidden,true);
  pass();assert.equal(saved().turnPending,true);assert.equal(saved().players[0].hand.length,6);assert.equal(saved().deck.length,review.deck.length);assert.match($('#undo-action').textContent,/2/);
  $('#menu-btn').onclick();$('#back-btn').onclick();$('#resume-btn').onclick();
  $('#undo-action').onclick();assert.equal(saved().used,1);assert.equal(saved().rev,3);assert.equal(saved().players[0].hand.length,7);
  $('#undo-action').onclick();assert.equal(saved().used,0);assert.equal(saved().rev,4);assert.deepEqual(saved().players[0].hand,review.players[0].hand);assert.deepEqual(saved().actionHistory,review.actionHistory);assert.equal($('#undo-action').hidden,true);
  pass();pass();$('#end-turn').onclick();const settled=saved();
  assert.equal(settled.round,3);assert.deepEqual(settled.order,[0,1]);assert.equal(settled.players[0].money,review.players[0].money+2);assert.equal(settled.players[0].hand.length,8);assert.equal($('#undo-action').hidden,true);
+ assert.equal($('#latest-action').hidden,false);assert.equal($('#latest-action strong').textContent,'刚刚 · You');assert.deepEqual([...$('#latest-action ol').children].map(e=>e.textContent),['弃牌跳过行动','弃牌跳过行动']);
+ pass();assert.equal($('#latest-action ol').children.length,2);$('#undo-action').onclick();assert.equal($('#latest-action ol').children.length,2);
  assert.match($('#turn-transition').textContent,/第 2 轮结算/);assert.match($('#turn-transition').textContent,/第 3 轮开始/);assert.equal($('#turn-transition li').textContent,'1You原第 2');
  $('#menu-btn').onclick();$('#back-btn').onclick();
 

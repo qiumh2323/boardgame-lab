@@ -131,9 +131,8 @@ function render(){
  const names={build:'建造',network:'连接',develop:'研发',sell:'出售',loan:'贷款',scout:'探索'};
  $('#action-buttons').innerHTML=Object.entries(names).map(([t,label])=>`<button data-type="${t}" ${!myTurn()||waiting?'disabled':''} class="${selectedType===t?'selected':''}">${label}</button>`).join('');
  $('#action-buttons').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectedType=b.dataset.type;selectedLocation=null;render();openActions(selectedType);});
- $('#action-history-btn').disabled=false;
- $('#log').innerHTML=historyItems(35);
- renderBoard();renderMat();renderCatalogue();directFlow.paint();paintActionFeedback();paintTurnTransition();if(modal.open&&$('#modal-title').textContent==='行动记录')renderActionHistory();if(view.gameOver&&render.endShown!==view.rev){render.endShown=view.rev;showResults();}
+ $('#log').innerHTML=historyItems();
+ renderPreviousTurn();renderBoard();renderMat();renderCatalogue();directFlow.paint();paintActionFeedback();paintTurnTransition();if(view.gameOver&&render.endShown!==view.rev){render.endShown=view.rev;showResults();}
 }
 
 
@@ -158,9 +157,9 @@ function historyArt(event){
  if(amount)art.push({src:`assets/pieces/piece-coin-${amount>=15?15:amount>=5?5:1}.webp`,label:`${event.movement.spent?'花费':'获得'} £${amount}`});
  return art;
 }
-function historyItems(limit=view.log.length){
+function historyItems(){
  const history=[...(view.actionHistory||[])];
- return [...view.log].reverse().slice(0,limit).map(line=>{
+ return [...view.log].reverse().map(line=>{
   const event=history.at(-1);
   if(event?.logEntry!==line)return `<li class="history-note">${esc(line)}</li>`;
   history.pop();
@@ -168,13 +167,18 @@ function historyItems(limit=view.log.length){
   return `<li class="history-event" style="--owner:${playerTint(view.players[event.actor])}"><strong>${esc(view.players[event.actor].name)} · ${esc(event.description)}</strong><span>${event.era==='rail'?'铁路':'运河'}时代 · 第 ${event.round} 轮</span><div class="history-art">${images}</div><p>${event.details.map(esc).join(' · ')}</p></li>`;
  }).join('');
 }
-function renderActionHistory(){
- $('#modal-content').innerHTML=`<ol class="action-history-list">${historyItems()}</ol>`;
+function renderPreviousTurn(){
+ const panel=$('#latest-action'),history=view.actionHistory??(view.lastAction?[view.lastAction]:[]);
+ const ongoing=view.phase==='play'&&!view.gameOver&&view.used>0;
+ const completed=history.filter(event=>event.type!=='liquidate'&&!(ongoing&&event.actor===current(view)&&event.era===view.era&&event.round===view.round));
+ const last=completed.at(-1);
+ panel.hidden=!last;
+ if(!last){panel.replaceChildren();return;}
+ const actions=completed.filter(event=>event.actor===last.actor&&event.era===last.era&&event.round===last.round);
+ panel.innerHTML=`<strong>刚刚 · ${esc(view.players[last.actor].name)}</strong><ol>${actions.map(event=>`<li>${esc(event.description)}</li>`).join('')}</ol>`;
 }
 function paintActionFeedback(){
  const e=view.lastAction,game=view.gameId;
- $('#latest-action').hidden=!e;
- if(e)$('#latest-action').textContent=`刚刚：${view.players[e.actor].name} · ${e.description}`;
  if(feedbackGame!==game){feedbackGame=game;feedbackRev=view.rev;return;}
  if(!e||e.rev!==view.rev||feedbackRev===e.rev)return;
  feedbackRev=e.rev;
@@ -415,7 +419,6 @@ $('#mat-preview').onclick=()=>setTableZoom(document.body.classList.contains('mat
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!directFlow.dismissIndustry())setTableZoom(null);});
 installDragPan($('.board-column'),()=>document.body.classList.contains('board-focus'));
 setTableZoom(null);
-$('#action-history-btn').onclick=()=>{showDialog('行动记录','');renderActionHistory();};
 $('#resume-btn').onclick=()=>{try{let s=JSON.parse(localStorage.getItem(SAVE));if(s.version!==1||!s.players||!s.deck)throw Error('存档格式不支持');const {turnUndo:checkpoints=[],...saved}=s;turnUndo=checkpoints;state=saved;mode='local';room?.destroy();room=null;seat=0;for(const position of [state,...turnUndo])for(const p of position.players)if(p.id!==seat)p.ai=true;if(current(state)!==seat){if(state.turnPending)state=endTurn(state,current(state)).state;turnUndo=[];}update();}catch(e){toast(e.message);}};
 async function init(){
  $('main').hidden=true;$('#ai-start').disabled=true;try{let [f,l]=await Promise.all([fetch('facts.json?v=0.32').then(r=>r.json()),fetch('layout.json?v=0.35').then(r=>r.json())]);configure(f);layout=l;$('#ai-start').disabled=false;saveAvailable=!!localStorage.getItem(SAVE);$('#resume-btn').hidden=!saveAvailable;let code=new URLSearchParams(location.search).get('room');if(code)joinDialog(code);if(typeof globalThis.Image==='function')preloadTableAssets();}catch(e){toast('加载游戏失败，请刷新：'+e.message);}
