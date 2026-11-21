@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.49';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.50';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -98,7 +98,7 @@ test('full page restores a game, develops from mat before discarding, and update
  saleGame.links={'gloucester-worcester':{owner:0},'gloucester-redditch':{owner:0}};saleGame.merchants=[{id:0,loc:'gloucester',buys:'any',beer:true}];restore(saleGame);
  $('#action-buttons [data-type="sell"]').onclick();$('[data-card="0"]').onclick();assert.ok($('[data-merchant="0"]').classList.contains('flow-target'));assert.equal(document.querySelectorAll('[data-flow-option]').length,0);
  $('[data-beer-merchant="0"]').onclick();assert.match($('#flow-text').textContent,/啤酒已选 1 \/ 所需 0 桶/);assert.equal($('#flow-finish').hidden,true);
- $('[data-loc="worcester"][data-slot="0"]').onclick();assert.ok($('[data-loc="worcester"][data-slot="0"]').classList.contains('flow-selected'));assert.ok(!$('[data-mat-type="coalMine"][data-level="2"]').classList.contains('flow-target'));
+ $('[data-loc="worcester"][data-slot="0"]').onclick();assert.match($('#flow-text').textContent,/继续选择待售产业.*确认出售/);assert.ok($('[data-loc="worcester"][data-slot="0"]').classList.contains('flow-selected'));assert.ok(!$('[data-mat-type="coalMine"][data-level="2"]').classList.contains('flow-target'));
  $('[data-loc="redditch"][data-slot="0"]').onclick();assert.equal($('#flow-finish').hidden,true);$('[data-loc="southern"][data-slot="0"]').onclick();assert.match($('#flow-text').textContent,/啤酒已选 2 \/ 所需 2 桶/);assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,0);assert.ok(!modal.open);assert.equal($('#flow-finish').textContent,'确认出售');$('#flow-finish').onclick();
  assert.equal(JSON.parse(store.get('brass-night-save-v1')).rev,0);assert.match($('#flow-text').textContent,/免费研发/);assert.ok(!$('[data-mat-type="coalMine"][data-level="1"]').classList.contains('flow-target'));assert.ok($('[data-mat-type="coalMine"][data-level="2"]').classList.contains('flow-target'));assert.equal(document.querySelectorAll('[data-flow-option]').length,1);
  $('[data-mat-type="coalMine"][data-level="2"]').onclick();assert.equal($('#flow-finish').textContent,'确认奖励');$('#flow-finish').onclick();

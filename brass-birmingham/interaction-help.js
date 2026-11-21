@@ -1,4 +1,4 @@
-import {F,ZH,applyAction} from './engine.js?v=0.49';
+import {F,ZH,applyAction} from './engine.js?v=0.50';
 // City border order requested by the player: purple, yellow, red, blue, green.
 export const CITY_CARD_COLOUR_GROUPS=[
  ['birmingham','coventry','nuneaton','redditch'],
@@ -27,7 +27,7 @@ export function placementReason(view,seat,target,edges=[]){
  if(target.route){
   if(edges.includes(target.route))return '这条连接已在本次行动中选中。';
   const a={type:'network',card:0,edges:[...edges,target.route]};
-  return applyAction(s,seat,a,{auto:true}).error||'该线路可铺设，请先选择铺路行动。';
+  return applyAction(s,seat,a,{auto:true}).error||'该线路可连接，请先选择连接行动。';
  }
  const types=F.cities[target.loc]?.slots[target.slot]||(F.farms[target.loc]?['brewery']:[]);
  return types.map(industry=>{

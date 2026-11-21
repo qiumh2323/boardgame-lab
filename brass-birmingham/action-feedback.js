@@ -1,4 +1,4 @@
-import {F,cityName,ZH,income} from './engine.js?v=0.49';
+import {F,cityName,ZH,income} from './engine.js?v=0.50';
 
 export function makeActionFeedback(before,after,actor,action,activity=null){
  const p=before.players[actor],next=after.players[actor],a=action,targets=[],previews=[],exhausted=[];
@@ -7,7 +7,7 @@ export function makeActionFeedback(before,after,actor,action,activity=null){
   const level=p.stacks[a.industry][0];description=`建造 ${cityName(a.loc)} ${ZH[a.industry]}${level}级`;
   targets.push({kind:'tile',key:`${a.loc}:${a.slot}`,effect:'build'});previews.push({owner:actor,type:a.industry,level});
  }else if(a.type==='network'){
-  description=`铺设${before.era==='canal'?'运河':'铁路'}：`+a.edges.map(id=>{
+  description=`连接${before.era==='canal'?'运河':'铁路'}：`+a.edges.map(id=>{
    targets.push({kind:'route',key:id,effect:'link'});
    const edge=F.connections.find(c=>c.id===id);return edge?cityName(edge.from)+'—'+cityName(edge.to):id;
   }).join('、');
@@ -22,7 +22,7 @@ export function makeActionFeedback(before,after,actor,action,activity=null){
    previews.push({...t,flipped:true});return `${cityName(sale.key.split(':')[0])} ${ZH[t.type]}${t.level}级`;
   }).join('、');
  }else if(a.type==='loan')description='贷款 £30，收入降低3级';
- else if(a.type==='scout')description='侦察，弃3张牌换取两张万能牌';
+ else if(a.type==='scout')description='探索，弃3张牌换取两张万能牌';
  else if(a.type==='liquidate'){
   const tile=before.board[a.key];
   description=`变卖 ${cityName(a.key.split(':')[0])} 的产业以支付欠款`;

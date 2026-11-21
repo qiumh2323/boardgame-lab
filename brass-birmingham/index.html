@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#15212b"><title>工业革命：伯明翰 · 在线对战</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="table.css?v=0.5"><link rel="stylesheet" href="flow.css?v=0.4"><link rel="stylesheet" href="alignment.css?v=0.5"><link rel="stylesheet" href="workspace.css?v=0.32"><link rel="stylesheet" href="dock.css?v=0.32"><link rel="stylesheet" href="refinement.css?v=0.32"><link rel="stylesheet" href="tabletop.css?v=0.37"><link rel="stylesheet" href="localization.css?v=0.32"><link rel="stylesheet" href="legibility.css?v=0.32"><link rel="stylesheet" href="compact-table.css?v=0.30"><link rel="stylesheet" href="action-feedback.css?v=0.49"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#15212b"><title>工业革命：伯明翰 · 在线对战</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="table.css?v=0.5"><link rel="stylesheet" href="flow.css?v=0.4"><link rel="stylesheet" href="alignment.css?v=0.5"><link rel="stylesheet" href="workspace.css?v=0.32"><link rel="stylesheet" href="dock.css?v=0.32"><link rel="stylesheet" href="refinement.css?v=0.32"><link rel="stylesheet" href="tabletop.css?v=0.37"><link rel="stylesheet" href="localization.css?v=0.32"><link rel="stylesheet" href="legibility.css?v=0.32"><link rel="stylesheet" href="compact-table.css?v=0.30"><link rel="stylesheet" href="action-feedback.css?v=0.50"></head>
 <body>
-<header class="topbar"><a class="brand" href="./"><span class="seal">B</span><span>工业革命：伯明翰<small>在线对战 · 测试版 0.49</small></span></a><nav><span id="connection-status" role="status">本地对局</span><details class="journal" id="journal-dropdown"><summary>对局记录</summary><ol id="log"></ol></details><button id="music-toggle" class="quiet" type="button" aria-label="游戏音乐" aria-pressed="false" hidden>音乐关</button><button id="help-btn" class="quiet">玩法与规则</button><button id="menu-btn" class="quiet">对局菜单</button></nav></header>
+<header class="topbar"><a class="brand" href="./"><span class="seal">B</span><span>工业革命：伯明翰<small>在线对战 · 测试版 0.50</small></span></a><nav><span id="connection-status" role="status">本地对局</span><details class="journal" id="journal-dropdown"><summary>对局记录</summary><ol id="log"></ol></details><button id="music-toggle" class="quiet" type="button" aria-label="游戏音乐" aria-pressed="false" hidden>音乐关</button><button id="help-btn" class="quiet">玩法与规则</button><button id="menu-btn" class="quiet">对局菜单</button></nav></header>
 <section id="lobby" class="lobby">
- <div class="lobby-copy"><p class="period">黑乡，1770—1870</p><h1>点亮你的<br>工业版图。</h1><p class="intro">沿运河铺路，让煤炭与啤酒流动。<br>从第一座工厂，走向铁路时代。</p>
+ <div class="lobby-copy"><p class="period">黑乡，1770—1870</p><h1>点亮你的<br>工业版图。</h1><p class="intro">沿运河连接城镇，让煤炭与啤酒流动。<br>从第一座工厂，走向铁路时代。</p>
  <div class="setup-controls"><label>你的名字<input id="player-name" maxlength="18" value="玩家" autocomplete="nickname"></label><label>对局人数<select id="player-count"><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option></select></label></div>
  <label class="setup-color">你的颜色<select id="player-color"></select></label>
  <button id="ai-start" class="primary wide">与规则 AI 开始对局</button><div class="lobby-actions"><button id="host-btn">创建联机房间</button><button id="join-btn">加入房间</button></div><button id="resume-btn" class="quiet wide" hidden>继续上次本地对局</button>
@@ -24,11 +24,11 @@
 <section id="flow-bar" hidden aria-live="polite"><p id="flow-text"></p><div id="flow-options"></div><div class="flow-controls"><button id="flow-finish" class="primary" hidden>确认执行</button><button id="flow-cancel" hidden>取消行动</button></div></section>
 <section id="card-catalogue" class="card-catalogue" hidden aria-label="牌组构成"><div class="catalogue-toolbar"><h2 id="catalogue-heading"></h2><button id="catalogue-close" type="button" hidden>关闭</button></div><p>逐张显示普通牌。灰牌标记为已弃牌或手中牌。</p><div id="catalogue-cards"></div></section>
 <div id="action-float-stack"><aside id="player-action-hint" role="status" aria-live="polite" hidden></aside><aside id="action-announcement" class="action-announcement" role="status" aria-live="polite" hidden></aside></div>
-<audio id="game-music" src="assets/audio/canal-evening.wav" preload="none" loop></audio>
+<audio id="game-music" src="assets/audio/evening-fall-piano.mp3" preload="none" loop></audio>
 <aside id="turn-transition" role="status" aria-live="polite" hidden></aside>
 <aside id="placement-hint" role="status" hidden></aside>
 <div id="industry-picker" role="group" hidden></div>
 <div id="action-motion" aria-hidden="true"></div>
 <div id="toast" role="status" hidden></div>
-<script src="vendor/peerjs.min.js"></script><script type="module" src="app.js?v=0.49"></script>
+<script src="vendor/peerjs.min.js"></script><script type="module" src="app.js?v=0.50"></script>
 </body></html>

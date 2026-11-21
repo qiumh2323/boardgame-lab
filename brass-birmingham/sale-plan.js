@@ -1,4 +1,4 @@
-import {isGoods,distances,tileLocation,tileData} from './engine.js?v=0.49';
+import {isGoods,distances,tileLocation,tileData} from './engine.js?v=0.50';
 
 export function createSalePlan(view,seat){
  const selected=new Set(),beer=new Map(),stock=new Map(),products=new Map();

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,publicView} from '../brass-birmingham/engine.js?v=0.49';
+import {configure,createGame,publicView} from '../brass-birmingham/engine.js?v=0.50';
 import {CITY_CARD_COLOUR_GROUPS,sortedHand,placementReason,ownOverbuild,overbuildPreferenceKey} from '../brass-birmingham/interaction-help.js';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 function fresh(){const s=createGame(['You','AI'],[false,true],88);s.order=[0,1];s.round=2;s.players[0].money=100;return s;}

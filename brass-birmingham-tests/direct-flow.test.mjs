@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {parseHTML} from 'linkedom';
 import {createDirectFlow} from '../brass-birmingham/direct-flow.js';
 import fs from 'node:fs';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.49';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.50';
 const facts=JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url)));facts.connections.push({id:'a',from:'birmingham',to:'coventry'},{id:'b',from:'coventry',to:'nuneaton'});configure(facts);
 function setup(){
  const {document,window}=parseHTML(`<html><body><section id="hand-float"><button id="hand-toggle"></button>${[0,1,2,3].map(i=>`<button data-card="${i}"></button>`).join('')}</section><div id="flow-bar"><p id="flow-text"></p><div id="flow-options"></div><button id="flow-finish"></button><button id="flow-cancel"></button></div><div id="action-buttons">${['build','network','develop','sell','scout'].map(t=>`<button data-type="${t}"></button>`).join('')}</div><div id="mat-board"></div><div id="industry-picker" hidden></div><button data-loc="birmingham" data-slot="0"></button><button data-loc="coventry" data-slot="0"></button><button data-loc="northern" data-slot="0"></button><button data-merchant="0"></button><button data-mat-type="coalMine" data-level="1"></button><button data-mat-type="coalMine" data-level="2"></button><button data-route="a"></button><button data-route="b"></button></body></html>`);
@@ -30,16 +30,16 @@ test('choosing the discard first filters build locations and clearing it restore
 });
 test('develop selects consecutive lowest tiles on the player mat then discards one card',()=>{
  let {flow,$,click,sent}=setup();flow.begin('develop');assert.ok($('[data-level="1"]').classList.contains('flow-target'));assert.ok(!$('[data-level="2"]').classList.contains('flow-target'));
- click('[data-level="1"]');assert.ok($('[data-level="2"]').classList.contains('flow-target'));click('[data-level="2"]');click('[data-card="3"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'develop',industries:['coalMine','coalMine'],card:3});
+ click('[data-level="1"]');assert.ok($('[data-level="2"]').classList.contains('flow-target'));click('[data-card="3"]');assert.match($('#flow-text').textContent,/再选一块研发板块.*确认研发/);click('[data-level="2"]');assert.equal($('#flow-text').textContent,'点击确认研发。');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'develop',industries:['coalMine','coalMine'],card:3});
 });
 test('two developments from the same stack show both picks on one tile',()=>{
  const {flow,$,click,view}=setup();view.players[0].stacks.coalMine=[1,1,2];flow.begin('develop');
- click('[data-level="1"]');assert.equal($('[data-level="1"]').dataset.developOrder,'1');
- click('[data-level="1"]');assert.equal($('[data-level="1"]').dataset.developOrder,'1 · 2');assert.ok(!$('[data-level="1"]').classList.contains('flow-target'));
- click('#flow-cancel');assert.ok(!$('[data-level="1"]').hasAttribute('data-develop-order'));
+ click('[data-level="1"]');assert.equal($('[data-level="1"]').dataset.developCount,'1');
+ click('[data-level="1"]');assert.equal($('[data-level="1"]').dataset.developCount,'2');assert.ok(!$('[data-level="1"]').classList.contains('flow-target'));
+ click('#flow-cancel');assert.ok(!$('[data-level="1"]').hasAttribute('data-develop-count'));
 });
 test('network reveals second railway only after selecting its valid first railway',()=>{
- let {flow,$,click,sent}=setup();flow.begin('network');assert.ok($('[data-route="a"]').classList.contains('flow-target'));assert.ok(!$('[data-route="b"]').classList.contains('flow-target'));click('[data-route="a"]');assert.ok($('[data-route="b"]').classList.contains('flow-target'));click('[data-route="b"]');click('[data-card="2"]');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'network',edges:['a','b'],card:2});
+ let {flow,$,click,sent}=setup();flow.begin('network');assert.ok($('[data-route="a"]').classList.contains('flow-target'));assert.ok(!$('[data-route="b"]').classList.contains('flow-target'));click('[data-route="a"]');assert.ok($('[data-route="b"]').classList.contains('flow-target'));click('[data-card="2"]');assert.match($('#flow-text').textContent,/再选一条铁路.*确认连接/);click('[data-route="b"]');assert.equal($('#flow-text').textContent,'点击确认连接。');assert.equal(sent.length,0);click('#flow-finish');assert.deepEqual(sent[0],{type:'network',edges:['a','b'],card:2});
 });
 test('a single remaining card is selected once a network action is ready',()=>{
  const {flow,$,click,sent,view}=setup();view.players[0].hand.splice(1);

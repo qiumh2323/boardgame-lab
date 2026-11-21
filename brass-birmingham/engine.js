@@ -183,13 +183,13 @@ export function applyAction(state,id,action,{auto=false,recordActivity=false,def
    if(a.type==='build')message=build(s,p,a,ctx);
    else if(a.type==='network'){
     insist(Array.isArray(a.edges)&&a.edges.length>=1&&a.edges.length<=(s.era==='canal'?1:2),'请选择1条运河，或1至2条铁路');
-    spend(s,p,s.era==='canal'?3:a.edges.length===2?15:5,ctx);for(let edge of a.edges)putLink(s,p,edge,ctx);if(a.edges.length===2)takeResource(s,id,'beer',ends(a.edges[1]),ctx);message='铺设'+a.edges.length+'条'+(s.era==='canal'?'运河':'铁路');
+    spend(s,p,s.era==='canal'?3:a.edges.length===2?15:5,ctx);for(let edge of a.edges)putLink(s,p,edge,ctx);if(a.edges.length===2)takeResource(s,id,'beer',ends(a.edges[1]),ctx);message='连接'+a.edges.length+'条'+(s.era==='canal'?'运河':'铁路');
    }else if(a.type==='sell')message=sell(s,p,a,ctx);
    else if(a.type==='develop'){
     insist(Array.isArray(a.industries)&&a.industries.length>=1&&a.industries.length<=2,'每次研发1至2个板块');for(let t of a.industries){developOne(s,p,t,ctx);takeResource(s,id,'iron',[],ctx);}message='研发 '+a.industries.map(t=>ZH[t]).join('、');
    }else if(a.type==='loan'){let n=income(p.income)-3;insist(n>=-10,'贷款会使收入低于-10');p.income=incomeTop(n);p.money+=30;message='贷款 £30，收入降低3级';}
    else if(a.type==='scout'){
-    insist(!p.hand.some(c=>c.kind.startsWith('wild')),'持有万能牌时不能侦察');insist(s.wild.location&&s.wild.industry,'万能牌供应不足');insist(Array.isArray(a.extra)&&a.extra.length===2,'侦察需要额外弃2张牌');discard(s,p,[a.card,...a.extra]);p.hand.push({kind:'wildLocation'},{kind:'wildIndustry'});s.wild.location--;s.wild.industry--;message='侦察，获得两张万能牌';
+    insist(!p.hand.some(c=>c.kind.startsWith('wild')),'持有万能牌时不能探索');insist(s.wild.location&&s.wild.industry,'万能牌供应不足');insist(Array.isArray(a.extra)&&a.extra.length===2,'探索需要额外弃2张牌');discard(s,p,[a.card,...a.extra]);p.hand.push({kind:'wildLocation'},{kind:'wildIndustry'});s.wild.location--;s.wild.industry--;message='探索，获得两张万能牌';
    }else if(a.type==='pass')message='跳过行动';else throw Error('未知行动');
    if(a.type!=='scout')discard(s,p,[a.card]);
    const entry=p.name+'：'+message;note(s,entry);if(ctx.activity)ctx.activity.logEntry=entry;advance(s,deferTurnEnd);
@@ -223,7 +223,7 @@ export function legalActions(s,id=current(s),{allCards=false,doubleRails=true}={
  if(singleSales.length>1){let saleList=[],seenSale=new Set();for(let sale of singleSales)if(!seenSale.has(sale.key)){let a={type:'sell',card:0,sales:[...saleList,sale]};if(applyAction(s,id,a,{auto:true}).ok){saleList.push(sale);seenSale.add(sale.key);}}if(saleList.length>1)result.push({type:'sell',card:0,sales:saleList});}
  if(p.hand.length>=3)test({type:'scout',card:0,extra:[1,2]});return result;
 }
-export function actionLabel(a){return a.type==='build'?`建造 ${cityName(a.loc)} · ${ZH[a.industry]} ${a.slot+1}号位`:a.type==='network'?`铺路 ${a.edges.map(e=>{let c=F.connections.find(x=>x.id===e);return cityName(c.from)+'—'+cityName(c.to);}).join(' / ')}`:a.type==='develop'?'研发 '+a.industries.map(x=>ZH[x]).join('、'):a.type==='sell'?'出售 '+a.sales.map(x=>cityName(tileLocation(x.key))).join('、'):a.type==='loan'?'贷款 £30':a.type==='scout'?'侦察万能牌':a.type==='liquidate'?'变卖 '+cityName(tileLocation(a.key)):'跳过';}
+export function actionLabel(a){return a.type==='build'?`建造 ${cityName(a.loc)} · ${ZH[a.industry]} ${a.slot+1}号位`:a.type==='network'?`连接 ${a.edges.map(e=>{let c=F.connections.find(x=>x.id===e);return cityName(c.from)+'—'+cityName(c.to);}).join(' / ')}`:a.type==='develop'?'研发 '+a.industries.map(x=>ZH[x]).join('、'):a.type==='sell'?'出售 '+a.sales.map(x=>cityName(tileLocation(x.key))).join('、'):a.type==='loan'?'贷款 £30':a.type==='scout'?'探索万能牌':a.type==='liquidate'?'变卖 '+cityName(tileLocation(a.key)):'跳过';}
 export function publicView(s,id){
  const v=clone(s);
  v.deckCount=v.deck.length;

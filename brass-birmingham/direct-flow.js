@@ -1,5 +1,5 @@
-import {createSalePlan} from './sale-plan.js?v=0.49';
-import {cityName,ZH,nextTile,tileLocation,previewSales} from './engine.js?v=0.49';
+import {createSalePlan} from './sale-plan.js?v=0.50';
+import {cityName,ZH,nextTile,tileLocation,previewSales} from './engine.js?v=0.50';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createDirectFlow(api){
  let draft=null,stage='idle',variants=[],resource=null,salePlan=null,lastRevision=null,selectedCard=null,previousSoleDiscard=null,industryChoice=null;
@@ -142,7 +142,7 @@ export function createDirectFlow(api){
   const picker=$('#industry-picker');if(picker)picker.hidden=true;
   all('.flow-target,.flow-selected').forEach(e=>e.classList.remove('flow-target','flow-selected'));
   all('[data-sale-beer]').forEach(e=>e.removeAttribute('data-sale-beer'));
-  all('[data-develop-order]').forEach(e=>e.removeAttribute('data-develop-order'));
+  all('[data-develop-count]').forEach(e=>e.removeAttribute('data-develop-count'));
   let v=api.view();$('#hand-float').hidden=!v;$('#flow-bar').hidden=!v;
   if(!v){api.hint?.('');return;}
   if(lastRevision!==v.rev){industryChoice=null;draft=null;variants=[];resource=null;stage='idle';selectedCard=null;previousSoleDiscard=null;lastRevision=v.rev;}
@@ -174,7 +174,7 @@ export function createDirectFlow(api){
   if(stage==='idle'){bar('先选择行动。');return;}
   if(stage==='waiting'){bar('正在提交行动…');return;}
   if(stage==='industry'){paintIndustryPicker();return;}
-  $('#flow-finish').textContent=draft?.type==='scout'?'确认侦察':draft?.type==='sell'?'确认出售':'确认执行';
+  $('#flow-finish').textContent=draft?.type==='scout'?'确认探索':draft?.type==='sell'?'确认出售':'确认执行';
   if(stage==='discard'){
    let n=draft.type==='scout'?draft.extra.length:(selectedCard===null?0:1);
    if(draft.type==='build'){
@@ -200,27 +200,33 @@ export function createDirectFlow(api){
    bar(selectedCard===null?'选择建造位置和弃牌。':'选择高亮的建造位置。');
   }
   if(draft.type==='network'){
-   let list=prefix(candidates(),'edges');for(let a of list){let key=a.edges[draft.edges.length],el=key?$(`[data-route="${key}"]`):null;mark(el);if(el)el.onclick=()=>selectRoute(key);}
+   const list=prefix(candidates(),'edges'),next=new Set(list.map(a=>a.edges[draft.edges.length]).filter(Boolean));
+   for(const key of next){const el=$(`[data-route="${key}"]`);mark(el);if(el)el.onclick=()=>selectRoute(key);}
    for(let key of draft.edges){let el=$(`[data-route="${key}"]`);mark(el,true);if(el)el.onclick=()=>selectRoute(key);}
-   bar(canConfirm()?'点击确认执行。':!targetReady()?(selectedCard===null?'选择线路和弃牌。':'选择要铺设的线路。'):'选择一张弃牌。',[],canConfirm());
+   const prompt=!targetReady()?(selectedCard===null?'选择线路和弃牌。':'选择要连接的线路。'):
+    choicePrompt(next.size?'再选一条铁路':'','确认连接');
+   $('#flow-finish').textContent='确认连接';bar(prompt,[],canConfirm());
   }
   if(draft.type==='develop'){
    const list=prefix(candidates(),'industries'),p=v.players[api.seat()];
+   const next=new Set(list.map(a=>a.industries[draft.industries.length]).filter(Boolean));
    const onOwnMat=!$('#hand')||Number($('#hand').dataset.player)===api.seat();
    if(onOwnMat){
     const removed=new Map();
     draft.industries.forEach((type,i)=>{
      const offset=removed.get(type)??0,level=p.stacks[type][offset];removed.set(type,offset+1);
      const el=resourceElement({id:type,level});if(!el)return;
-     el.dataset.developOrder=[el.dataset.developOrder,i+1].filter(Boolean).join(' · ');
+     el.dataset.developCount=String(Number(el.dataset.developCount||0)+1);
      el.onclick=()=>{draft.industries.splice(i);paint();};
     });
-    for(const type of new Set(list.map(a=>a.industries[draft.industries.length]).filter(Boolean))){
+    for(const type of next){
      const level=p.stacks[type][removed.get(type)??0],el=resourceElement({id:type,level});
      mark(el);if(el)el.onclick=()=>selectDevelop(type,level);
     }
    }
-   bar(canConfirm()?'点击确认执行。':!targetReady()?(selectedCard===null?'选择研发板块和弃牌。':'选择要研发的板块。'):'选择一张弃牌。',[],canConfirm());
+   const prompt=!targetReady()?(selectedCard===null?'选择研发板块和弃牌。':'选择要研发的板块。'):
+    choicePrompt(next.size?'再选一块研发板块':'','确认研发');
+   $('#flow-finish').textContent='确认研发';bar(prompt,[],canConfirm());
   }
   if(sale){
    const available=new Set(sale.available),selected=new Set(sale.industries);
@@ -240,11 +246,16 @@ export function createDirectFlow(api){
    const label=names.length>0&&names.length<=2?`（${names.join('、')}）`:'';
    const summary=`已选 ${selected.size} 个产业${label} · 啤酒已选 ${sale.picked} / 所需 ${sale.required} 桶`;
    let prompt=selected.size?'调整酒源。':'选择待售产业。';
-   if(sale.action)prompt=selectedCard===null?'选择一张弃牌。':'点击确认出售。';
-   else if(selected.size&&sale.picked<sale.required)prompt=`还需选择 ${sale.required-sale.picked} 桶啤酒。`;
+   if(sale.action)prompt=choicePrompt(available.size?'继续选择待售产业':'','确认出售');
+   else if(selected.size&&sale.picked<sale.required)prompt=`还需选择 ${sale.required-sale.picked} 桶啤酒。${available.size?'也可继续选择待售产业。':''}`;
    else if(selected.size&&sale.picked===sale.required)prompt='调整不匹配的酒源。';
+   else if(selected.size)prompt=`多选了 ${sale.picked-sale.required} 桶啤酒。${available.size?'可减少啤酒或继续选择待售产业。':'请减少啤酒。'}`;
    bar(`${summary} · ${prompt}`,[],canConfirm());
   }
+ }
+ function choicePrompt(option,confirm){
+  if(selectedCard===null)return `选择一张弃牌。${option?`也可${option}。`:''}`;
+  return option?`可${option}，也可直接${confirm}。`:`点击${confirm}。`;
  }
  return {begin,paint,reset,requestChoice,dismissIndustry,failed:()=>{stage='target';resource=null;paint();}};
 }

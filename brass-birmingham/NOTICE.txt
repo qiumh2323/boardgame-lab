@@ -18,6 +18,12 @@ source code is included in this implementation.
 PeerJS v1.5.5: MIT license, see vendor/PeerJS-LICENSE.txt.
 https://github.com/peers/peerjs
 
+Background music: “Evening Fall (Piano)” by Kevin MacLeod (incompetech.com).
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100235
+License: Creative Commons Attribution 4.0 International (CC BY 4.0).
+https://creativecommons.org/licenses/by/4.0/
+The recording is unchanged and played on a loop.
+
 This build uses the public PeerServer signaling service for room discovery
 and encrypted WebRTC data channels for game state. The host arbitrates all
 actions. Guests receive their own hand only; the host necessarily sees all

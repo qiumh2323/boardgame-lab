@@ -1,4 +1,4 @@
-import {createDeck} from './engine.js?v=0.49';
+import {createDeck} from './engine.js?v=0.50';
 import {sortedHand} from './interaction-help.js?v=0.42';
 
 export const cardKey = card => card.kind==='location' ? `location:${card.loc}`
