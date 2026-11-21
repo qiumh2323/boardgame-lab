@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {configure,createGame,publicView,applyAction} from '../brass-birmingham/engine.js?v=0.46';
+import {configure,createGame,publicView,applyAction} from '../brass-birmingham/engine.js?v=0.49';
 import {createSalePlan} from '../brass-birmingham/sale-plan.js';
 configure(JSON.parse(fs.readFileSync(new URL('../brass-birmingham/facts.json',import.meta.url))));
 function fresh(){

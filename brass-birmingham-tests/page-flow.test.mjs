@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {parseHTML} from 'linkedom';
-import {configure,createGame} from '../brass-birmingham/engine.js?v=0.46';
+import {configure,createGame} from '../brass-birmingham/engine.js?v=0.49';
 test('full page restores a game, develops from mat before discarding, and updates the stack',async()=>{
  const root=new URL('../brass-birmingham/',import.meta.url),{window,document}=parseHTML(fs.readFileSync(new URL('index.html',root),'utf8'));
  globalThis.document=document;globalThis.window=window;globalThis.location={search:'',origin:'http://test',pathname:'/'};
@@ -50,7 +50,7 @@ test('full page restores a game, develops from mat before discarding, and update
  assert.equal($('#player-reserve').parentElement.className,'mat-workspace');assert.ok($('link[href^="refinement.css"]'));assert.ok($('link[href^="tabletop.css"]'));assert.equal($('#hand-toggle'),null);assert.ok(document.querySelectorAll('img[src*="piece-coin"]').length>0);assert.ok($('link[href^="legibility.css"]'));assert.ok(document.querySelectorAll('img[src*="beer-white.svg"]').length>0);
  $('[data-pile="draw"]').onmouseenter();assert.equal($('#card-catalogue').hidden,false);assert.match($('#catalogue-heading').textContent,/普通牌 40张/);assert.equal(document.querySelectorAll('.catalogue-card').length,40);assert.equal($('#catalogue-opening-discards'),null);
  assert.ok(document.querySelectorAll('.catalogue-card .in-hand').length>0);assert.equal($('#catalogue-close').hidden,true);$('[data-pile="draw"]').onmouseleave();$('#card-catalogue').onmouseenter();await new Promise(r=>setTimeout(r,140));assert.equal($('#card-catalogue').hidden,false);$('#card-catalogue').onmouseleave();await new Promise(r=>setTimeout(r,140));assert.equal($('#card-catalogue').hidden,true);
- $('#menu-btn').onclick();assert.ok($('#pass-menu-btn'));$('#pass-menu-btn').onclick();assert.ok(!$('#modal').open);assert.match($('#flow-text').textContent,/跳过/);$('#flow-cancel').onclick();
+ $('#menu-btn').onclick();assert.ok($('#pass-menu-btn'));$('#pass-menu-btn').onclick();assert.ok(!$('#modal').open);assert.equal($('#flow-text').textContent,'选择一张弃牌。');$('#flow-cancel').onclick();
  $('[data-mat-player="1"]').onclick();assert.equal(document.querySelectorAll('#hand [data-card]').length,0);$('#action-buttons [data-type="develop"]').onclick();assert.equal(document.querySelectorAll('#hand [data-card]').length,8);assert.ok($('[data-mat-type="coalMine"][data-level="1"]').classList.contains('flow-target'));
  let before=$('[data-mat-type="coalMine"][data-level="1"]').dataset.count;$('[data-mat-type="coalMine"][data-level="1"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);
  assert.ok($('[data-card="0"]').classList.contains('discard-allowed'));$('[data-card="0"]').onclick();assert.equal($('[data-mat-type="coalMine"][data-level="1"]').dataset.count,before);$('#flow-finish').onclick();
@@ -116,6 +116,21 @@ test('full page restores a game, develops from mat before discarding, and update
  assert.equal(picker.querySelectorAll('img').length,2);assert.equal($('#flow-options').children.length,0);
  $('[data-industry-option="manufacturer"]').onclick();assert.equal(picker.hidden,true);assert.equal($('[data-card="0"]').getAttribute('aria-pressed'),'true');
  $('#flow-finish').onclick();assert.equal(JSON.parse(store.get('brass-night-save-v1')).board['birmingham:0'].type,'manufacturer');
+ $('#menu-btn').onclick();$('#back-btn').onclick();
+
+ const review=createGame(['You','AI'],[false,true],44);review.gameId='turn-review';review.round=2;review.order=[1,0];review.turn=1;
+ review.players[0].income=14;review.players[1].spent=5;review.players[0].spent=2;
+ restore(review);
+ const saved=()=>JSON.parse(store.get('brass-night-save-v1'));
+ const pass=()=>{$('#menu-btn').onclick();$('#pass-menu-btn').onclick();$('[data-card="0"]').onclick();$('#flow-finish').onclick();};
+ pass();assert.equal(saved().used,1);assert.equal($('#end-turn').hidden,true);
+ pass();assert.equal(saved().turnPending,true);assert.equal(saved().players[0].hand.length,6);assert.equal(saved().deck.length,review.deck.length);assert.match($('#undo-action').textContent,/2/);
+ $('#menu-btn').onclick();$('#back-btn').onclick();$('#resume-btn').onclick();
+ $('#undo-action').onclick();assert.equal(saved().used,1);assert.equal(saved().rev,3);assert.equal(saved().players[0].hand.length,7);
+ $('#undo-action').onclick();assert.equal(saved().used,0);assert.equal(saved().rev,4);assert.deepEqual(saved().players[0].hand,review.players[0].hand);assert.deepEqual(saved().actionHistory,review.actionHistory);assert.equal($('#undo-action').hidden,true);
+ pass();pass();$('#end-turn').onclick();const settled=saved();
+ assert.equal(settled.round,3);assert.deepEqual(settled.order,[0,1]);assert.equal(settled.players[0].money,review.players[0].money+2);assert.equal(settled.players[0].hand.length,8);assert.equal($('#undo-action').hidden,true);
+ assert.match($('#turn-transition').textContent,/第 2 轮结算/);assert.match($('#turn-transition').textContent,/第 3 轮开始/);assert.equal($('#turn-transition li').textContent,'1You原第 2');
  $('#menu-btn').onclick();$('#back-btn').onclick();
 
 });

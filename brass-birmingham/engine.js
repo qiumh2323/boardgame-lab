@@ -155,21 +155,31 @@ function settleDebts(s){
  }
  s.phase='play';afterUpkeep(s);
 }
-function advance(s){
+function advance(s,deferTurnEnd){
  let p=s.players[current(s)];s.used++;let limit=s.era==='canal'&&s.round===1?1:2;
  if(s.used<limit&&p.hand.length)return;
+ if(deferTurnEnd){s.turnPending=true;return;}
+ closeTurn(s);
+}
+function closeTurn(s){
+ const p=s.players[current(s)];
  fill(s,p);s.used=0;s.turn++;
  if(s.turn>=s.order.length){endRound(s);return;}
  while(!s.players[s.order[s.turn]].hand.length){s.turn++;if(s.turn>=s.order.length){endRound(s);return;}}
 }
-export function applyAction(state,id,action,{auto=false,recordActivity=false}={}){
+export function endTurn(state,id){
+ if(state.gameOver||state.phase!=='play'||!state.turnPending||id!==current(state))return {ok:false,error:'当前不能结束回合。'};
+ const s=clone(state);delete s.turnPending;closeTurn(s);s.rev++;
+ return {ok:true,state:s};
+}
+export function applyAction(state,id,action,{auto=false,recordActivity=false,deferTurnEnd=false}={}){
  let s=clone(state),a=clone(action),ctx={choices:a.choices,index:0,auto,activity:recordActivity?{spent:0,developed:[]}:null};
  try{
   insist(!s.gameOver,'对局已结束');insist(Number.isInteger(id)&&id===current(s),'尚未轮到该玩家');let p=s.players[id],message;
   if(s.phase==='liquidation'){
    insist(a.type==='liquidate'&&s.board[a.key]?.owner===id,'请选择自己的产业支付欠款');let t=s.board[a.key];p.money+=Math.floor(tileData(t).cost/2);delete s.board[a.key];message='出售产业支付收入欠款';settleDebts(s);
   }else{
-   insist(s.phase==='play','当前不能行动');insist(Number.isInteger(a.card)&&p.hand[a.card],'请先选择一张手牌');
+   insist(s.phase==='play'&&!s.turnPending,'当前不能行动');insist(Number.isInteger(a.card)&&p.hand[a.card],'请先选择一张手牌');
    if(a.type==='build')message=build(s,p,a,ctx);
    else if(a.type==='network'){
     insist(Array.isArray(a.edges)&&a.edges.length>=1&&a.edges.length<=(s.era==='canal'?1:2),'请选择1条运河，或1至2条铁路');
@@ -182,13 +192,13 @@ export function applyAction(state,id,action,{auto=false,recordActivity=false}={}
     insist(!p.hand.some(c=>c.kind.startsWith('wild')),'持有万能牌时不能侦察');insist(s.wild.location&&s.wild.industry,'万能牌供应不足');insist(Array.isArray(a.extra)&&a.extra.length===2,'侦察需要额外弃2张牌');discard(s,p,[a.card,...a.extra]);p.hand.push({kind:'wildLocation'},{kind:'wildIndustry'});s.wild.location--;s.wild.industry--;message='侦察，获得两张万能牌';
    }else if(a.type==='pass')message='跳过行动';else throw Error('未知行动');
    if(a.type!=='scout')discard(s,p,[a.card]);
-   const entry=p.name+'：'+message;note(s,entry);if(ctx.activity)ctx.activity.logEntry=entry;advance(s);
+   const entry=p.name+'：'+message;note(s,entry);if(ctx.activity)ctx.activity.logEntry=entry;advance(s,deferTurnEnd);
   }
   if(a.type==='liquidate'){const entry=p.name+'：'+message;note(s,entry);if(ctx.activity)ctx.activity.logEntry=entry;}s.rev++;return {ok:true,state:s,...(ctx.activity?{activity:ctx.activity}:{})};
  }catch(e){return {ok:false,error:e.message,choice:e.choice};}
 }
 export function legalActions(s,id=current(s),{allCards=false,doubleRails=true}={}){
- if(s.gameOver||id!==current(s))return [];
+ if(s.gameOver||s.turnPending||id!==current(s))return [];
  if(s.phase==='liquidation')return Object.entries(s.board).filter(([,t])=>t.owner===id).map(([key])=>({type:'liquidate',key}));
  let p=s.players[id],result=[],test=a=>{if(applyAction(s,id,a,{auto:true}).ok)result.push(a);};
  let cards=allCards?p.hand.map((_,i)=>i):[0];
