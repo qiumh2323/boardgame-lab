@@ -26,7 +26,7 @@ test('placing a link reduces reserve, renders matching owner and era artwork and
  assert.equal((html.match(/route-placed/g)||[]).length,1);assert.equal((reserve.match(/alt="备用连接板块"/g)||[]).length,13);assert.equal(s.players[id].spent,3);assert.ok(boardPieces(s,layout).includes('£3'));assert.ok(boardPieces(s,layout).includes('piece-coin-1.webp'));checkArt(html+reserve);
 });
 test('tokens follow loans, income spaces, score laps, and round expenditure resets',()=>{
- let s=createGame(['A','B'],[false,false],43),id=current(s),r=applyAction(s,id,{type:'loan',card:0});assert.ok(r.ok);s=r.state;let html=boardPieces(s,layout);assert.ok(html.includes(`class="track-token income" data-track-space="7" data-player="${id}"`));s.players[id].vp=137;html=boardPieces(s,layout);assert.ok(html.includes('data-track-space="37"'));assert.ok(html.includes('+100'));
+ let s=createGame(['A','B'],[false,false],43),id=current(s),r=applyAction(s,id,{type:'loan',card:0});assert.ok(r.ok);s=r.state;let html=boardPieces(s,layout);assert.ok(html.includes(`<button type="button" class="track-token income" data-track-kind="income" data-track-space="7" data-player="${id}"`));s.players[id].vp=137;html=boardPieces(s,layout);assert.ok(html.includes('data-track-space="37"'));assert.ok(html.includes('+100'));
  s.players.forEach(p=>p.spent=7);r=applyAction(s,current(s),{type:'pass',card:0});assert.ok(r.ok);assert.ok(r.state.players.every(p=>p.spent===0));
 });
 test('rail reserve and placed railway use the reverse artwork',()=>{

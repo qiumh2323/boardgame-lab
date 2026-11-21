@@ -18,8 +18,8 @@ source code is included in this implementation.
 PeerJS v1.5.5: MIT license, see vendor/PeerJS-LICENSE.txt.
 https://github.com/peers/peerjs
 
-Background music: “Evening Fall (Piano)” by Kevin MacLeod (incompetech.com).
-Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100235
+Background music: “Industrial Revolution” by Kevin MacLeod (incompetech.com).
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100811
 License: Creative Commons Attribution 4.0 International (CC BY 4.0).
 https://creativecommons.org/licenses/by/4.0/
 The recording is unchanged and played on a loop.

@@ -9,7 +9,7 @@ import {configure,F,TYPES,ZH,cityName,cardName,createDeck,createGame,current,leg
 import {selectAI} from './ai.js?v=0.50';
 import {Room} from './room.js?v=0.40';
 import {createDirectFlow} from './direct-flow.js?v=0.50';
-import {boardPieces,routePieces,playerReserve,merchantTileStem,tablePieceAssets} from './table-pieces.js?v=0.40';
+import {boardPieces,routePieces,playerReserve,merchantTileStem,tablePieceAssets} from './table-pieces.js?v=0.51';
 
 const $=s=>document.querySelector(s),esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const playerTint = player => PLAYER_COLORS[playerColor(player)].tint;
@@ -29,6 +29,49 @@ function positionHint(anchor,text){
  tip.style.top=Math.max(8,Math.min((window.innerHeight||768)-120,(box.top??box.bottom)-tip.offsetHeight-12))+'px';
  clearTimeout(positionHint.timer);positionHint.timer=setTimeout(()=>tip.hidden=true,4500);positionHint.timer.unref?.();
 }
+let pinnedTrack=null,shownTrack=null;
+function closeTrackDetail(){
+ shownTrack?.setAttribute('aria-expanded','false');
+ shownTrack=null;pinnedTrack=null;$('#track-detail').hidden=true;
+}
+function showTrackDetail(token){
+ const detail=$('#track-detail'),space=token.dataset.trackSpace,scores=estimateEraScore(view);
+ shownTrack?.setAttribute('aria-expanded','false');
+ shownTrack=token;token.setAttribute('aria-expanded','true');
+ const markers=[...$('#board-tokens').querySelectorAll(`[data-track-space="${space}"]`)];
+ const rows=[token,...markers.filter(marker=>marker!==token)].map(marker=>{
+  const p=view.players[Number(marker.dataset.player)],score=scores[p.id],rate=income(p.income);
+  const cash=`${rate<0?'−':''}£${Math.abs(rate)}`;
+  const title=marker.dataset.trackKind==='income'?'收入':'当前 VP';
+  const amount=marker.dataset.trackKind==='income'?`${cash} / 轮`:`${p.vp} 分`;
+  const context=marker.dataset.trackKind==='income'?`收入轨第 ${p.income} 格`:
+   view.gameOver?'最终得分':`预计 ${p.vp+score.industry+score.links} 分（产业 +${score.industry}，连接 +${score.links}）`;
+  return `<div class="track-detail-row" style="--owner:${playerTint(p)}"><strong>${esc(p.name)} · ${title} ${amount}</strong><span>${context}</span></div>`;
+ });
+ detail.innerHTML=rows.join('');detail.hidden=false;
+ const box=token.getBoundingClientRect(),width=detail.offsetWidth,height=detail.offsetHeight;
+ const viewportWidth=window.innerWidth||1024,viewportHeight=window.innerHeight||768;
+ detail.style.left=`${Math.max(8,Math.min(box.left+(box.width-width)/2,viewportWidth-width-8))}px`;
+ const top=box.top>=height+14?box.top-height-8:box.bottom+8;
+ detail.style.top=`${Math.max(8,Math.min(top,viewportHeight-height-8))}px`;
+}
+function bindTrackDetails(){
+ for(const token of $('#board-tokens').querySelectorAll('.track-token')){
+  const preview=()=>{if(!pinnedTrack)showTrackDetail(token);};
+  const dismiss=()=>{if(!pinnedTrack&&shownTrack===token)closeTrackDetail();};
+  token.onmouseenter=preview;token.onfocus=preview;
+  token.onmouseleave=()=>{if(document.activeElement!==token)dismiss();};
+  token.onblur=dismiss;
+  token.onclick=()=>{
+   if(pinnedTrack===token){closeTrackDetail();return;}
+   pinnedTrack=token;showTrackDetail(token);
+  };
+ }
+}
+document.addEventListener('pointerdown',e=>{if(shownTrack&&!e.target.closest?.('.track-token'))closeTrackDetail();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&shownTrack)closeTrackDetail();});
+document.addEventListener('scroll',()=>{if(shownTrack)closeTrackDetail();},true);
+window.addEventListener?.('resize',()=>{if(shownTrack)closeTrackDetail();});
 function showDialog(title,content){$('#modal-title').textContent=title;$('#modal-content').innerHTML=content;if(!modal.open)modal.showModal();}
 $('#modal-close').onclick=closeModal;modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
 function tileUrl(type,level,flipped=false,owner=seat){
@@ -181,7 +224,7 @@ function syncMusic(){
  musicButton.textContent=playing?'音乐开':'音乐关';musicButton.setAttribute('aria-pressed',String(playing));
 }
 function startMusic(){
- if(musicEnabled&&typeof music.play==='function'){music.volume=.42;void music.play()?.catch(syncMusic);}
+ if(musicEnabled&&typeof music.play==='function'){music.volume=.24;void music.play()?.catch(syncMusic);}
 }
 music.addEventListener('play',syncMusic);music.addEventListener('pause',syncMusic);
 musicButton.onclick=()=>{
@@ -218,6 +261,7 @@ function renderCatalogue(){
 
 function slots(loc){return layout.slots[loc]||[];}
 function renderBoard(){
+ closeTrackDetail();
  let html='';for(let [loc,city]of Object.entries({...F.cities,...Object.fromEntries(Object.keys(F.farms).map(k=>[k,{slots:[['brewery']]}]))}))slots(loc).forEach(([x,y],i)=>{
   let key=loc+':'+i,t=view.board[key],label=t?`${cityName(loc)} ${view.players[t.owner].name} ${ZH[t.type]}${t.level}级${t.flipped?'（已翻面）':''}`:`${cityName(loc)} ${city.slots[i]?.map(t=>ZH[t]).join('/')} 空位`;
   html+=`<button class="slot" style="left:${x*100}%;top:${y*100}%;${t?'border:2px solid '+playerTint(view.players[t.owner]):''}" data-loc="${loc}" data-slot="${i}" title="${esc(label)}" aria-label="${esc(label)}">${t?`<img style="width:100%;height:100%" src="${tileUrl(t.type,t.level,t.flipped,t.owner)}" alt="">${t.resource?`<span class="resource-count resource-piece" data-resource="${t.type==='brewery'?'beer':t.type==='coalMine'?'coal':'iron'}" title="剩余${t.resource}${t.type==='brewery'?'桶啤酒':t.type==='coalMine'?'块煤':'块铁'}">${t.resource}</span>`:''}`:''}</button>`;
@@ -234,6 +278,7 @@ function renderBoard(){
  for(let resource of ['coal','iron']){let positions=layout.markets[resource],empty=positions.length-view[resource];for(let i=0;i<positions.length;i++){let [x,y]=positions[i];html+=`<span class="market-cube ${resource} ${i>=empty?'filled resource-piece':'empty'}" data-resource="${resource}" style="left:${x*100}%;top:${y*100}%" title="${resource==='coal'?'煤':'铁'}市场 £${Math.floor(i/2)+1} ${i>=empty?'有货':'空位'}"></span>`;}}
  html+=boardPieces(view,layout)+routePieces(view,layout,F.connections);
  $('#board-tokens').innerHTML=html;
+ bindTrackDetails();
  $('#board-labels').innerHTML=Object.entries(layout.cityLabels).map(([loc,p])=>`<span class="city-zh" data-city-label="${loc}" style="left:${p.center[0]*100}%;top:${p.center[1]*100}%;width:${p.width*100}%;height:${p.height*100}%;--label-font:${p.font/14}cqw">${esc(cityName(loc))}</span>`).join('');
  $('#board-tokens').querySelectorAll('[data-loc]').forEach(b=>b.onclick=()=>{let loc=b.dataset.loc,i=Number(b.dataset.slot),t=view.board[loc+':'+i];if(view.phase==='liquidation'){if(myTurn()&&t?.owner===seat)confirmAction({type:'liquidate',key:loc+':'+i});return;}if(myTurn()){selectedLocation=loc;openActions(selectedType==='sell'&&t?.owner===seat?'sell':'build',loc,i);}else if(t)toast(`${view.players[t.owner].name} · ${ZH[t.type]} ${t.level}级 · ${t.flipped?'已翻面':'未翻面'}${t.resource?' · 资源'+t.resource:''}`);});
  $('#board-tokens').querySelectorAll('[data-merchant]').forEach(b=>b.onclick=()=>{let m=view.merchants.find(m=>m.id===Number(b.dataset.merchant));toast(`${cityName(m.loc)}：${m.buys==='blank'?'不收商品':m.buys==='any'?'接收所有商品':'接收'+ZH[m.buys]}，${m.beer?'有商人啤酒':'没有商人啤酒'}`);});
@@ -327,7 +372,7 @@ function scheduleAI(){
  aiTimer=setTimeout(()=>{if(aiBusy)return;aiBusy=true;try{let id=current(state),a=selectAI(state,id);if(a)execute(id,a);else toast('AI没有找到行动，请导出存档反馈。');}catch(e){toast('AI执行失败：'+e.message);}finally{aiBusy=false;scheduleAI();}},!$('#turn-transition').hidden&&$('#turn-transition').classList.contains('round-transition')?2950:2200);
 }
 function showResults(){showDialog('两时代结算',`<p>${view.winners.map(id=>esc(view.players[id].name)).join('、')} 获胜</p><div class="option-list">${[...view.players].sort((a,b)=>b.vp-a.vp).map(p=>`<p>${esc(p.name)}：${p.vp} VP · 收入${income(p.income)} · £${p.money}</p>`).join('')}</div><p class="modal-note">${view.scores.map(s=>(s.era==='canal'?'运河':'铁路')+'：'+s.points.map((p,i)=>view.players[i].name+' 产业'+p.industry+' / 连接'+p.links).join('，')).join('<br>')}</p>`);}
-function help(){showDialog('玩法与测试说明',`<div class="help-content"><p>2–4人、运河与铁路两个时代。得分最高者获胜。</p><h3>操作顺序</h3><p>先选择行动，然后可按任意顺序选择目标和弃牌。确认行动后仍可撤回，点击结束回合才会补牌并交给下一位玩家。研发直接点击玩家面板，连接直接点击线路，销售直接点击产业、商人和啤酒来源。只有建造要求对应地点牌或产业牌；其他行动可弃任意牌。每次行动弃1张，首轮每人1次，其后2次；回合结束补到8张。</p><h3>运输与资源</h3><p>煤必须从相连且最近的煤矿取用，没有相连煤矿时须接通任意商人地点才能从市场购买。铁无需运输，先取棋盘铁厂，再买市场。自己的啤酒无需连接，对手啤酒须连接；商人啤酒只能用于向该商人出售。</p><h3>六种行动</h3><p>建造最低级产业；连接扩展网络；研发移除1–2块并耗铁；出售相连商人收购的商品并耗啤酒；贷款£30、收入下降3级；探索弃3张换2张万能牌。也可弃牌跳过。</p><h3>时代结算</h3><p>产业翻面立即提升收入，时代结束按翻面产业和连接计分。运河后移除所有一级产业及运河；二级以上保留。铁路时代每条铁路耗煤，双铁路另需啤酒。最终轮不领取收入。</p><h3>联机测试</h3><p>房主创建房间，将8位房间码或邀请链接发给朋友。2–4人均可，未入座的位置可由规则AI补齐。房主需要保持页面开启。断线客人用原浏览器标签重连；房主离线后对局不能继续同步。</p><p>使用 WebRTC 与公共 PeerJS 信令服务，部分校园网、公司网或严格 NAT 可能无法直连。测试版由房主裁判；不含账号、排名和反作弊服务。AI是启发式规则AI，可完成两时代对局。</p><p>游戏音乐为 Kevin MacLeod 的 <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100235" target="_blank" rel="noopener">Evening Fall (Piano)</a>，按 <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> 授权使用。</p><p><a href="rules.pdf" target="_blank" rel="noopener">打开官方英文规则</a></p></div>`);}
+function help(){showDialog('玩法与测试说明',`<div class="help-content"><p>2–4人、运河与铁路两个时代。得分最高者获胜。</p><h3>操作顺序</h3><p>先选择行动，然后可按任意顺序选择目标和弃牌。确认行动后仍可撤回，点击结束回合才会补牌并交给下一位玩家。研发直接点击玩家面板，连接直接点击线路，销售直接点击产业、商人和啤酒来源。只有建造要求对应地点牌或产业牌；其他行动可弃任意牌。每次行动弃1张，首轮每人1次，其后2次；回合结束补到8张。</p><h3>运输与资源</h3><p>煤必须从相连且最近的煤矿取用，没有相连煤矿时须接通任意商人地点才能从市场购买。铁无需运输，先取棋盘铁厂，再买市场。自己的啤酒无需连接，对手啤酒须连接；商人啤酒只能用于向该商人出售。</p><h3>六种行动</h3><p>建造最低级产业；连接扩展网络；研发移除1–2块并耗铁；出售相连商人收购的商品并耗啤酒；贷款£30、收入下降3级；探索弃3张换2张万能牌。也可弃牌跳过。</p><h3>时代结算</h3><p>产业翻面立即提升收入，时代结束按翻面产业和连接计分。运河后移除所有一级产业及运河；二级以上保留。铁路时代每条铁路耗煤，双铁路另需啤酒。最终轮不领取收入。</p><h3>联机测试</h3><p>房主创建房间，将8位房间码或邀请链接发给朋友。2–4人均可，未入座的位置可由规则AI补齐。房主需要保持页面开启。断线客人用原浏览器标签重连；房主离线后对局不能继续同步。</p><p>使用 WebRTC 与公共 PeerJS 信令服务，部分校园网、公司网或严格 NAT 可能无法直连。测试版由房主裁判；不含账号、排名和反作弊服务。AI是启发式规则AI，可完成两时代对局。</p><p>游戏音乐为 Kevin MacLeod 的 <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100811" target="_blank" rel="noopener">Industrial Revolution</a>，按 <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> 授权使用。</p><p><a href="rules.pdf" target="_blank" rel="noopener">打开官方英文规则</a></p></div>`);}
 async function host(){
  try{room?.destroy();room=new Room(roomEvent);mode='host';state=null;view=null;seat=0;showDialog('正在创建房间','<p class="modal-note">正在连接房间服务…</p>');await room.create(name(),count(),$('#player-color').value);}catch(e){toast(e.message);showDialog('房间连接失败',`<p class="error">${esc(e.message)}</p><p class="modal-note">可以关闭后使用本地规则 AI 对战。</p>`);}
 }
@@ -357,7 +402,7 @@ function renderLobby(){
  $('#copy-invite').onclick=()=>navigator.clipboard.writeText(invite).then(()=>toast('邀请链接已复制'),()=>toast(invite));
  if($('#room-start'))$('#room-start').onclick=()=>{if(lobby.seats.some(s=>!s.online)){toast('请等待离线玩家重连后开始');return;}let names=[],ai=[];for(let i=0;i<lobby.count;i++){let s=lobby.seats.find(s=>s.seat===i);names.push(s?s.name:'规则 AI '+(i+1));ai.push(!s);}const preferences=Array.from({length:lobby.count},(_,i)=>lobby.seats.find(s=>s.seat===i)?.color);turnUndo=[];state=createGame(names,ai,undefined,preferences);seat=0;mode='host';room.started=true;room.broadcastLobby();modal.close();update();};
 }
-function menu(){showDialog('对局菜单',`<div class="option-list">${view?'<button id="export-btn">导出对局存档</button>':''}${myTurn()&&view.phase==='play'&&!view.turnPending?'<button id="pass-menu-btn">弃1张牌跳过行动</button>':''}${mode==='guest'?'<button id="reconnect-btn">重新连接房主</button>':''}${view?.gameOver?'<button id="results-btn">查看最终结算</button>':''}<button id="back-btn">返回开局界面</button></div><p class="modal-note">本地及房主对局自动存档。联机客人不保存其他玩家的手牌。</p>`);if($('#pass-menu-btn'))$('#pass-menu-btn').onclick=()=>{modal.close();directFlow.begin('pass');};if($('#export-btn'))$('#export-btn').onclick=()=>{let data=mode==='guest'?view:state,blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brass-night-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('存档已导出');};if($('#reconnect-btn'))$('#reconnect-btn').onclick=()=>{room.connect();modal.close();};if($('#results-btn'))$('#results-btn').onclick=showResults;$('#back-btn').onclick=()=>{setTableZoom(null);closeCatalogue();clearActionMotion();clearTimeout(announcementTimer);$('#action-announcement').hidden=true;$('#placement-hint').hidden=true;feedbackGame=null;previousView=null;clearTimeout(transitionTimer);$('#turn-transition').hidden=true;music.pause?.();musicButton.hidden=true;clearTimeout(aiTimer);room?.destroy();room=null;state=null;view=null;turnUndo=[];remoteUndoCount=0;directFlow.reset();mode='local';$('main').hidden=true;$('.lobby').hidden=false;$('#connection-status').textContent='本地对局';$('#resume-btn').hidden=!saveAvailable;modal.close();};}
+function menu(){showDialog('对局菜单',`<div class="option-list">${view?'<button id="export-btn">导出对局存档</button>':''}${myTurn()&&view.phase==='play'&&!view.turnPending?'<button id="pass-menu-btn">弃1张牌跳过行动</button>':''}${mode==='guest'?'<button id="reconnect-btn">重新连接房主</button>':''}${view?.gameOver?'<button id="results-btn">查看最终结算</button>':''}<button id="back-btn">返回开局界面</button></div><p class="modal-note">本地及房主对局自动存档。联机客人不保存其他玩家的手牌。</p>`);if($('#pass-menu-btn'))$('#pass-menu-btn').onclick=()=>{modal.close();directFlow.begin('pass');};if($('#export-btn'))$('#export-btn').onclick=()=>{let data=mode==='guest'?view:state,blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brass-night-'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('存档已导出');};if($('#reconnect-btn'))$('#reconnect-btn').onclick=()=>{room.connect();modal.close();};if($('#results-btn'))$('#results-btn').onclick=showResults;$('#back-btn').onclick=()=>{setTableZoom(null);closeCatalogue();closeTrackDetail();clearActionMotion();clearTimeout(announcementTimer);$('#action-announcement').hidden=true;$('#placement-hint').hidden=true;feedbackGame=null;previousView=null;clearTimeout(transitionTimer);$('#turn-transition').hidden=true;music.pause?.();musicButton.hidden=true;clearTimeout(aiTimer);room?.destroy();room=null;state=null;view=null;turnUndo=[];remoteUndoCount=0;directFlow.reset();mode='local';$('main').hidden=true;$('.lobby').hidden=false;$('#connection-status').textContent='本地对局';$('#resume-btn').hidden=!saveAvailable;modal.close();};}
 $('#ai-start').onclick=()=>startLocal(count());$('#host-btn').onclick=host;$('#join-btn').onclick=()=>joinDialog();$('#help-btn').onclick=help;$('#menu-btn').onclick=menu;
 function setTableZoom(kind){
  document.body.classList.toggle('board-focus',kind==='board');document.body.classList.toggle('mat-focus',kind==='mat');

@@ -37,7 +37,7 @@ export function boardPieces(view,layout){
   let key=String(space),index=groups.get(key)||0;groups.set(key,index+1);
   let x=pos[0]+((index%2)-.5)*.008,y=pos[1]+Math.floor(index/2)*.008;
   let label=`${p.name} ${kind==='vp'?'胜利点':'收入轨'}：${value}`;
-  html+=`<div class="track-token ${kind}" data-track-space="${space}" data-player="${p.id}" style="${at([x,y])}" title="${safe(label)}" aria-label="${safe(label)}"><img src="assets/pieces/piece-${kind}-${playerColor(p)}.webp" alt="${safe(label)}">${kind==='vp'&&value>=100?`<span>+${Math.floor(value/100)*100}</span>`:''}</div>`;
+  html+=`<button type="button" class="track-token ${kind}" data-track-kind="${kind}" data-track-space="${space}" data-player="${p.id}" style="${at([x,y])}" aria-label="${safe(label)}" aria-controls="track-detail" aria-expanded="false"><img src="assets/pieces/piece-${kind}-${playerColor(p)}.webp" alt="">${kind==='vp'&&value>=100?`<span aria-hidden="true">+${Math.floor(value/100)*100}</span>`:''}</button>`;
  }
  return html;
 }
