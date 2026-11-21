@@ -35,16 +35,17 @@ function closeTrackDetail(){
  shownTrack=null;pinnedTrack=null;$('#track-detail').hidden=true;
 }
 function showTrackDetail(token){
- const detail=$('#track-detail'),space=token.dataset.trackSpace,scores=estimateEraScore(view);
+ const detail=$('#track-detail'),{trackSpace,trackKind}=token.dataset;
+ const isIncome=trackKind==='income',scores=isIncome?null:estimateEraScore(view);
  shownTrack?.setAttribute('aria-expanded','false');
  shownTrack=token;token.setAttribute('aria-expanded','true');
- const markers=[...$('#board-tokens').querySelectorAll(`[data-track-space="${space}"]`)];
+ const markers=[...$('#board-tokens').querySelectorAll(`[data-track-space="${trackSpace}"][data-track-kind="${trackKind}"]`)];
  const rows=[token,...markers.filter(marker=>marker!==token)].map(marker=>{
-  const p=view.players[Number(marker.dataset.player)],score=scores[p.id],rate=income(p.income);
+  const p=view.players[Number(marker.dataset.player)],score=scores?.[p.id],rate=income(p.income);
   const cash=`${rate<0?'−':''}£${Math.abs(rate)}`;
-  const title=marker.dataset.trackKind==='income'?'收入':'当前 VP';
-  const amount=marker.dataset.trackKind==='income'?`${cash} / 轮`:`${p.vp} 分`;
-  const context=marker.dataset.trackKind==='income'?`收入轨第 ${p.income} 格`:
+  const title=isIncome?'收入':'当前 VP';
+  const amount=isIncome?`${cash} / 轮`:`${p.vp} 分`;
+  const context=isIncome?`收入轨第 ${p.income} 格`:
    view.gameOver?'最终得分':`预计 ${p.vp+score.industry+score.links} 分（产业 +${score.industry}，连接 +${score.links}）`;
   return `<div class="track-detail-row" style="--owner:${playerTint(p)}"><strong>${esc(p.name)} · ${title} ${amount}</strong><span>${context}</span></div>`;
  });
@@ -57,7 +58,7 @@ function showTrackDetail(token){
 }
 function bindTrackDetails(){
  for(const token of $('#board-tokens').querySelectorAll('.track-token')){
-  const preview=()=>{if(!pinnedTrack)showTrackDetail(token);};
+  const preview=()=>{if(pinnedTrack!==token)pinnedTrack=null;showTrackDetail(token);};
   const dismiss=()=>{if(!pinnedTrack&&shownTrack===token)closeTrackDetail();};
   token.onmouseenter=preview;token.onfocus=preview;
   token.onmouseleave=()=>{if(document.activeElement!==token)dismiss();};

@@ -123,7 +123,13 @@ test('full page restores a game, develops from mat before discarding, and update
 
  const review=createGame(['You','AI'],[false,true],44);review.gameId='turn-review';review.round=2;review.order=[1,0];review.turn=1;
  review.players[0].income=14;review.players[1].spent=5;review.players[0].spent=2;
+ review.players[0].vp=review.players[1].income;
  restore(review);
+ const overlappingVP=$('.track-token.vp[data-player="0"]'),overlappingIncome=$('.track-token.income[data-player="1"]');
+ assert.equal(overlappingVP.dataset.trackSpace,overlappingIncome.dataset.trackSpace);
+ overlappingIncome.onclick();assert.match(trackDetail.textContent,/收入轨/);assert.doesNotMatch(trackDetail.textContent,/VP/);
+ overlappingVP.onmouseenter();assert.match(trackDetail.textContent,/当前 VP 10 分/);assert.doesNotMatch(trackDetail.textContent,/收入/);assert.equal(trackDetail.children.length,1);
+ overlappingVP.onmouseleave();assert.equal(trackDetail.hidden,true);
  const saved=()=>JSON.parse(store.get('brass-night-save-v1'));
  const pass=()=>{$('#menu-btn').onclick();$('#pass-menu-btn').onclick();$('[data-card="0"]').onclick();$('#flow-finish').onclick();};
  pass();assert.equal(saved().used,1);assert.equal($('#end-turn').hidden,true);assert.equal($('#latest-action').hidden,true);
